@@ -1,0 +1,48 @@
+/**
+ * File: 	CirculinearContinuousCurve2D.java
+ * Project: javaGeom
+ * 
+ * Distributed under the LGPL License.
+ *
+ * Created: 11 mai 09
+ */
+package math.geom2d.circulinear;
+
+import math.geom2d.Box2D;
+import math.geom2d.curve.CurveSet2D;
+import math.geom2d.domain.ContinuousOrientedCurve2D;
+import math.geom2d.transform.CircleInversion2D;
+
+import java.util.Collection;
+
+
+/**
+ * A tagging interface defining a circulinear curve which is continuous.
+ * @author dlegland
+ *
+ */
+public interface CirculinearContinuousCurve2D
+        extends CirculinearCurve2D, ContinuousOrientedCurve2D {
+
+    // ===================================================================
+    // redefines declaration of CirculinearCurve2D interfaces
+
+    CirculinearContinuousCurve2D parallel(double d);
+
+    CirculinearContinuousCurve2D transform(CircleInversion2D inv);
+
+    // ===================================================================
+    // redefines declaration of some parent interfaces
+
+    /**
+     * Returns a set of circulinear elements, which are basis for circulinear
+     * curves.
+     */
+    Collection<? extends CirculinearElement2D> smoothPieces();
+
+    CurveSet2D<? extends CirculinearContinuousCurve2D> clip(Box2D box);
+
+    CirculinearContinuousCurve2D subCurve(double t0, double t1);
+
+    CirculinearContinuousCurve2D reverse();
+}
