@@ -728,7 +728,7 @@ public class OsmandMapTileView implements IMapDownloaderCallback {
 	public int getBaseZoom() {
 		MapRendererView mapRenderer = getMapRenderer();
 		if (mapRenderer != null) {
-			return mapRenderer.getState().getZoomLevel().ordinal() + mapRenderer.getTileZoomOffset();
+			return mapRenderer.getState().getZoomLevel().ordinal(); // FK-FIXME: reactivate: + mapRenderer.getTileZoomOffset();
 		}
 		return currentViewport.getZoom();
 	}

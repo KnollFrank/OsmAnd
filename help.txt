@@ -1,0 +1,2 @@
+frankknoll@frankknoll-XPS-13-9370:~/AndroidStudioProjects/OsmAnd/android/OsmAnd$
+../gradlew assembleNightlyFreeOpenglArm64Debug
