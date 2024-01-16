@@ -1,2 +1,27 @@
 frankknoll@frankknoll-XPS-13-9370:~/AndroidStudioProjects/OsmAnd/android/OsmAnd$
 ../gradlew assembleNightlyFreeOpenglArm64Debug
+
+TransportRoutingHelper
+
+Callbacks mit Location:
+- LocationCallback.onLocationResult()
+- OsmAndLocationListener.updateLocation(net.osmand.Location location)
+- net.osmand.Location OsmAndLocationProvider.getLastKnownLocation()
+
+wichtig:
+- RoutingHelper.setCurrentLocation(), contains: RouteRecalculationHelper, TransportRoutingHelper
+- TargetPointsHelper
+- PointLocationLayer.updateMarker()
+- OsmAndLocationProvider
+- MapRouteInproviderfoMenu.clickRouteGo(), plan_route_info.xml, MapRouteInfoMenuFragment,
+  IRouteInformationListener, RouteCalculationResultListener
+- MapActionsHelper: startNavigation(), onNavigationClick()
+- MapActions.enterRoutePlanningMode()
+- RouteRecalculationTask und RouteProvider.calculateRouteImpl(), RoutePlannerFrontEnd
+- RouteCalculationResult
+- OsmAndLocationSimulation
+
+<string name="shared_string_control_start">Start</string>
+
+TODO:
+- OsmAndLocationProvider.setLocation() selbst aufrufen.

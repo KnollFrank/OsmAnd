@@ -1,7 +1,9 @@
 package org.labyrinth.footpath.core;
 
-import android.app.Activity;
-import android.content.Context;
+import static tec.units.ri.quantity.Quantities.getQuantity;
+import static tec.units.ri.unit.MetricPrefix.MILLI;
+import static tec.units.ri.unit.Units.SECOND;
+
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -11,14 +13,12 @@ import android.util.Log;
 import org.labyrinth.coordinate.Angle;
 import org.labyrinth.coordinate.Unit;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Time;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Consumer;
 
-import static tec.units.ri.quantity.Quantities.getQuantity;
-import static tec.units.ri.unit.MetricPrefix.MILLI;
-import static tec.units.ri.unit.Units.SECOND;
+import javax.measure.Quantity;
+import javax.measure.quantity.Time;
 
 // FK-TODO: refactor
 public class StepDetection {
@@ -26,9 +26,9 @@ public class StepDetection {
     private static final Quantity<Time> INTERVAL = getQuantity(1000L / 30L, MILLI(SECOND));
 
     private final IStepListener stepListener;
-    private final Activity activity;
+    private final Consumer<Runnable> runInUIThread;
 
-    private SensorManager sensorManager;
+    private final SensorManager sensorManager;
 
     private static final int vhSize = 6;
     private final double[] values_history = new double[vhSize];
@@ -71,24 +71,25 @@ public class StepDetection {
         }
     };
 
-    public StepDetection(final Activity activity,
+    public StepDetection(final Consumer<Runnable> runInUIThread,
+                         final SensorManager sensorManager,
                          final IStepListener stepListener,
                          final double a,
                          final double peak,
                          final Quantity<Time> stepTimeout) {
-        this.activity = activity;
+        this.runInUIThread = runInUIThread;
+        this.sensorManager = sensorManager;
         this.stepListener = stepListener;
         this.a = a;
         this.peak = peak;
         this.step_timeout_ms = stepTimeout.to(MILLI(SECOND)).getValue().intValue();
     }
 
-    public StepDetection(final Activity activity, final IStepListener stepListener) {
-        this(activity, stepListener, 0.5f, 0.5f, getQuantity(666, MILLI(SECOND)));
+    public StepDetection(final Consumer<Runnable> runInUIThread, final SensorManager sensorManager, final IStepListener stepListener) {
+        this(runInUIThread, sensorManager, stepListener, 0.5f, 0.5f, getQuantity(666, MILLI(SECOND)));
     }
 
     public void load() {
-        sensorManager = (SensorManager) activity.getSystemService(Context.SENSOR_SERVICE);
         for (final Sensor sensor : sensorManager.getSensorList(Sensor.TYPE_ALL)) {
             if (sensor.getType() == Sensor.TYPE_ACCELEROMETER || sensor.getType() == Sensor.TYPE_ORIENTATION) {
                 sensorManager.registerListener(mySensorEventListener, sensor, SensorManager.SENSOR_DELAY_GAME);
@@ -106,6 +107,10 @@ public class StepDetection {
                 },
                 0,
                 INTERVAL.to(MILLI(SECOND)).getValue().longValue());
+    }
+
+    public boolean isLoaded() {
+        return timer != null;
     }
 
     public void unload() {
@@ -131,7 +136,7 @@ public class StepDetection {
 
         if ((now_ms - last_step_ts) > step_timeout_ms && checkForStep(peak)) {
             last_step_ts = now_ms;
-            activity.runOnUiThread(() -> stepListener.onStepDetected(lCompass));
+            this.runInUIThread.accept(() -> stepListener.onStepDetected(lCompass));
             Log.i("FOOTPATH", "Detected step in direction " + lCompass + " in round = " + round + " @ " + now_ms);
         }
         round++;

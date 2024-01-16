@@ -136,7 +136,6 @@ import net.osmand.plus.views.mapwidgets.WidgetsVisibilityHelper;
 import net.osmand.util.Algorithms;
 
 import org.apache.commons.logging.Log;
-import org.labyrinth.footpath.core.StepDetection;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -174,7 +173,6 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 	private WidgetsVisibilityHelper mapWidgetsVisibilityHelper;
 
 	private ExtendedMapActivity extendedMapActivity;
-	private StepDetection stepDetection;
 
 	// App variables
 	private OsmandApplication app;
@@ -735,8 +733,6 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 		extendedMapActivity.onResume(this);
 
 		getMapView().getAnimatedDraggingThread().allowAnimations();
-		stepDetection = new StepDetection(this, stepDirection -> LOG.info("step detected: " + stepDirection));
-		stepDetection.load();
 	}
 
 	@Override
@@ -997,9 +993,6 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 			onPauseActivity();
 		}
 		extendedMapActivity.onPause(this);
-		if (stepDetection != null) {
-			stepDetection.unload();
-		}
 	}
 
 	private void onPauseActivity() {

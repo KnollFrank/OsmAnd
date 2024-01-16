@@ -65,7 +65,7 @@ public class OsmAndLocationSimulation {
 		listeners.remove(listener);
 	}
 
-	private void notifyListeners(boolean simulating) {
+	protected void notifyListeners(boolean simulating) {
 		for (LocationSimulationListener listener : listeners) {
 			listener.onSimulationStateChanged(simulating);
 		}
