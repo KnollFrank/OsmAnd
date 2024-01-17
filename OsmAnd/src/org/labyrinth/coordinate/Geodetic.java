@@ -61,7 +61,6 @@ public class Geodetic implements Serializable {
 
     public Quantity<Length> getDistanceTo(final Geodetic other) {
         // FK-TODO: oder MapUtils.getDistance() verwenden?
-        // FK-TODO: stimmt die Einheit METRE als Rückgabeeinheit von location.distanceTo()?
         return getQuantity(this.location.distanceTo(other.location), METRE);
     }
 

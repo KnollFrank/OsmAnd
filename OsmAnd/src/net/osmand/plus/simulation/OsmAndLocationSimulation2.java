@@ -14,8 +14,8 @@ import net.osmand.PlatformUtil;
 import net.osmand.plus.OsmandApplication;
 
 import org.apache.commons.logging.Log;
-import org.labyrinth.coordinate.Geodetic;
 import org.labyrinth.coordinate.GeodeticFactory;
+import org.labyrinth.footpath.StepLengthProvider;
 import org.labyrinth.footpath.core.Navigator;
 import org.labyrinth.footpath.core.StepDetection;
 import org.labyrinth.footpath.graph.Node;
@@ -47,9 +47,9 @@ public class OsmAndLocationSimulation2 extends OsmAndLocationSimulation {
                         });
     }
 
-    private static Location asLocation(final PathPosition currentPathPosition) {
-        final Location location = currentPathPosition.getGeodetic().asOsmAndLocation();
-        location.setBearing((float) currentPathPosition.asEdgePosition().edge.getDirection().toDegrees());
+    private static Location asLocation(final PathPosition pathPosition) {
+        final Location location = pathPosition.getGeodetic().asOsmAndLocation();
+        location.setBearing((float) pathPosition.asEdgePosition().edge.getDirection().toDegrees());
         return location;
     }
 
@@ -63,8 +63,7 @@ public class OsmAndLocationSimulation2 extends OsmAndLocationSimulation {
         this.navigator =
                 new Navigator(
                         PathFactory.createPath(asNodes(directions)),
-                        // StepLengthProvider.getStepLength(getQuantity(272.0, CENTI(METRE)))
-                        getQuantity(2.0, METRE));
+                        StepLengthProvider.getStepLength(getQuantity(187.0, CENTI(METRE))));
         notifyListeners(true);
         this.stepDetection.load();
     }
