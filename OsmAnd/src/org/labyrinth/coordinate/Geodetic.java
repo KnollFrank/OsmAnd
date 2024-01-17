@@ -1,24 +1,22 @@
 package org.labyrinth.coordinate;
 
-import org.labyrinth.model.PathSrcDst;
+import static java.lang.Math.abs;
+import static java.lang.Math.acos;
+import static java.lang.Math.asin;
+import static java.lang.Math.cos;
+import static java.lang.Math.signum;
+import static java.lang.Math.sin;
+import static tec.units.ri.quantity.Quantities.getQuantity;
+import static tec.units.ri.unit.Units.METRE;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Length;
+import org.labyrinth.model.PathSrcDst;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.acos;
-import static java.lang.Math.asin;
-import static java.lang.Math.atan2;
-import static java.lang.Math.cos;
-import static java.lang.Math.signum;
-import static java.lang.Math.sin;
-import static java.lang.Math.sqrt;
-import static tec.units.ri.quantity.Quantities.getQuantity;
-import static tec.units.ri.unit.Units.METRE;
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
 
 public class Geodetic implements Serializable {
 
@@ -35,11 +33,11 @@ public class Geodetic implements Serializable {
     }
 
     public Angle getLatitude() {
-        return new Angle(this.location.getLatitude(), Unit.DEGREES);
+        return new Angle(this.location.getLatitude(), Angle.Unit.DEGREES);
     }
 
     public Angle getLongitude() {
-        return new Angle(this.location.getLongitude(), Unit.DEGREES);
+        return new Angle(this.location.getLongitude(), Angle.Unit.DEGREES);
     }
 
     public android.location.Location asAndroidLocation() {
@@ -102,7 +100,7 @@ public class Geodetic implements Serializable {
     public Angle getInitialBearingTo(final Geodetic other) {
         return new Angle(
                 this.location.bearingTo(other.location),
-                Unit.DEGREES);
+                Angle.Unit.DEGREES);
     }
 
     public Geodetic moveIntoDirection(final Geodetic pos, final double factor) {
@@ -113,8 +111,8 @@ public class Geodetic implements Serializable {
         final double posLat = pos.getLatitude().toRadians();
         final double posLon = pos.getLongitude().toRadians();
         return new Geodetic(
-                new Angle(lat + (posLat - lat) * factor, Unit.RADIANS),
-                new Angle(lon + (posLon - lon) * factor, Unit.RADIANS));
+                new Angle(lat + (posLat - lat) * factor, Angle.Unit.RADIANS),
+                new Angle(lon + (posLon - lon) * factor, Angle.Unit.RADIANS));
     }
 
     @Override

@@ -8,7 +8,6 @@ import org.labyrinth.footpath.graph.EdgePosition;
 import org.labyrinth.footpath.graph.Node;
 import org.labyrinth.footpath.graph.NodeBuilder;
 import org.labyrinth.coordinate.Angle;
-import org.labyrinth.coordinate.Unit;
 import org.labyrinth.footpath.graph.Path;
 
 import java.util.LinkedList;
@@ -65,7 +64,7 @@ public class SimplifiedEdgesProvider {
         // to simplify the path, having less but longer edges
 
         // Allow a difference of diff degrees to both sides
-        final Angle diff = new Angle(8.0, Unit.DEGREES);
+        final Angle diff = new Angle(8.0, Angle.Unit.DEGREES);
         final List<Edge> simplifiedEdgesOfShortestPath = new LinkedList<>();
         // This will be the last node of the last edge equaling edge_i
         Node node_x_1 = null;

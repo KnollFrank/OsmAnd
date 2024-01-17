@@ -11,7 +11,6 @@ import android.hardware.SensorManager;
 import android.util.Log;
 
 import org.labyrinth.coordinate.Angle;
-import org.labyrinth.coordinate.Unit;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -58,9 +57,9 @@ public class StepDetection {
                     lastAcc[2] = lowpassFilter(lastAcc[2], event.values[2], a);
                     break;
                 case Sensor.TYPE_ORIENTATION:
-                    lastComp[0] = new Angle(-event.values[0], Unit.DEGREES).wrap0To360Degrees();
-                    lastComp[1] = new Angle(event.values[1], Unit.DEGREES);
-                    lastComp[2] = new Angle(event.values[2], Unit.DEGREES);
+                    lastComp[0] = new Angle(-event.values[0], Angle.Unit.DEGREES).wrap0To360Degrees();
+                    lastComp[1] = new Angle(event.values[1], Angle.Unit.DEGREES);
+                    lastComp[2] = new Angle(event.values[2], Angle.Unit.DEGREES);
                     break;
                 default:
             }

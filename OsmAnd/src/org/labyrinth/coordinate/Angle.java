@@ -1,17 +1,20 @@
 package org.labyrinth.coordinate;
 
+import static math.geom2d.Angle2D.M_2PI;
+
 import java.io.Serializable;
 import java.util.Objects;
 
-import static math.geom2d.Angle2D.M_2PI;
-import static org.labyrinth.coordinate.Unit.DEGREES;
-import static org.labyrinth.coordinate.Unit.RADIANS;
-
 public class Angle implements Serializable {
+
+    public enum Unit {
+
+        DEGREES, RADIANS
+    }
 
     private final double angleInRadians;
 
-    public static final Angle ZERO = new Angle(0, DEGREES);
+    public static final Angle ZERO = new Angle(0, Unit.DEGREES);
 
     public Angle(final double angle, final Unit unit) {
         this.angleInRadians = getAngleInRadians(angle, unit);
@@ -33,7 +36,7 @@ public class Angle implements Serializable {
             return this;
         }
 
-        return new Angle(((angleInRadians % M_2PI) + M_2PI) % M_2PI, RADIANS);
+        return new Angle(((angleInRadians % M_2PI) + M_2PI) % M_2PI, Unit.RADIANS);
     }
 
     public double toDegrees() {
@@ -45,11 +48,11 @@ public class Angle implements Serializable {
     }
 
     public Angle add(final Angle other) {
-        return new Angle(this.angleInRadians + other.angleInRadians, RADIANS);
+        return new Angle(this.angleInRadians + other.angleInRadians, Unit.RADIANS);
     }
 
     public Angle sub(final Angle other) {
-        return new Angle(this.angleInRadians - other.angleInRadians, RADIANS);
+        return new Angle(this.angleInRadians - other.angleInRadians, Unit.RADIANS);
     }
 
     public Angle get0To180DegreesDifferenceTo(final Angle other) {
@@ -62,7 +65,7 @@ public class Angle implements Serializable {
         // leads to build error "com.android.tools.r8.errors.d: Unexpected non-trivial phi in method eligible for class inlining"
         final double angle0To360Degrees = Math.toDegrees(this.sub(other).wrap0To360Degrees().angleInRadians);
         final double angle0To180Degrees = angle0To360Degrees > 180 ? 360 - angle0To360Degrees : angle0To360Degrees;
-        return new Angle(angle0To180Degrees, DEGREES);
+        return new Angle(angle0To180Degrees, Unit.DEGREES);
     }
 
     @Override
