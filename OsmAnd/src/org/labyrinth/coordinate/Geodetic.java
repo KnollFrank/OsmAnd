@@ -6,6 +6,7 @@ import org.labyrinth.model.PathSrcDst;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -25,8 +26,8 @@ public class Geodetic implements Serializable {
 
     public static final Quantity<Length> EARTH_RADIUS = getQuantity(6378137.0, METRE);
 
-    public final Angle latitude;
-    public final Angle longitude;
+    private final Angle latitude;
+    private final Angle longitude;
 
     private Geodetic(final Angle latitude, final Angle longitude) {
         this.latitude = latitude;
@@ -41,6 +42,14 @@ public class Geodetic implements Serializable {
         return fromLatitudeLongitude(
                 new Angle(location.getLatitude(), Unit.DEGREES),
                 new Angle(location.getLongitude(), Unit.DEGREES));
+    }
+
+    public Angle getLatitude() {
+        return latitude;
+    }
+
+    public Angle getLongitude() {
+        return longitude;
     }
 
     public Location asLocation() {

@@ -57,8 +57,8 @@ public class OsmAndLocationSimulation2 extends OsmAndLocationSimulation {
     private static Location asLocation(final Geodetic geodetic) {
         return new Location(
                 "",
-                geodetic.latitude.toRadians(),
-                geodetic.longitude.toRadians());
+                geodetic.getLatitude().toRadians(),
+                geodetic.getLongitude().toRadians());
     }
 
     @Override
@@ -72,7 +72,7 @@ public class OsmAndLocationSimulation2 extends OsmAndLocationSimulation {
                 new Navigator(
                         PathFactory.createPath(asNodes(directions)),
                         // StepLengthProvider.getStepLength(getQuantity(272.0, CENTI(METRE)))
-                        getQuantity(15.0, METRE));
+                        getQuantity(2.0, METRE));
         notifyListeners(true);
         this.stepDetection.load();
     }
