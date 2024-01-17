@@ -14,9 +14,8 @@ import net.osmand.PlatformUtil;
 import net.osmand.plus.OsmandApplication;
 
 import org.apache.commons.logging.Log;
-import org.labyrinth.coordinate.Angle;
 import org.labyrinth.coordinate.Geodetic;
-import org.labyrinth.coordinate.Unit;
+import org.labyrinth.coordinate.GeodeticFactory;
 import org.labyrinth.footpath.core.Navigator;
 import org.labyrinth.footpath.core.StepDetection;
 import org.labyrinth.footpath.graph.Node;
@@ -89,15 +88,9 @@ public class OsmAndLocationSimulation2 extends OsmAndLocationSimulation {
     private static Node asNode(final Location location) {
         return new NodeBuilder()
                 .withId(id++)
-                .withPosition(asGeodetic(location))
+                .withPosition(GeodeticFactory.createGeodetic(location))
                 .withName("")
                 .createNode();
-    }
-
-    private static Geodetic asGeodetic(final Location location) {
-        return new Geodetic(
-                new Angle(location.getLatitude(), Unit.RADIANS),
-                new Angle(location.getLongitude(), Unit.RADIANS));
     }
 
     @Override
