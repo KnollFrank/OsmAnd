@@ -17,7 +17,6 @@ import org.apache.commons.logging.Log;
 import org.labyrinth.coordinate.Angle;
 import org.labyrinth.coordinate.Geodetic;
 import org.labyrinth.coordinate.Unit;
-import org.labyrinth.footpath.StepLengthProvider;
 import org.labyrinth.footpath.core.Navigator;
 import org.labyrinth.footpath.core.StepDetection;
 import org.labyrinth.footpath.graph.Node;
@@ -53,8 +52,8 @@ public class OsmAndLocationSimulation2 extends OsmAndLocationSimulation {
 
     private static Location asLocation(final Geodetic geodetic) {
         return new Location("",
-                geodetic.getLatitude().toRadians(),
-                geodetic.getLongitude().toRadians());
+                geodetic.latitude.toRadians(),
+                geodetic.longitude.toRadians());
     }
 
     @Override
@@ -67,7 +66,8 @@ public class OsmAndLocationSimulation2 extends OsmAndLocationSimulation {
         this.navigator =
                 new Navigator(
                         PathFactory.createPath(asNodes(directions)),
-                        StepLengthProvider.getStepLength(getQuantity(272.0, CENTI(METRE))));
+                        // StepLengthProvider.getStepLength(getQuantity(272.0, CENTI(METRE)))
+                        getQuantity(2.0, METRE));
         notifyListeners(true);
         this.stepDetection.load();
     }

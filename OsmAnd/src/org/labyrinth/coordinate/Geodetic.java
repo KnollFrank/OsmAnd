@@ -25,8 +25,8 @@ public class Geodetic implements Serializable {
 
     public static final Quantity<Length> EARTH_RADIUS = getQuantity(6378137.0, METRE);
 
-    private final Angle latitude;
-    private final Angle longitude;
+    public final Angle latitude;
+    public final Angle longitude;
 
     private Geodetic(final Angle latitude, final Angle longitude) {
         this.latitude = latitude;
@@ -50,17 +50,8 @@ public class Geodetic implements Serializable {
         return location;
     }
 
-    public Angle getLatitude() {
-        return latitude;
-    }
-
-    public Angle getLongitude() {
-        return longitude;
-    }
-
     public boolean equalsDeltaDegrees(final Geodetic other, final double deltaDegrees) {
-        return equalsDeltaDegrees(this.getLatitude(), other.getLatitude(), deltaDegrees) &&
-                equalsDeltaDegrees(this.getLongitude(), other.getLongitude(), deltaDegrees);
+        return equalsDeltaDegrees(latitude, other.latitude, deltaDegrees) && equalsDeltaDegrees(longitude, other.longitude, deltaDegrees);
     }
 
     private boolean equalsDeltaDegrees(final Angle angle1, final Angle angle2, final double deltaDegrees) {
@@ -69,9 +60,9 @@ public class Geodetic implements Serializable {
 
     // adapted from http://www.movable-type.co.uk/scripts/latlong.html
     public Quantity<Length> getDistanceTo(final Geodetic other) {
-        final double lat1 = this.getLatitude().toRadians();
-        final double lat2 = other.getLatitude().toRadians();
-        final double dLon = other.getLongitude().sub(this.getLongitude()).toRadians();
+        final double lat1 = latitude.toRadians();
+        final double lat2 = other.latitude.toRadians();
+        final double dLon = other.longitude.sub(longitude).toRadians();
         final double dLat = lat2 - lat1;
 
         final double a = sin(dLat / 2) * sin(dLat / 2) + cos(lat1) * cos(lat2) * sin(dLon / 2) * sin(dLon / 2);
@@ -112,9 +103,9 @@ public class Geodetic implements Serializable {
 
     // adapted from http://www.movable-type.co.uk/scripts/latlong.html
     public Angle getInitialBearingTo(final Geodetic other) {
-        final double lat1 = this.getLatitude().toRadians();
-        final double lat2 = other.getLatitude().toRadians();
-        final double dLon = other.getLongitude().sub(this.getLongitude()).toRadians();
+        final double lat1 = latitude.toRadians();
+        final double lat2 = other.latitude.toRadians();
+        final double dLon = other.longitude.sub(longitude).toRadians();
         final double x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon);
         final double y = sin(dLon) * cos(lat2);
         final double b = atan2(y, x);
@@ -123,10 +114,10 @@ public class Geodetic implements Serializable {
 
     public Geodetic moveIntoDirection(final Geodetic pos, final double factor) {
         // First step: Do Mercator Projection with latitude.
-        final double lat = this.getLatitude().toRadians();
-        final double lon = this.getLongitude().toRadians();
-        final double posLat = pos.getLatitude().toRadians();
-        final double posLon = pos.getLongitude().toRadians();
+        final double lat = latitude.toRadians();
+        final double lon = longitude.toRadians();
+        final double posLat = pos.latitude.toRadians();
+        final double posLon = pos.longitude.toRadians();
         return Geodetic.fromLatitudeLongitude(
                 new Angle(lat + (posLat - lat) * factor, Unit.RADIANS),
                 new Angle(lon + (posLon - lon) * factor, Unit.RADIANS));

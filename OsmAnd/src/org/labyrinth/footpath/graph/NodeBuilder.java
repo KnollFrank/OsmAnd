@@ -26,7 +26,7 @@ public class NodeBuilder {
     }
 
     public NodeBuilder withPosition(final Geodetic position) {
-        return withLat(position.getLatitude()).withLon(position.getLongitude());
+        return withLat(position.latitude).withLon(position.longitude);
     }
 
     public NodeBuilder withName(final String name) {
