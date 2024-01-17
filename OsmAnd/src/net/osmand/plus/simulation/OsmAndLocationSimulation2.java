@@ -48,16 +48,9 @@ public class OsmAndLocationSimulation2 extends OsmAndLocationSimulation {
     }
 
     private static Location asLocation(final PathPosition currentPathPosition) {
-        final Location location = asLocation(currentPathPosition.getGeodetic());
+        final Location location = currentPathPosition.getGeodetic().asOsmAndLocation();
         location.setBearing((float) currentPathPosition.asEdgePosition().edge.getDirection().toDegrees());
         return location;
-    }
-
-    private static Location asLocation(final Geodetic geodetic) {
-        return new Location(
-                "",
-                geodetic.getLatitude().toRadians(),
-                geodetic.getLongitude().toRadians());
     }
 
     @Override
