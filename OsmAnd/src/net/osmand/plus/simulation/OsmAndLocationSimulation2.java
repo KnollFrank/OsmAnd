@@ -95,7 +95,7 @@ public class OsmAndLocationSimulation2 extends OsmAndLocationSimulation {
     }
 
     private static Geodetic asGeodetic(final Location location) {
-        return Geodetic.fromLatitudeLongitude(
+        return new Geodetic(
                 new Angle(location.getLatitude(), Unit.RADIANS),
                 new Angle(location.getLongitude(), Unit.RADIANS));
     }

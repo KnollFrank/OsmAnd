@@ -35,6 +35,6 @@ public class NodeBuilder {
     }
 
     public Node createNode() {
-        return new Node(id, Geodetic.fromLatitudeLongitude(lat, lon), name);
+        return new Node(id, new Geodetic(lat, lon), name);
     }
 }

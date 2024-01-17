@@ -29,19 +29,9 @@ public class Geodetic implements Serializable {
     private final Angle latitude;
     private final Angle longitude;
 
-    private Geodetic(final Angle latitude, final Angle longitude) {
+    public Geodetic(final Angle latitude, final Angle longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
-    }
-
-    public static Geodetic fromLatitudeLongitude(final Angle latitude, final Angle longitude) {
-        return new Geodetic(latitude, longitude);
-    }
-
-    public static Geodetic fromLocation(final Location location) {
-        return fromLatitudeLongitude(
-                new Angle(location.getLatitude(), Unit.DEGREES),
-                new Angle(location.getLongitude(), Unit.DEGREES));
     }
 
     public Angle getLatitude() {
@@ -127,7 +117,7 @@ public class Geodetic implements Serializable {
         final double lon = longitude.toRadians();
         final double posLat = pos.latitude.toRadians();
         final double posLon = pos.longitude.toRadians();
-        return Geodetic.fromLatitudeLongitude(
+        return new Geodetic(
                 new Angle(lat + (posLat - lat) * factor, Unit.RADIANS),
                 new Angle(lon + (posLon - lon) * factor, Unit.RADIANS));
     }
