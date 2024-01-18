@@ -147,9 +147,10 @@ public class SimplifiedEdgesProvider {
      * @return true if v <= diff away from t
      */
     private static boolean isInRange(final Angle v, final Angle t, final Angle diff) {
-        if (Math.abs(v.toDegrees() - t.toDegrees()) <= diff.toDegrees()) {
+        final Angle.Unit unit = Angle.Unit.DEGREES;
+        if (Math.abs(v.to(unit) - t.to(unit)) <= diff.to(unit)) {
             return true;
         }
-        return Math.abs((v.toDegrees() + diff.toDegrees()) % 360 - (t.toDegrees() + diff.toDegrees()) % 360) <= diff.toDegrees();
+        return Math.abs((v.to(unit) + diff.to(unit)) % 360 - (t.to(unit) + diff.to(unit)) % 360) <= diff.to(unit);
     }
 }

@@ -28,8 +28,8 @@ public class Geodetic implements Serializable {
         this.location =
                 new net.osmand.Location(
                         "",
-                        latitude.toDegrees(),
-                        longitude.toDegrees());
+                        latitude.to(Angle.Unit.DEGREES),
+                        longitude.to(Angle.Unit.DEGREES));
     }
 
     public Angle getLatitude() {
@@ -42,8 +42,8 @@ public class Geodetic implements Serializable {
 
     public android.location.Location asAndroidLocation() {
         final android.location.Location location = new android.location.Location("");
-        location.setLatitude(getLatitude().toDegrees());
-        location.setLongitude(getLongitude().toDegrees());
+        location.setLatitude(getLatitude().to(Angle.Unit.DEGREES));
+        location.setLongitude(getLongitude().to(Angle.Unit.DEGREES));
         return location;
     }
 
@@ -56,7 +56,7 @@ public class Geodetic implements Serializable {
     }
 
     private boolean equalsDeltaDegrees(final Angle angle1, final Angle angle2, final double deltaDegrees) {
-        return abs(angle1.toDegrees() - angle2.toDegrees()) < deltaDegrees;
+        return abs(angle1.to(Angle.Unit.DEGREES) - angle2.to(Angle.Unit.DEGREES)) < deltaDegrees;
     }
 
     public Quantity<Length> getDistanceTo(final Geodetic other) {
@@ -73,8 +73,8 @@ public class Geodetic implements Serializable {
 
         final double R = EARTH_RADIUS.to(lengthUnit).getValue().doubleValue();
         final double dist13 = path.getSrc().getDistanceTo(this).to(lengthUnit).getValue().doubleValue() / R;
-        final double bearing13 = path.getSrc().getInitialBearingTo(this).toRadians();
-        final double bearing12 = path.getSrc().getInitialBearingTo(path.getDst()).toRadians();
+        final double bearing13 = path.getSrc().getInitialBearingTo(this).to(Angle.Unit.RADIANS);
+        final double bearing12 = path.getSrc().getInitialBearingTo(path.getDst()).to(Angle.Unit.RADIANS);
         final double deltaxt = asin(sin(dist13) * sin(bearing13 - bearing12));
         final double deltaat = acos(cos(dist13) / abs(cos(deltaxt)));
         return getQuantity((deltaat * signum(cos(bearing12 - bearing13))) * R, lengthUnit);
@@ -89,8 +89,8 @@ public class Geodetic implements Serializable {
 
         final double R = EARTH_RADIUS.to(lengthUnit).getValue().doubleValue();
         final double dist13 = path.getSrc().getDistanceTo(this).to(lengthUnit).getValue().doubleValue() / R;
-        final double bearing13 = path.getSrc().getInitialBearingTo(this).toRadians();
-        final double bearing12 = path.getSrc().getInitialBearingTo(path.getDst()).toRadians();
+        final double bearing13 = path.getSrc().getInitialBearingTo(this).to(Angle.Unit.RADIANS);
+        final double bearing12 = path.getSrc().getInitialBearingTo(path.getDst()).to(Angle.Unit.RADIANS);
         final double deltaxt = asin(sin(dist13) * sin(bearing13 - bearing12));
         return getQuantity(abs(deltaxt * R), lengthUnit);
     }
@@ -105,13 +105,14 @@ public class Geodetic implements Serializable {
     public Geodetic moveIntoDirection(final Geodetic pos, final double factor) {
         // FK-TODO: verwende LocationSimulationUtils.middleLocation()
         // First step: Do Mercator Projection with latitude.
-        final double lat = getLatitude().toRadians();
-        final double lon = getLongitude().toRadians();
-        final double posLat = pos.getLatitude().toRadians();
-        final double posLon = pos.getLongitude().toRadians();
+        final Angle.Unit unit = Angle.Unit.RADIANS;
+        final double lat = getLatitude().to(unit);
+        final double lon = getLongitude().to(unit);
+        final double posLat = pos.getLatitude().to(unit);
+        final double posLon = pos.getLongitude().to(unit);
         return new Geodetic(
-                new Angle(lat + (posLat - lat) * factor, Angle.Unit.RADIANS),
-                new Angle(lon + (posLon - lon) * factor, Angle.Unit.RADIANS));
+                new Angle(lat + (posLat - lat) * factor, unit),
+                new Angle(lon + (posLon - lon) * factor, unit));
     }
 
     @Override

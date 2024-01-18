@@ -39,12 +39,15 @@ public class Angle implements Serializable {
         return new Angle(((angleInRadians % M_2PI) + M_2PI) % M_2PI, Unit.RADIANS);
     }
 
-    public double toDegrees() {
-        return Math.toDegrees(angleInRadians);
-    }
-
-    public double toRadians() {
-        return angleInRadians;
+    public double to(final Unit unit) {
+        switch (unit) {
+            case DEGREES:
+                return Math.toDegrees(angleInRadians);
+            case RADIANS:
+                return angleInRadians;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     public Angle add(final Angle other) {
@@ -83,6 +86,6 @@ public class Angle implements Serializable {
 
     @Override
     public String toString() {
-        return "Angle{angle = " + toDegrees() + "°}";
+        return "Angle{angle = " + to(Unit.DEGREES) + "°}";
     }
 }
