@@ -22,22 +22,18 @@ public class Geodetic implements Serializable {
 
     public static final Quantity<Length> EARTH_RADIUS = getQuantity(6378137.0, METRE);
 
-    private final net.osmand.Location location;
+    private final LocationWrapper location;
 
     public Geodetic(final Angle latitude, final Angle longitude) {
-        this.location =
-                new net.osmand.Location(
-                        "",
-                        latitude.to(Angle.Unit.DEGREES),
-                        longitude.to(Angle.Unit.DEGREES));
+        this.location = new LocationWrapper("", latitude, longitude);
     }
 
     public Angle getLatitude() {
-        return new Angle(this.location.getLatitude(), Angle.Unit.DEGREES);
+        return this.location._getLatitude();
     }
 
     public Angle getLongitude() {
-        return new Angle(this.location.getLongitude(), Angle.Unit.DEGREES);
+        return this.location._getLongitude();
     }
 
     public android.location.Location asAndroidLocation() {
@@ -47,8 +43,8 @@ public class Geodetic implements Serializable {
         return location;
     }
 
-    public net.osmand.Location asOsmAndLocation() {
-        return new net.osmand.Location(this.location);
+    public LocationWrapper asOsmAndLocation() {
+        return new LocationWrapper(this.location);
     }
 
     public boolean equalsDeltaDegrees(final Geodetic other, final double deltaDegrees) {
@@ -60,8 +56,7 @@ public class Geodetic implements Serializable {
     }
 
     public Quantity<Length> getDistanceTo(final Geodetic other) {
-        // FK-TODO: oder MapUtils.getDistance() verwenden?
-        return getQuantity(this.location.distanceTo(other.location), METRE);
+        return this.location._distanceTo(other.location);
     }
 
     // adapted from http://www.movable-type.co.uk/scripts/latlong.html
@@ -95,11 +90,8 @@ public class Geodetic implements Serializable {
         return getQuantity(abs(deltaxt * R), lengthUnit);
     }
 
-    // adapted from http://www.movable-type.co.uk/scripts/latlong.html
     public Angle getInitialBearingTo(final Geodetic other) {
-        return new Angle(
-                this.location.bearingTo(other.location),
-                Angle.Unit.DEGREES);
+        return this.location._bearingTo(other.location);
     }
 
     public Geodetic moveIntoDirection(final Geodetic pos, final double factor) {

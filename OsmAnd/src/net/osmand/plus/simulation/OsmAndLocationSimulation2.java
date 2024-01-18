@@ -14,8 +14,8 @@ import net.osmand.PlatformUtil;
 import net.osmand.plus.OsmandApplication;
 
 import org.apache.commons.logging.Log;
-import org.labyrinth.coordinate.Angle;
 import org.labyrinth.coordinate.GeodeticFactory;
+import org.labyrinth.coordinate.LocationWrapper;
 import org.labyrinth.footpath.StepLengthProvider;
 import org.labyrinth.footpath.core.Navigator;
 import org.labyrinth.footpath.core.StepDetection;
@@ -49,8 +49,8 @@ public class OsmAndLocationSimulation2 extends OsmAndLocationSimulation {
     }
 
     private static Location asLocation(final PathPosition pathPosition) {
-        final Location location = pathPosition.getGeodetic().asOsmAndLocation();
-        location.setBearing((float) pathPosition.asEdgePosition().edge.getDirection().to(Angle.Unit.DEGREES));
+        final LocationWrapper location = pathPosition.getGeodetic().asOsmAndLocation();
+        location._setBearing(pathPosition.asEdgePosition().edge.getDirection());
         return location;
     }
 
