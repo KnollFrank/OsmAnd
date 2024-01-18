@@ -48,7 +48,7 @@ public class OsmAndLocationSimulation2 extends OsmAndLocationSimulation {
                         });
     }
 
-    private static Location asLocation(final PathPosition pathPosition) {
+    private static LocationWrapper asLocation(final PathPosition pathPosition) {
         final LocationWrapper location = pathPosition.getGeodetic().asOsmAndLocation();
         location._setBearing(pathPosition.asEdgePosition().edge.getDirection());
         return location;
