@@ -48,12 +48,6 @@ public class OsmAndLocationSimulation2 extends OsmAndLocationSimulation {
                         });
     }
 
-    private static LocationWrapper asLocation(final PathPosition pathPosition) {
-        final LocationWrapper location = pathPosition.getGeodetic().asOsmAndLocation();
-        location._setBearing(pathPosition.asEdgePosition().edge.getDirection());
-        return location;
-    }
-
     @Override
     public boolean isRouteAnimating() {
         return this.stepDetection.isLoaded();
@@ -67,6 +61,18 @@ public class OsmAndLocationSimulation2 extends OsmAndLocationSimulation {
                         StepLengthProvider.getStepLength(getQuantity(187.0, CENTI(METRE))));
         notifyListeners(true);
         this.stepDetection.load();
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        this.stepDetection.unload();
+    }
+
+    private static LocationWrapper asLocation(final PathPosition pathPosition) {
+        final LocationWrapper location = pathPosition.getGeodetic().asOsmAndLocation();
+        location._setBearing(pathPosition.asEdgePosition().edge.getDirection());
+        return location;
     }
 
     private static List<Node> asNodes(final List<? extends Location> locations) {
@@ -84,11 +90,5 @@ public class OsmAndLocationSimulation2 extends OsmAndLocationSimulation {
                 .withPosition(GeodeticFactory.createGeodetic(location))
                 .withName("")
                 .createNode();
-    }
-
-    @Override
-    public void stop() {
-        super.stop();
-        this.stepDetection.unload();
     }
 }
