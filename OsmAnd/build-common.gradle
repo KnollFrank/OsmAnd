@@ -406,5 +406,5 @@ dependencies {
 	implementation group: 'tec.units', name: 'unit-ri', version: '1.0.3'
 	// https://mvnrepository.com/artifact/org.jgrapht/jgrapht-core
 	implementation group: 'org.jgrapht', name: 'jgrapht-core', version: '1.5.2'
-	implementation('com.google.guava:guava:30.1.1-jre')
+	implementation 'com.google.guava:guava:30.1.1-jre'
 }
