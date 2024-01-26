@@ -69,13 +69,15 @@ public class OsmAndLocationSimulation2 extends OsmAndLocationSimulation {
         this.stepDetection.unload();
     }
 
-    private static LocationWrapper asLocation(final PathPosition pathPosition) {
+    // FK-TODO: make private again
+    public static LocationWrapper asLocation(final PathPosition pathPosition) {
         final LocationWrapper location = pathPosition.getGeodetic().asOsmAndLocation();
         location._setBearing(pathPosition.asEdgePosition().edge.getDirection());
         return location;
     }
 
-    private static List<Node> asNodes(final List<? extends Location> locations) {
+    // FK-TODO: make private again
+    public static List<Node> asNodes(final List<? extends Location> locations) {
         return locations
                 .stream()
                 .map(OsmAndLocationSimulation2::asNode)

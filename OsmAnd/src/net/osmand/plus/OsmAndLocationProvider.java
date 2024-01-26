@@ -179,7 +179,9 @@ public class OsmAndLocationProvider implements SensorEventListener {
 							location = locations.get(locations.size() - 1);
 							lastTimeGPSLocationFixed = System.currentTimeMillis();
 						}
-						if (!locationSimulation.isRouteAnimating()) {
+						// FK-FIXME: ergänze ... && footPath.isRunning() == false
+						// FK-TODO: wie in OsmAndLocationSimulation2: footPath.isRunning() := this.stepDetection.isLoaded()
+						if (false /*!locationSimulation.isRouteAnimating()*/) {
 							setLocation(location);
 						}
 					}

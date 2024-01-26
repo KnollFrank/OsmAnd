@@ -20,6 +20,13 @@ wichtig:
 - RouteRecalculationTask und RouteProvider.calculateRouteImpl(), RoutePlannerFrontEnd
 - RouteCalculationResult
 - OsmAndLocationSimulation
+- RouteOptionsBottomSheet
+- Listener:
+  + RouteCalculationProgressListener
+  - IRouteInformationListener
+  [+ RouteCalculationParams.RouteCalculationResultListener]
+  - IRoutingDataUpdateListener
+  - TransportRouteCalculationResultListener
 
 <string name="shared_string_control_start">Start</string>
 
