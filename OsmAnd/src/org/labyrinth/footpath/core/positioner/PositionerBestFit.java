@@ -13,6 +13,7 @@ import static com.google.common.primitives.Doubles.min;
 import static tec.units.ri.quantity.Quantities.getQuantity;
 import static tec.units.ri.unit.Units.METRE;
 
+// adapted from the paper "FootPath: Accurate Map-based Indoor Navigation Using Smartphones" https://www.comsys.rwth-aachen.de/fileadmin/papers/2011/2011-IPIN-bitsch-footpath.pdf
 public class PositionerBestFit {
 
     private final Angle[] mapStepDirectionByStepIndex;
