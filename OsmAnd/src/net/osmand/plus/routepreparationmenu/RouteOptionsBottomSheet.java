@@ -28,10 +28,9 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import net.osmand.gpx.GPXFile;
 import net.osmand.PlatformUtil;
 import net.osmand.StateChangedListener;
-import net.osmand.plus.simulation.OsmAndLocationSimulation;
+import net.osmand.gpx.GPXFile;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
@@ -42,20 +41,19 @@ import net.osmand.plus.base.bottomsheetmenu.BottomSheetItemWithDescription;
 import net.osmand.plus.base.bottomsheetmenu.SimpleBottomSheetItem;
 import net.osmand.plus.base.bottomsheetmenu.simpleitems.DividerStartItem;
 import net.osmand.plus.base.bottomsheetmenu.simpleitems.TitleItem;
-import net.osmand.plus.track.helpers.GpxUiHelper;
 import net.osmand.plus.measurementtool.MeasurementToolFragment;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.AvoidPTTypesRoutingParameter;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.AvoidRoadsRoutingParameter;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.CalculateAltitudeItem;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.CustomizeRouteLineRoutingParameter;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.DividerItem;
+import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.FootPathItem;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.GpxLocalRoutingParameter;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.LocalRoutingParameter;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.LocalRoutingParameterGroup;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.MuteSoundRoutingParameter;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.OtherSettingsRoutingParameter;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.RouteSimulationItem;
-import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.FootPathItem;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.ShowAlongTheRouteItem;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.TimeConditionalRoutingItem;
 import net.osmand.plus.routing.GPXRouteParams.GPXRouteParamsBuilder;
@@ -70,8 +68,10 @@ import net.osmand.plus.settings.bottomsheets.ElevationDateBottomSheet;
 import net.osmand.plus.settings.fragments.BaseSettingsFragment;
 import net.osmand.plus.settings.fragments.SettingsScreenType;
 import net.osmand.plus.settings.fragments.voice.VoiceLanguageBottomSheetFragment;
+import net.osmand.plus.simulation.OsmAndLocationSimulation;
 import net.osmand.plus.track.fragments.TrackAltitudeBottomSheet;
 import net.osmand.plus.track.fragments.TrackAltitudeBottomSheet.CalculateAltitudeListener;
+import net.osmand.plus.track.helpers.GpxUiHelper;
 import net.osmand.plus.track.helpers.save.SaveGpxHelper;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.ColorUtilities;
@@ -82,7 +82,6 @@ import net.osmand.router.GeneralRouter.RoutingParameter;
 import net.osmand.util.Algorithms;
 
 import org.apache.commons.logging.Log;
-import org.labyrinth.osmand.FootPath;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -511,20 +510,14 @@ public class RouteOptionsBottomSheet extends MenuBottomSheetDialogFragment imple
         tvTitle.setText(getString(R.string.foot_path));
         icon.setImageDrawable(getContentIcon(R.drawable.ic_action_start_navigation));
         cb.setChecked(settings.footPath);
+        app.getLocationProvider().footPath.setEnabled(settings.footPath);
         cb.setFocusable(false);
         UiUtilities.setupCompoundButton(nightMode, selectedModeColor, cb);
 
         basicItem.setOnClickListener(v -> {
             settings.footPath = !settings.footPath;
             cb.setChecked(settings.footPath);
-            final FootPath footPath = app.getLocationProvider().footPath;
-            if (settings.footPath) {
-                if (routingHelper.isFollowingMode() && routingHelper.isRouteCalculated() && !routingHelper.isRouteBeingCalculated()) {
-                    footPath.restart();
-                }
-            } else {
-                footPath.stop();
-            }
+            app.getLocationProvider().footPath.setEnabled(settings.footPath);
         });
 
         Drawable drawable = app.getUIUtilities().getIcon(R.drawable.ic_action_settings,

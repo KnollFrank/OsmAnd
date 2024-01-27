@@ -10,25 +10,29 @@ public class FootPath implements IRouteInformationListener {
 
     private final FootPathDriver footPathDriver;
     private final Supplier<RouteCalculationResult> getRoute;
+    private boolean enabled;
 
     public FootPath(final FootPathDriver footPathDriver, final Supplier<RouteCalculationResult> getRoute) {
         this.footPathDriver = footPathDriver;
         this.getRoute = getRoute;
+        this.enabled = false;
     }
 
-    // FK-TODO: RouteCalculationResult als Parameter von newRouteIsCalculated() dazufügen?
     @Override
     public void newRouteIsCalculated(final boolean newRoute, final ValueHolder<Boolean> showToast) {
+        if (!isEnabled()) return;
         restart();
     }
 
     @Override
     public void routeWasCancelled() {
+        if (!isEnabled()) return;
         stop();
     }
 
     @Override
     public void routeWasFinished() {
+        if (!isEnabled()) return;
         stop();
     }
 
@@ -36,11 +40,24 @@ public class FootPath implements IRouteInformationListener {
         return this.footPathDriver.isNavigating();
     }
 
-    public void restart() {
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(final boolean enabled) {
+        this.enabled = enabled;
+        if (enabled) {
+            restart();
+        } else {
+            stop();
+        }
+    }
+
+    private void restart() {
         this.footPathDriver.restartNavigating(this.getRoute.get());
     }
 
-    public void stop() {
+    private void stop() {
         this.footPathDriver.stopNavigating();
     }
 }
