@@ -136,7 +136,6 @@ import net.osmand.plus.views.mapwidgets.WidgetsVisibilityHelper;
 import net.osmand.util.Algorithms;
 
 import org.apache.commons.logging.Log;
-import org.labyrinth.osmand.FootPathRouteInformationListenerFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -222,7 +221,6 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
     private RouteCalculationProgressListener routeCalculationProgressCallback;
     private TransportRouteCalculationProgressCallback transportRouteCalculationProgressCallback;
     private LoadSimulatedLocationsListener simulatedLocationsListener;
-    private IRouteInformationListener footPathRouteInformationListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -654,8 +652,7 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
         }
 
         routingHelper.addListener(this);
-        footPathRouteInformationListener = FootPathRouteInformationListenerFactory.createFootPathRouteInformationListener(app);
-        routingHelper.addListener(footPathRouteInformationListener);
+        routingHelper.addListener(app.getLocationProvider().footPathRouteInformationListener);
         app.getMapMarkersHelper().addListener(this);
 
         if (System.currentTimeMillis() - time > 50) {
@@ -1017,7 +1014,7 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
         mapView.setOnDrawMapListener(null);
         cancelSplashScreenTimer();
         app.getMapMarkersHelper().removeListener(this);
-        app.getRoutingHelper().removeListener(footPathRouteInformationListener);
+        app.getRoutingHelper().removeListener(app.getLocationProvider().footPathRouteInformationListener);
         app.getRoutingHelper().removeListener(this);
         app.getDownloadThread().resetUiActivity(this);
 

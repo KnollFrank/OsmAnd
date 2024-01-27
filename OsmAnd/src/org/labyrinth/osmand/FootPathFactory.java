@@ -11,7 +11,7 @@ class FootPathFactory {
 
     public static FootPath createFootPath(final OsmandApplication app) {
         return new FootPath(
-                app.getLocationProvider()::setLocationFromSimulation,
+                location -> app.getLocationProvider().setLocationFromSimulation(location),
                 stepListener ->
                         new StepDetection(
                                 app::runInUIThread,

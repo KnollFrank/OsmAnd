@@ -32,7 +32,7 @@ class FootPath {
                         });
     }
 
-    public void startNavigation(final RouteCalculationResult route) {
+    public void startNavigating(final RouteCalculationResult route) {
         final List<Location> locations = route.getImmutableAllLocations();
         this.navigator =
                 new Navigator(
@@ -41,7 +41,11 @@ class FootPath {
         this.stepDetection.load();
     }
 
-    public void stopNavigation() {
+    public void stopNavigating() {
         this.stepDetection.unload();
+    }
+
+    public boolean isNavigating() {
+        return this.stepDetection.isLoaded();
     }
 }

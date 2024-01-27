@@ -6,7 +6,7 @@ import net.osmand.data.ValueHolder;
 import net.osmand.plus.routing.IRouteInformationListener;
 import net.osmand.plus.routing.RouteCalculationResult;
 
-class FootPathRouteInformationListener implements IRouteInformationListener {
+public class FootPathRouteInformationListener implements IRouteInformationListener {
 
     private final FootPath footPath;
     private final Supplier<RouteCalculationResult> getRoute;
@@ -20,16 +20,20 @@ class FootPathRouteInformationListener implements IRouteInformationListener {
     // FK-TODO: RouteCalculationResult als Parameter von newRouteIsCalculated() dazufügen.
     @Override
     public void newRouteIsCalculated(final boolean newRoute, final ValueHolder<Boolean> showToast) {
-        this.footPath.startNavigation(this.getRoute.get());
+        this.footPath.startNavigating(this.getRoute.get());
     }
 
     @Override
     public void routeWasCancelled() {
-        this.footPath.stopNavigation();
+        this.footPath.stopNavigating();
     }
 
     @Override
     public void routeWasFinished() {
-        this.footPath.stopNavigation();
+        this.footPath.stopNavigating();
+    }
+
+    public boolean isRunning() {
+        return this.footPath.isNavigating();
     }
 }
