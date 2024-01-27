@@ -151,7 +151,7 @@ public class OsmAndLocationProvider implements SensorEventListener {
         navigationInfo = new NavigationInfo(app);
         currentPositionHelper = new CurrentPositionHelper(app);
         locationSimulation = new OsmAndLocationSimulation(app);
-        footPath = FootPathFactory.createFootPath(app);
+        footPath = FootPathFactory.createFootPath(app, app.settings.footPath);
         locationServiceHelper = app.createLocationServiceHelper();
         addLocationSourceListener();
         addLocationListener(navigationInfo);

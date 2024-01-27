@@ -12,10 +12,13 @@ public class FootPath implements IRouteInformationListener {
     private final Supplier<RouteCalculationResult> getRoute;
     private boolean enabled;
 
-    public FootPath(final FootPathDriver footPathDriver, final Supplier<RouteCalculationResult> getRoute) {
+    public FootPath(
+            final FootPathDriver footPathDriver,
+            final Supplier<RouteCalculationResult> getRoute,
+            final boolean enabled) {
         this.footPathDriver = footPathDriver;
         this.getRoute = getRoute;
-        this.enabled = false;
+        this.enabled = enabled;
     }
 
     @Override
