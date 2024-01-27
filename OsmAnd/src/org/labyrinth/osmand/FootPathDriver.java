@@ -32,13 +32,13 @@ class FootPathDriver {
                         });
     }
 
-    public void startNavigating(final RouteCalculationResult route) {
+    public void restartNavigating(final RouteCalculationResult route) {
         final List<Location> locations = route.getImmutableAllLocations();
         this.navigator =
                 new Navigator(
                         PathFactory.createPath(Converters.asNodes(locations)),
                         StepLengthProvider.getStepLength(getQuantity(187.0, CENTI(METRE))));
-        this.stepDetection.load();
+        this.stepDetection.reload();
     }
 
     public void stopNavigating() {

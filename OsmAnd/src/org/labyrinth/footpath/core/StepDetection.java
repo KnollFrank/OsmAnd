@@ -88,7 +88,8 @@ public class StepDetection {
         this(runInUIThread, sensorManager, stepListener, 0.5f, 0.5f, getQuantity(666, MILLI(SECOND)));
     }
 
-    public void load() {
+    public void reload() {
+        unload();
         for (final Sensor sensor : sensorManager.getSensorList(Sensor.TYPE_ALL)) {
             if (sensor.getType() == Sensor.TYPE_ACCELEROMETER || sensor.getType() == Sensor.TYPE_ORIENTATION) {
                 sensorManager.registerListener(mySensorEventListener, sensor, SensorManager.SENSOR_DELAY_GAME);

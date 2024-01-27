@@ -2561,6 +2561,7 @@ You need to activate the sensor so OsmAnd can find it.</string>
     <string name="avoid_roads_descr">Select a road you want to avoid during navigation, either on the map, or from the list below:</string>
     <string name="show_along_the_route">Show along the route</string>
     <string name="simulate_navigation">Simulate navigation</string>
+    <string name="foot_path">Foot Path</string>
     <string name="choose_track_file_to_follow">Select track file to follow</string>
     <string name="voice_announcements">Voice prompts</string>
     <string name="intermediate_destinations">Intermediate destinations</string>

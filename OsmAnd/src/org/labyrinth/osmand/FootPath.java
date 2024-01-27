@@ -11,7 +11,6 @@ public class FootPath implements IRouteInformationListener {
     private final FootPathDriver footPathDriver;
     private final Supplier<RouteCalculationResult> getRoute;
 
-
     public FootPath(final FootPathDriver footPathDriver, final Supplier<RouteCalculationResult> getRoute) {
         this.footPathDriver = footPathDriver;
         this.getRoute = getRoute;
@@ -20,20 +19,28 @@ public class FootPath implements IRouteInformationListener {
     // FK-TODO: RouteCalculationResult als Parameter von newRouteIsCalculated() dazufügen?
     @Override
     public void newRouteIsCalculated(final boolean newRoute, final ValueHolder<Boolean> showToast) {
-        this.footPathDriver.startNavigating(this.getRoute.get());
+        restart();
     }
 
     @Override
     public void routeWasCancelled() {
-        this.footPathDriver.stopNavigating();
+        stop();
     }
 
     @Override
     public void routeWasFinished() {
-        this.footPathDriver.stopNavigating();
+        stop();
     }
 
     public boolean isRunning() {
         return this.footPathDriver.isNavigating();
+    }
+
+    public void restart() {
+        this.footPathDriver.restartNavigating(this.getRoute.get());
+    }
+
+    public void stop() {
+        this.footPathDriver.stopNavigating();
     }
 }

@@ -170,6 +170,7 @@ public interface OsmAndCustomizationConstants {
 	String NAVIGATION_OPTIONS_MENU_ID = NAVIGATION_OPTIONS_ID + "options_menu";
 	String NAVIGATION_SOUND_ID = NAVIGATION_OPTIONS_ID + "mute_sound";
 	String NAVIGATION_ROUTE_SIMULATION_ID = NAVIGATION_OPTIONS_ID + "route_simulation";
+	String NAVIGATION_FOOTPATH_ID = NAVIGATION_OPTIONS_ID + "foot_path";
 	String NAVIGATION_TIME_CONDITIONAL_ID = NAVIGATION_OPTIONS_ID + "time_conditional";
 	String NAVIGATION_SHOW_ALONG_THE_ROUTE_ID = NAVIGATION_OPTIONS_ID + "show_along_the_route";
 	String NAVIGATION_AVOID_ROADS_ID = NAVIGATION_OPTIONS_ID + "avoid_roads_routing";

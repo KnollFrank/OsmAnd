@@ -5,6 +5,7 @@ import static net.osmand.aidlapi.OsmAndCustomizationConstants.NAVIGATION_AVOID_R
 import static net.osmand.aidlapi.OsmAndCustomizationConstants.NAVIGATION_CUSTOMIZE_ROUTE_LINE_ID;
 import static net.osmand.aidlapi.OsmAndCustomizationConstants.NAVIGATION_DIVIDER_ID;
 import static net.osmand.aidlapi.OsmAndCustomizationConstants.NAVIGATION_FOLLOW_TRACK_ID;
+import static net.osmand.aidlapi.OsmAndCustomizationConstants.NAVIGATION_FOOTPATH_ID;
 import static net.osmand.aidlapi.OsmAndCustomizationConstants.NAVIGATION_INTERRUPT_MUSIC_ID;
 import static net.osmand.aidlapi.OsmAndCustomizationConstants.NAVIGATION_LOCAL_ROUTING_GROUP_ID;
 import static net.osmand.aidlapi.OsmAndCustomizationConstants.NAVIGATION_LOCAL_ROUTING_ID;
@@ -408,6 +409,8 @@ public class RoutingOptionsHelper {
 				return new DividerItem();
 			case RouteSimulationItem.KEY:
 				return new RouteSimulationItem();
+			case FootPathItem.KEY:
+				return new FootPathItem();
 			case CalculateAltitudeItem.KEY:
 				return new CalculateAltitudeItem();
 			case ShowAlongTheRouteItem.KEY:
@@ -821,6 +824,23 @@ public class RoutingOptionsHelper {
 		}
 
 		public RouteSimulationItem() {
+			super(null);
+		}
+	}
+
+	public static class FootPathItem extends LocalRoutingParameter {
+
+		public static final String KEY = NAVIGATION_FOOTPATH_ID;
+
+		public String getKey() {
+			return KEY;
+		}
+
+		public boolean canAddToRouteMenu() {
+			return false;
+		}
+
+		public FootPathItem() {
 			super(null);
 		}
 	}
