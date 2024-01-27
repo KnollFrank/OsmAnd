@@ -1,7 +1,5 @@
 package net.osmand.plus;
 
-import static org.labyrinth.osmand.FootPathRouteInformationListenerFactory.createFootPathRouteInformationListener;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -55,7 +53,8 @@ import net.osmand.router.RouteSegmentResult;
 import net.osmand.util.Algorithms;
 import net.osmand.util.MapUtils;
 
-import org.labyrinth.osmand.FootPathRouteInformationListener;
+import org.labyrinth.osmand.FootPath;
+import org.labyrinth.osmand.FootPathFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,7 +64,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class OsmAndLocationProvider implements SensorEventListener {
 
     public static final int REQUEST_LOCATION_PERMISSION = 100;
-    public final FootPathRouteInformationListener footPathRouteInformationListener;
+    public final FootPath footPath;
 
     public interface OsmAndLocationListener {
         void updateLocation(net.osmand.Location location);
@@ -152,7 +151,7 @@ public class OsmAndLocationProvider implements SensorEventListener {
         navigationInfo = new NavigationInfo(app);
         currentPositionHelper = new CurrentPositionHelper(app);
         locationSimulation = new OsmAndLocationSimulation(app);
-        footPathRouteInformationListener = createFootPathRouteInformationListener(app);
+        footPath = FootPathFactory.createFootPath(app);
         locationServiceHelper = app.createLocationServiceHelper();
         addLocationSourceListener();
         addLocationListener(navigationInfo);
@@ -183,7 +182,7 @@ public class OsmAndLocationProvider implements SensorEventListener {
                             location = locations.get(locations.size() - 1);
                             lastTimeGPSLocationFixed = System.currentTimeMillis();
                         }
-                        if (!locationSimulation.isRouteAnimating() && !footPathRouteInformationListener.isRunning()) {
+                        if (!locationSimulation.isRouteAnimating() && !footPath.isRunning()) {
                             setLocation(location);
                         }
                     }
@@ -198,7 +197,7 @@ public class OsmAndLocationProvider implements SensorEventListener {
                 locationServiceHelper.requestNetworkLocationUpdates(new LocationServiceHelper.LocationCallback() {
                     @Override
                     public void onLocationResult(@NonNull List<net.osmand.Location> locations) {
-                        if (!locations.isEmpty() && !useOnlyGPS() && !locationSimulation.isRouteAnimating() && !footPathRouteInformationListener.isRunning()) {
+                        if (!locations.isEmpty() && !useOnlyGPS() && !locationSimulation.isRouteAnimating() && !footPath.isRunning()) {
                             setLocation(locations.get(locations.size() - 1));
                         }
                     }

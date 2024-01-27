@@ -1,51 +1,39 @@
 package org.labyrinth.osmand;
 
-import static tec.units.ri.quantity.Quantities.getQuantity;
-import static tec.units.ri.unit.MetricPrefix.CENTI;
-import static tec.units.ri.unit.Units.METRE;
+import com.google.common.base.Supplier;
 
-import net.osmand.Location;
+import net.osmand.data.ValueHolder;
+import net.osmand.plus.routing.IRouteInformationListener;
 import net.osmand.plus.routing.RouteCalculationResult;
 
-import org.labyrinth.footpath.StepLengthProvider;
-import org.labyrinth.footpath.core.IStepListener;
-import org.labyrinth.footpath.core.Navigator;
-import org.labyrinth.footpath.core.StepDetection;
-import org.labyrinth.footpath.graph.PathFactory;
+public class FootPath implements IRouteInformationListener {
 
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
+    private final FootPathDriver footPathDriver;
+    private final Supplier<RouteCalculationResult> getRoute;
 
-class FootPath {
 
-    private final StepDetection stepDetection;
-    private Navigator navigator;
-
-    public FootPath(final Consumer<Location> setLocation,
-                    final Function<IStepListener, StepDetection> createStepDetection) {
-        this.stepDetection =
-                createStepDetection.apply(
-                        stepDirection -> {
-                            navigator.stepInDirection(stepDirection);
-                            setLocation.accept(Converters.asLocation(navigator.getCurrentPathPosition()));
-                        });
+    public FootPath(final FootPathDriver footPathDriver, final Supplier<RouteCalculationResult> getRoute) {
+        this.footPathDriver = footPathDriver;
+        this.getRoute = getRoute;
     }
 
-    public void startNavigating(final RouteCalculationResult route) {
-        final List<Location> locations = route.getImmutableAllLocations();
-        this.navigator =
-                new Navigator(
-                        PathFactory.createPath(Converters.asNodes(locations)),
-                        StepLengthProvider.getStepLength(getQuantity(187.0, CENTI(METRE))));
-        this.stepDetection.load();
+    // FK-TODO: RouteCalculationResult als Parameter von newRouteIsCalculated() dazufügen?
+    @Override
+    public void newRouteIsCalculated(final boolean newRoute, final ValueHolder<Boolean> showToast) {
+        this.footPathDriver.startNavigating(this.getRoute.get());
     }
 
-    public void stopNavigating() {
-        this.stepDetection.unload();
+    @Override
+    public void routeWasCancelled() {
+        this.footPathDriver.stopNavigating();
     }
 
-    public boolean isNavigating() {
-        return this.stepDetection.isLoaded();
+    @Override
+    public void routeWasFinished() {
+        this.footPathDriver.stopNavigating();
+    }
+
+    public boolean isRunning() {
+        return this.footPathDriver.isNavigating();
     }
 }
