@@ -655,7 +655,7 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 
         routingHelper.addListener(this);
         footPathRouteInformationListener = FootPathRouteInformationListenerFactory.createFootPathRouteInformationListener(app);
-        app.getRoutingHelper().addListener(footPathRouteInformationListener);
+        routingHelper.addListener(footPathRouteInformationListener);
         app.getMapMarkersHelper().addListener(this);
 
         if (System.currentTimeMillis() - time > 50) {
