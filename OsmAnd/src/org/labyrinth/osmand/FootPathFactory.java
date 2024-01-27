@@ -1,4 +1,4 @@
-package org.labyrinth;
+package org.labyrinth.osmand;
 
 import android.content.Context;
 import android.hardware.SensorManager;
@@ -7,12 +7,11 @@ import net.osmand.plus.OsmandApplication;
 
 import org.labyrinth.footpath.core.StepDetection;
 
-public class FootPathRouteInformationListenerFactory {
+class FootPathFactory {
 
-    public static FootPathRouteInformationListener createFootPathRouteInformationListener(final OsmandApplication app) {
-        return new FootPathRouteInformationListener(
+    public static FootPath createFootPath(final OsmandApplication app) {
+        return new FootPath(
                 app.getLocationProvider()::setLocationFromSimulation,
-                app.getRoutingHelper()::getRoute,
                 stepListener ->
                         new StepDetection(
                                 app::runInUIThread,

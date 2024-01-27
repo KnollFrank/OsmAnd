@@ -136,7 +136,7 @@ import net.osmand.plus.views.mapwidgets.WidgetsVisibilityHelper;
 import net.osmand.util.Algorithms;
 
 import org.apache.commons.logging.Log;
-import org.labyrinth.FootPathRouteInformationListenerFactory;
+import org.labyrinth.osmand.FootPathRouteInformationListenerFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
