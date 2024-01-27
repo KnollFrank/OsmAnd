@@ -5,9 +5,6 @@ import static net.osmand.aidlapi.OsmAndCustomizationConstants.MAP_STYLE_ID;
 import static net.osmand.plus.firstusage.FirstUsageWizardFragment.FIRST_USAGE;
 import static net.osmand.plus.measurementtool.MeasurementToolFragment.PLAN_ROUTE_MODE;
 import static net.osmand.plus.views.AnimateDraggingMapThread.TARGET_NO_ROTATION;
-import static tec.units.ri.quantity.Quantities.getQuantity;
-import static tec.units.ri.unit.MetricPrefix.CENTI;
-import static tec.units.ri.unit.Units.METRE;
 
 import android.Manifest;
 import android.app.Activity;
@@ -16,7 +13,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -106,7 +102,6 @@ import net.osmand.plus.render.UpdateVectorRendererAsyncTask;
 import net.osmand.plus.routepreparationmenu.MapRouteInfoMenu;
 import net.osmand.plus.routing.IRouteInformationListener;
 import net.osmand.plus.routing.RouteCalculationProgressListener;
-import net.osmand.plus.routing.RouteCalculationResult;
 import net.osmand.plus.routing.RoutingHelper;
 import net.osmand.plus.routing.TransportRoutingHelper.TransportRouteCalculationProgressCallback;
 import net.osmand.plus.search.ShowQuickSearchMode;
@@ -119,7 +114,6 @@ import net.osmand.plus.settings.fragments.BaseSettingsFragment;
 import net.osmand.plus.settings.fragments.SettingsScreenType;
 import net.osmand.plus.simulation.LoadSimulatedLocationsTask.LoadSimulatedLocationsListener;
 import net.osmand.plus.simulation.OsmAndLocationSimulation;
-import net.osmand.plus.simulation.OsmAndLocationSimulation2;
 import net.osmand.plus.simulation.SimulatedLocation;
 import net.osmand.plus.track.GpxSelectionParams;
 import net.osmand.plus.track.fragments.TrackAppearanceFragment;
@@ -142,10 +136,7 @@ import net.osmand.plus.views.mapwidgets.WidgetsVisibilityHelper;
 import net.osmand.util.Algorithms;
 
 import org.apache.commons.logging.Log;
-import org.labyrinth.footpath.StepLengthProvider;
-import org.labyrinth.footpath.core.Navigator;
-import org.labyrinth.footpath.core.StepDetection;
-import org.labyrinth.footpath.graph.PathFactory;
+import org.labyrinth.FootPathRouteInformationListenerFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -231,7 +222,7 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
     private RouteCalculationProgressListener routeCalculationProgressCallback;
     private TransportRouteCalculationProgressCallback transportRouteCalculationProgressCallback;
     private LoadSimulatedLocationsListener simulatedLocationsListener;
-    private IRouteInformationListener routeInformationListener;
+    private IRouteInformationListener footPathRouteInformationListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -663,56 +654,8 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
         }
 
         routingHelper.addListener(this);
-        routeInformationListener =
-                // FK-TODO: refactor
-                new IRouteInformationListener() {
-
-                    private final StepDetection stepDetection;
-                    private Navigator navigator;
-
-                    {
-                        this.stepDetection =
-                                new StepDetection(
-                                        app::runInUIThread,
-                                        (SensorManager) app.getSystemService(Context.SENSOR_SERVICE),
-                                        stepDirection -> {
-                                            LOG.info("step detected: " + stepDirection);
-                                            navigator.stepInDirection(stepDirection);
-                                            app.getLocationProvider().setLocationFromSimulation(
-                                                    OsmAndLocationSimulation2.asLocation(navigator.getCurrentPathPosition()));
-                                        });
-                    }
-
-                    // FK-TODO: RouteCalculationResult als Parameter von newRouteIsCalculated() dazufügen.
-                    @Override
-                    public void newRouteIsCalculated(final boolean newRoute, final ValueHolder<Boolean> showToast) {
-                        final RouteCalculationResult route = app.getRoutingHelper().getRoute();
-                        final List<Location> locations = route.getImmutableAllLocations();
-                        LOG.info(
-                                String.format(
-                                        "FKK: IRouteInformationListener.newRouteIsCalculated() %d, %s: ",
-                                        locations.size(),
-                                        locations));
-                        this.navigator =
-                                new Navigator(
-                                        PathFactory.createPath(OsmAndLocationSimulation2.asNodes(locations)),
-                                        StepLengthProvider.getStepLength(getQuantity(187.0, CENTI(METRE))));
-                        this.stepDetection.load();
-                    }
-
-                    @Override
-                    public void routeWasCancelled() {
-                        LOG.info("FKK: IRouteInformationListener.routeWasCancelled()");
-                        this.stepDetection.unload();
-                    }
-
-                    @Override
-                    public void routeWasFinished() {
-                        LOG.info("FKK: IRouteInformationListener.routeWasFinished()");
-                        this.stepDetection.unload();
-                    }
-                };
-        app.getRoutingHelper().addListener(routeInformationListener);
+        footPathRouteInformationListener = FootPathRouteInformationListenerFactory.createFootPathRouteInformationListener(app);
+        app.getRoutingHelper().addListener(footPathRouteInformationListener);
         app.getMapMarkersHelper().addListener(this);
 
         if (System.currentTimeMillis() - time > 50) {
@@ -1074,7 +1017,7 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
         mapView.setOnDrawMapListener(null);
         cancelSplashScreenTimer();
         app.getMapMarkersHelper().removeListener(this);
-        app.getRoutingHelper().removeListener(routeInformationListener);
+        app.getRoutingHelper().removeListener(footPathRouteInformationListener);
         app.getRoutingHelper().removeListener(this);
         app.getDownloadThread().resetUiActivity(this);
 

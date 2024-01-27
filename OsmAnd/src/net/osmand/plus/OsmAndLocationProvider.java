@@ -47,7 +47,6 @@ import net.osmand.plus.settings.backend.ApplicationMode;
 import net.osmand.plus.settings.backend.OsmandSettings;
 import net.osmand.plus.settings.enums.LocationSource;
 import net.osmand.plus.simulation.OsmAndLocationSimulation;
-import net.osmand.plus.simulation.OsmAndLocationSimulation2;
 import net.osmand.plus.simulation.SimulationProvider;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.router.RouteSegmentResult;
@@ -148,7 +147,7 @@ public class OsmAndLocationProvider implements SensorEventListener {
 		this.app = app;
 		navigationInfo = new NavigationInfo(app);
 		currentPositionHelper = new CurrentPositionHelper(app);
-		locationSimulation = new OsmAndLocationSimulation2(app);
+		locationSimulation = new OsmAndLocationSimulation(app);
 		locationServiceHelper = app.createLocationServiceHelper();
 		addLocationSourceListener();
 		addLocationListener(navigationInfo);
