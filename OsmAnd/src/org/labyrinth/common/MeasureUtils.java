@@ -6,6 +6,7 @@ import tec.units.ri.quantity.Quantities;
 import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
+
 import java.util.Comparator;
 import java.util.stream.Stream;
 
@@ -61,5 +62,13 @@ public class MeasureUtils {
 
     public static Quantity<Length> sum(final Stream<Quantity<Length>> lens) {
         return lens.reduce(getQuantity(0.0, METRE), Quantity::add);
+    }
+
+    public static Quantity<Length> min(final Quantity<Length> length1, final Quantity<Length> length2) {
+        return isLessOrEqual(length1, length2) ? length1 : length2;
+    }
+
+    public static Quantity<Length> max(final Quantity<Length> length1, final Quantity<Length> length2) {
+        return isGreaterOrEqual(length1, length2) ? length1 : length2;
     }
 }

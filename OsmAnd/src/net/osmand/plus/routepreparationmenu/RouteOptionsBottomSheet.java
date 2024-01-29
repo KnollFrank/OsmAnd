@@ -526,7 +526,7 @@ public class RouteOptionsBottomSheet extends MenuBottomSheetDialogFragment imple
         drawable = AndroidUtils.createPressedStateListDrawable(drawable, activeDrawable);
         settingBtnImage.setImageDrawable(drawable);
         settingBtn.setOnClickListener(v -> {
-            BaseSettingsFragment.showInstance(mapActivity, SettingsScreenType.SIMULATION_NAVIGATION, applicationMode);
+            BaseSettingsFragment.showInstance(mapActivity, SettingsScreenType.FOOTPATH_NAVIGATION, applicationMode);
             dismiss();
         });
 

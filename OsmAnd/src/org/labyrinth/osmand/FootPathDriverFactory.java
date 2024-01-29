@@ -16,6 +16,7 @@ class FootPathDriverFactory {
                         new StepDetection(
                                 app::runInUIThread,
                                 (SensorManager) app.getSystemService(Context.SENSOR_SERVICE),
-                                stepListener));
+                                stepListener),
+                () -> app.getSettings().pedestrianHeight);
     }
 }

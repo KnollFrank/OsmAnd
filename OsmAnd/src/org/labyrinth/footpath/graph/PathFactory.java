@@ -8,19 +8,24 @@ import java.util.Optional;
 
 public class PathFactory {
 
-    public static Path createPath(final List<Node> nodes) {
-        return createPath(
-                new EdgePosition(
-                        new Edge(
-                                nodes.get(0),
-                                nodes.get(1)),
-                        0),
-                nodes,
-                new EdgePosition(
-                        new Edge(
-                                nodes.get(nodes.size() - 2),
-                                nodes.get(nodes.size() - 1)),
-                        1));
+    public static Optional<Path> createPath(final List<Node> nodes) {
+        if (nodes.size() < 2) {
+            return Optional.empty();
+        }
+        final Path path =
+                createPath(
+                        new EdgePosition(
+                                new Edge(
+                                        nodes.get(0),
+                                        nodes.get(1)),
+                                0),
+                        nodes,
+                        new EdgePosition(
+                                new Edge(
+                                        nodes.get(nodes.size() - 2),
+                                        nodes.get(nodes.size() - 1)),
+                                1));
+        return Optional.of(path);
     }
 
     public static Path createPath(final EdgePosition src,

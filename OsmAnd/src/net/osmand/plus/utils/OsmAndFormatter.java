@@ -50,6 +50,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
+
 public class OsmAndFormatter {
 	public static final float METERS_IN_KILOMETER = 1000f;
 	public static final float METERS_IN_ONE_MILE = 1609.344f; // 1609.344
@@ -474,6 +477,11 @@ public class OsmAndFormatter {
 			formattedValue = formatValue(meters, R.string.m, false, 0, ctx);
 		}
 		return formattedValue;
+	}
+
+	@NonNull
+	public static String getFormattedPedestrianHeight(Quantity<Length> height, @NonNull OsmandApplication app) {
+		return height.toString();
 	}
 
 	@NonNull

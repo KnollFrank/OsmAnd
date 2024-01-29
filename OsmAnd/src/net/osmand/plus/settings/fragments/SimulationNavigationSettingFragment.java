@@ -53,7 +53,6 @@ public class SimulationNavigationSettingFragment extends BaseSettingsFragment {
 
 		view.findViewById(R.id.toolbar_switch_container).setOnClickListener(v -> {
 			settings.simulateNavigation = !settings.simulateNavigation;
-			settings.footPath = !settings.footPath;
 			updateToolbarSwitch(view);
 			updateAllSettings();
 		});

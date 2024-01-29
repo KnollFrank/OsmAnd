@@ -13,12 +13,10 @@ import static org.labyrinth.common.MeasureUtils.divide;
 public class Navigator {
 
     public final Path path;
-    public final Quantity<Length> stepLength;
     private final PositionerBestFit positionerBestFit;
 
     public Navigator(final Path path, final Quantity<Length> stepLength) {
         this.path = path;
-        this.stepLength = stepLength;
         this.positionerBestFit = new PositionerBestFit(path.getEdges(), stepLength);
     }
 

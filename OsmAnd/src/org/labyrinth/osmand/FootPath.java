@@ -57,7 +57,7 @@ public class FootPath implements IRouteInformationListener {
     }
 
     private void restart() {
-        this.footPathDriver.restartNavigating(this.getRoute.get());
+        this.footPathDriver.tryRestartNavigating(this.getRoute.get());
     }
 
     private void stop() {
