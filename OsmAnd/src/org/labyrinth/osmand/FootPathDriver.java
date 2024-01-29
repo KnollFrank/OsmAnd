@@ -13,7 +13,6 @@ import org.labyrinth.footpath.core.Navigator;
 import org.labyrinth.footpath.core.StepDetection;
 import org.labyrinth.footpath.graph.PathFactory;
 
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -33,10 +32,9 @@ class FootPathDriver {
     }
 
     public void restartNavigating(final RouteCalculationResult route) {
-        final List<Location> locations = route.getImmutableAllLocations();
         this.navigator =
                 new Navigator(
-                        PathFactory.createPath(Converters.asNodes(locations)),
+                        PathFactory.createPath(Converters.asNodes(route.getImmutableAllLocations())),
                         StepLengthProvider.getStepLength(getQuantity(187.0, CENTI(METRE))));
         this.stepDetection.reload();
     }
