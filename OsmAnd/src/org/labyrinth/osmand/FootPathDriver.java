@@ -1,9 +1,5 @@
 package org.labyrinth.osmand;
 
-import static tec.units.ri.quantity.Quantities.getQuantity;
-import static tec.units.ri.unit.MetricPrefix.CENTI;
-import static tec.units.ri.unit.Units.METRE;
-
 import net.osmand.Location;
 import net.osmand.plus.routing.RouteCalculationResult;
 
@@ -49,19 +45,19 @@ class FootPathDriver {
         return true;
     }
 
-    private void restartNavigating(final Path path) {
-        this.navigator =
-                new Navigator(
-                        path,
-                        StepLengthProvider.getStepLength(this.getPedestrianHeight.get()));
-        this.stepDetection.reload();
-    }
-
     public void stopNavigating() {
         this.stepDetection.unload();
     }
 
     public boolean isNavigating() {
         return this.stepDetection.isLoaded();
+    }
+
+    private void restartNavigating(final Path path) {
+        this.navigator =
+                new Navigator(
+                        path,
+                        StepLengthProvider.getStepLength(this.getPedestrianHeight.get()));
+        this.stepDetection.reload();
     }
 }
