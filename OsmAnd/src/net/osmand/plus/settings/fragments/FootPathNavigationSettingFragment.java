@@ -59,6 +59,7 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
                 .findViewById(R.id.toolbar_switch_container)
                 .setOnClickListener(v -> {
                     settings.footPath = !settings.footPath;
+                    app.getLocationProvider().footPath.setEnabled(settings.footPath);
                     updateToolbarSwitch(view);
                     updateAllSettings();
                 });
@@ -236,6 +237,8 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
             title.setText(getString(R.string.ltr_or_rtl_combine_via_colon,
                     getString(titleRes), getFormattedPedestrianHeight(value, app)));
             settings.pedestrianHeight = value;
+            // FK-FIXME: nicht setEnabled(true) sondern Neustart wegen neuer pedestrianHeight
+            app.getLocationProvider().footPath.setEnabled(true);
         });
         UiUtilities.setupSlider(slider, isNightMode(), getActiveProfileColor());
     }
