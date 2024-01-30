@@ -44,7 +44,6 @@ import javax.measure.quantity.Length;
 
 public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
 
-    public static final float SIM_MAX_SPEED = 900 / 3.6f;
     private OsmandActionBarActivity activity;
 
     @Override
