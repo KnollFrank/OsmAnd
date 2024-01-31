@@ -32,7 +32,7 @@ import com.google.android.material.slider.Slider;
 
 import net.osmand.plus.R;
 import net.osmand.plus.activities.OsmandActionBarActivity;
-import net.osmand.plus.settings.enums.SimulationMode;
+import net.osmand.plus.settings.enums.FootPathMode;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.ColorUtilities;
 import net.osmand.plus.utils.UiUtilities;
@@ -42,7 +42,6 @@ import org.labyrinth.common.MeasureUtils;
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 
-// FK-TODO: refactor
 public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
 
     private OsmandActionBarActivity activity;
@@ -71,12 +70,8 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
         if (view == null) {
             return;
         }
-        final ImageView profileIcon = view.findViewById(R.id.profile_icon);
-        profileIcon.setVisibility(View.GONE);
-
-        final TextView profileTitle = view.findViewById(R.id.toolbar_subtitle);
-        profileTitle.setVisibility(View.GONE);
-
+        view.<ImageView>findViewById(R.id.profile_icon).setVisibility(View.GONE);
+        view.<TextView>findViewById(R.id.toolbar_subtitle).setVisibility(View.GONE);
         updateToolbarSwitch(view);
     }
 
@@ -118,8 +113,8 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         super.onPreferenceChange(preference, newValue);
-        settings.simulateNavigationMode = preference.getKey();
-        PreferenceScreen screen = getPreferenceScreen();
+        settings.footPathMode = preference.getKey();
+        final PreferenceScreen screen = getPreferenceScreen();
         if (screen == null) {
             return false;
         }
@@ -133,86 +128,70 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
         return ColorUtilities.getActivityBgColorId(isNightMode());
     }
 
-    private void updateView(PreferenceScreen screen) {
+    private void updateView(final PreferenceScreen screen) {
         for (int i = 0; i < screen.getPreferenceCount(); i++) {
-            Preference preference = screen.getPreference(i);
+            final Preference preference = screen.getPreference(i);
             if (preference instanceof CheckBoxPreference) {
-                String preferenceKey = preference.getKey();
-                boolean checked = preferenceKey != null && preferenceKey.equals(settings.simulateNavigationMode);
+                final String preferenceKey = preference.getKey();
+                final boolean checked = preferenceKey != null && preferenceKey.equals(settings.footPathMode);
                 ((CheckBoxPreference) preference).setChecked(checked);
             }
         }
     }
 
     private void setFootpathPref(final PreferenceScreen screen) {
-        Preference preference = new Preference(activity);
-        preference.setLayoutResource(R.layout.preference_simulation_title);
-        preference.setTitle(R.string.speed_mode);
-        preference.setSelectable(false);
-        screen.addPreference(preference);
-        for (final SimulationMode sm : SimulationMode.values()) {
-            preference = new CheckBoxPreference(activity);
+        {
+            final Preference preference = new Preference(activity);
+            preference.setLayoutResource(R.layout.preference_simulation_title);
+            preference.setTitle(R.string.speed_mode);
+            preference.setSelectable(false);
+            screen.addPreference(preference);
+        }
+        for (final FootPathMode sm : FootPathMode.values()) {
+            final Preference preference = new CheckBoxPreference(activity);
             preference.setKey(sm.getKey());
             preference.setTitle(sm.getTitle());
             preference.setLayoutResource(sm.getLayout());
             screen.addPreference(preference);
         }
-        preference = new Preference(activity);
-        preference.setLayoutResource(R.layout.card_bottom_divider);
-        preference.setSelectable(false);
-        screen.addPreference(preference);
+        {
+            final Preference preference = new Preference(activity);
+            preference.setLayoutResource(R.layout.card_bottom_divider);
+            preference.setSelectable(false);
+            screen.addPreference(preference);
+        }
     }
 
     @Override
     public RecyclerView onCreateRecyclerView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        RecyclerView recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState);
+        final RecyclerView recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState);
         recyclerView.setItemAnimator(null);
         return recyclerView;
     }
 
     @Override
-    protected void onBindPreferenceViewHolder(Preference preference, PreferenceViewHolder holder) {
+    protected void onBindPreferenceViewHolder(final Preference preference, final PreferenceViewHolder holder) {
         super.onBindPreferenceViewHolder(preference, holder);
-        String key = preference.getKey();
+        final String key = preference.getKey();
         if (key == null) {
             return;
         }
-        View itemView = holder.itemView;
         if (preference instanceof CheckBoxPreference) {
-            SimulationMode mode = SimulationMode.getMode(key);
+            final FootPathMode mode = FootPathMode.getMode(key);
             if (mode != null) {
-                TextView description = itemView.findViewById(R.id.description);
-                boolean checked = ((CheckBoxPreference) preference).isChecked();
+                final View itemView = holder.itemView;
+                final TextView description = itemView.findViewById(R.id.description);
+                final boolean checked = ((CheckBoxPreference) preference).isChecked();
                 description.setVisibility(checked ? View.VISIBLE : View.GONE);
-                String str = getString(mode.getDescription());
-                SpannableString spanDescription = new SpannableString(str);
-                if (mode == SimulationMode.REALISTIC) {
-                    int startLine = 0;
-                    int endLine = 0;
-                    int dp8 = AndroidUtils.dpToPx(itemView.getContext(), 8f);
-                    while (endLine < str.length()) {
-                        endLine = str.indexOf("\n", startLine);
-                        endLine = endLine > 0 ? endLine : str.length();
-                        spanDescription.setSpan(new BulletSpan(dp8),
-                                startLine, endLine, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        startLine = endLine + 1;
-                    }
-                    AndroidUtils.setPadding(description, dp8, 0, 0, 0);
-                }
-                description.setText(spanDescription);
-                View slider = itemView.findViewById(R.id.slider_group);
+                description.setText(new SpannableString(getString(mode.getDescription())));
+                final View slider = itemView.findViewById(R.id.slider_group);
                 if (slider != null) {
                     slider.setVisibility(checked ? View.VISIBLE : View.GONE);
                     if (checked) {
                         setupPedestrianHeightSlider(itemView, mode.getTitle());
                     }
                 }
-                View divider = itemView.findViewById(R.id.divider);
-                if (mode != SimulationMode.REALISTIC) {
-                    divider.setVisibility(View.VISIBLE);
-                } else {
-                    divider.setVisibility(View.INVISIBLE);
-                }
+                itemView.findViewById(R.id.divider).setVisibility(View.INVISIBLE);
             }
         }
     }
