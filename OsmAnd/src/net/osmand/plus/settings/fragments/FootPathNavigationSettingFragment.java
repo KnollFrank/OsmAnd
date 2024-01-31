@@ -140,9 +140,9 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
     private void setFootpathPref(final PreferenceScreen screen) {
         for (final FootPathMode sm : FootPathMode.values()) {
             final Preference preference = new CheckBoxPreference(activity);
-            preference.setKey(sm.getKey());
-            preference.setTitle(sm.getTitle());
-            preference.setLayoutResource(sm.getLayout());
+            preference.setKey(sm.key);
+            preference.setTitle(sm.title);
+            preference.setLayoutResource(sm.layout);
             screen.addPreference(preference);
         }
         {
@@ -174,12 +174,12 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
                 final TextView description = itemView.findViewById(R.id.description);
                 final boolean checked = ((CheckBoxPreference) preference).isChecked();
                 description.setVisibility(checked ? View.VISIBLE : View.GONE);
-                description.setText(new SpannableString(getString(mode.getDescription())));
+                description.setText(new SpannableString(getString(mode.description)));
                 final View slider = itemView.findViewById(R.id.slider_group);
                 if (slider != null) {
                     slider.setVisibility(checked ? View.VISIBLE : View.GONE);
                     if (checked) {
-                        setupPedestrianHeightSlider(itemView, mode.getTitle());
+                        setupPedestrianHeightSlider(itemView, mode.title);
                     }
                 }
                 itemView.findViewById(R.id.divider).setVisibility(View.INVISIBLE);

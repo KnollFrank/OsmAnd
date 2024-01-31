@@ -6,13 +6,14 @@ import androidx.annotation.StringRes;
 
 import net.osmand.plus.R;
 
+// FK-TODO: refactor, this is not an enum
 public enum FootPathMode {
-    CONSTANT("const_mode", R.string.simulation_constant_mode_title, R.string.simulation_constant_mode_desc, R.layout.preference_simulation_mode_slider);
+    PEDESTRIAN_HEIGHT("pedestrian_height", R.string.footpath_pedestrianheight_title, R.string.footpath_pedestrianheight_desc, R.layout.preference_simulation_mode_slider);
 
-    String key;
-    int title;
-    int description;
-    int layout;
+    public final String key;
+    public final int title;
+    public final int description;
+    public final int layout;
 
     FootPathMode(String key, @StringRes int title, @StringRes int description, @LayoutRes int layout) {
         this.key = key;
@@ -29,21 +30,5 @@ public enum FootPathMode {
             }
         }
         return null;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public int getTitle() {
-        return title;
-    }
-
-    public int getDescription() {
-        return description;
-    }
-
-    public int getLayout() {
-        return layout;
     }
 }
