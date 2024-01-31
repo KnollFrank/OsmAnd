@@ -9,8 +9,6 @@ import static tec.units.ri.unit.Units.METRE;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.BulletSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -140,13 +138,6 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
     }
 
     private void setFootpathPref(final PreferenceScreen screen) {
-        {
-            final Preference preference = new Preference(activity);
-            preference.setLayoutResource(R.layout.preference_simulation_title);
-            preference.setTitle(R.string.speed_mode);
-            preference.setSelectable(false);
-            screen.addPreference(preference);
-        }
         for (final FootPathMode sm : FootPathMode.values()) {
             final Preference preference = new CheckBoxPreference(activity);
             preference.setKey(sm.getKey());
