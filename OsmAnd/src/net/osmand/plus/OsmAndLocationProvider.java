@@ -182,7 +182,7 @@ public class OsmAndLocationProvider implements SensorEventListener {
                             location = locations.get(locations.size() - 1);
                             lastTimeGPSLocationFixed = System.currentTimeMillis();
                         }
-                        if (!locationSimulation.isRouteAnimating() && !footPath.isRunning()) {
+                        if (!locationSimulation.isRouteAnimating() && !footPath.isEnabled()) {
                             setLocation(location);
                         }
                     }
@@ -197,7 +197,7 @@ public class OsmAndLocationProvider implements SensorEventListener {
                 locationServiceHelper.requestNetworkLocationUpdates(new LocationServiceHelper.LocationCallback() {
                     @Override
                     public void onLocationResult(@NonNull List<net.osmand.Location> locations) {
-                        if (!locations.isEmpty() && !useOnlyGPS() && !locationSimulation.isRouteAnimating() && !footPath.isRunning()) {
+                        if (!locations.isEmpty() && !useOnlyGPS() && !locationSimulation.isRouteAnimating() && !footPath.isEnabled()) {
                             setLocation(locations.get(locations.size() - 1));
                         }
                     }

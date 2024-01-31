@@ -88,7 +88,7 @@ public class StepDetection {
         this(runInUIThread, sensorManager, stepListener, 0.5f, 0.5f, getQuantity(666, MILLI(SECOND)));
     }
 
-    public void reload() {
+    public void load() {
         unload();
         for (final Sensor sensor : sensorManager.getSensorList(Sensor.TYPE_ALL)) {
             if (sensor.getType() == Sensor.TYPE_ACCELEROMETER || sensor.getType() == Sensor.TYPE_ORIENTATION) {

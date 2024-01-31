@@ -42,6 +42,7 @@ import org.labyrinth.common.MeasureUtils;
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 
+// FK-TODO: refactor
 public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
 
     private OsmandActionBarActivity activity;
@@ -237,8 +238,7 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
             title.setText(getString(R.string.ltr_or_rtl_combine_via_colon,
                     getString(titleRes), getFormattedPedestrianHeight(value, app)));
             settings.pedestrianHeight = value;
-            // FK-FIXME: nicht setEnabled(true) sondern Neustart wegen neuer pedestrianHeight
-            app.getLocationProvider().footPath.setEnabled(true);
+            app.getLocationProvider().footPath.setPedestrianHeight(settings.pedestrianHeight);
         });
         UiUtilities.setupSlider(slider, isNightMode(), getActiveProfileColor());
     }

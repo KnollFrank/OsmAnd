@@ -1,66 +1,95 @@
 package org.labyrinth.osmand;
 
-import com.google.common.base.Supplier;
-
 import net.osmand.data.ValueHolder;
+import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.routing.IRouteInformationListener;
-import net.osmand.plus.routing.RouteCalculationResult;
+
+import org.labyrinth.footpath.graph.Path;
+
+import java.util.Optional;
+import java.util.function.Supplier;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
 
 public class FootPath implements IRouteInformationListener {
 
-    private final FootPathDriver footPathDriver;
-    private final Supplier<RouteCalculationResult> getRoute;
+    private final OsmandApplication app;
+    private Optional<FootPathDriver> footPathDriver = Optional.empty();
+    private final Supplier<Optional<Path>> optionalPathSupplier;
+    private Quantity<Length> pedestrianHeight;
     private boolean enabled;
 
-    public FootPath(
-            final FootPathDriver footPathDriver,
-            final Supplier<RouteCalculationResult> getRoute,
-            final boolean enabled) {
-        this.footPathDriver = footPathDriver;
-        this.getRoute = getRoute;
+    public FootPath(final OsmandApplication app,
+                    final Supplier<Optional<Path>> optionalPathSupplier,
+                    final Quantity<Length> pedestrianHeight,
+                    final boolean enabled) {
+        this.app = app;
+        this.optionalPathSupplier = optionalPathSupplier;
+        this.pedestrianHeight = pedestrianHeight;
         this.enabled = enabled;
     }
 
     @Override
     public void newRouteIsCalculated(final boolean newRoute, final ValueHolder<Boolean> showToast) {
-        if (!isEnabled()) return;
-        restart();
+        if (!this.enabled) return;
+        tryRestart();
     }
 
     @Override
     public void routeWasCancelled() {
-        if (!isEnabled()) return;
+        if (!this.enabled) return;
         stop();
     }
 
     @Override
     public void routeWasFinished() {
-        if (!isEnabled()) return;
+        if (!this.enabled) return;
         stop();
-    }
-
-    public boolean isRunning() {
-        return this.footPathDriver.isNavigating();
-    }
-
-    public boolean isEnabled() {
-        return enabled;
     }
 
     public void setEnabled(final boolean enabled) {
         this.enabled = enabled;
         if (enabled) {
-            restart();
+            tryRestart();
         } else {
             stop();
         }
     }
 
-    private void restart() {
-        this.footPathDriver.tryRestartNavigating(this.getRoute.get());
+    public boolean isEnabled() {
+        return this.enabled;
+    }
+
+    public void setPedestrianHeight(final Quantity<Length> pedestrianHeight) {
+        this.pedestrianHeight = pedestrianHeight;
+        if (this.enabled) {
+            tryRestart();
+        }
+    }
+
+    private void tryRestart() {
+        stop();
+        this.footPathDriver = createFootPathDriver();
+        this.footPathDriver.ifPresent(FootPathDriver::start);
     }
 
     private void stop() {
-        this.footPathDriver.stopNavigating();
+        this.footPathDriver.ifPresent(FootPathDriver::stop);
+    }
+
+    private Optional<FootPathDriver> createFootPathDriver() {
+        return this
+                .getOptionalPath()
+                .map(path ->
+                        new FootPathDriver(
+                                this.app,
+                                location -> this.app.getLocationProvider().setLocationFromSimulation(location),
+                                path,
+                                this.pedestrianHeight));
+    }
+
+    private Optional<Path> getOptionalPath() {
+        return this.optionalPathSupplier.get();
     }
 }

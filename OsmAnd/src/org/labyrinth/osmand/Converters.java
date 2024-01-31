@@ -26,7 +26,7 @@ class Converters {
                 .collect(Collectors.toList());
     }
 
-    private static int id = 0;
+    private static long id = 0;
 
     private static Node asNode(final Location location) {
         return new NodeBuilder()
