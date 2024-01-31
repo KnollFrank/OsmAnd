@@ -204,7 +204,7 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
                 if (slider != null) {
                     slider.setVisibility(checked ? View.VISIBLE : View.GONE);
                     if (checked) {
-                        setupSpeedSlider(itemView, mode.getTitle());
+                        setupPedestrianHeightSlider(itemView, mode.getTitle());
                     }
                 }
                 View divider = itemView.findViewById(R.id.divider);
@@ -217,30 +217,44 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
         }
     }
 
-    private void setupSpeedSlider(View itemView, int titleRes) {
-        Quantity<Length> min = getQuantity(70.0, CENTI(METRE));
-        Quantity<Length> max = getQuantity(272.0, CENTI(METRE));
-        Quantity<Length> speedValue = settings.pedestrianHeight;
-        speedValue = MeasureUtils.min(speedValue, max);
-        Slider slider = itemView.findViewById(R.id.slider);
-        TextView title = itemView.findViewById(android.R.id.title);
-        TextView minSpeed = itemView.findViewById(R.id.min);
-        TextView maxSpeed = itemView.findViewById(R.id.max);
+    private static final Quantity<Length> MIN_PEDESTRIAN_HEIGHT = getQuantity(30.0, CENTI(METRE));
+    private static final Quantity<Length> MAX_PEDESTRIAN_HEIGHT = getQuantity(272.0, CENTI(METRE));
 
-        minSpeed.setText(getFormattedPedestrianHeight(min, app));
-        maxSpeed.setText(getFormattedPedestrianHeight(max, app));
-        title.setText(getString(R.string.ltr_or_rtl_combine_via_colon, getString(titleRes),
-                getFormattedPedestrianHeight(speedValue, app)));
-        slider.setValueTo(toCentiMetres(max.subtract(min)));
-        slider.setValue(toCentiMetres(speedValue.subtract(min)));
-        slider.addOnChangeListener((s, val, fromUser) -> {
-            final Quantity<Length> value = min.add(fromCentiMetres(val));
-            title.setText(getString(R.string.ltr_or_rtl_combine_via_colon,
-                    getString(titleRes), getFormattedPedestrianHeight(value, app)));
-            settings.pedestrianHeight = value;
-            app.getLocationProvider().footPath.setPedestrianHeight(settings.pedestrianHeight);
-        });
-        UiUtilities.setupSlider(slider, isNightMode(), getActiveProfileColor());
+    private void setupPedestrianHeightSlider(View itemView, int titleRes) {
+        {
+            itemView.<TextView>findViewById(R.id.min).setText(getFormattedPedestrianHeight(MIN_PEDESTRIAN_HEIGHT, app));
+            itemView.<TextView>findViewById(R.id.max).setText(getFormattedPedestrianHeight(MAX_PEDESTRIAN_HEIGHT, app));
+        }
+
+        final Quantity<Length> pedestrianHeight =
+                MeasureUtils.clamp(
+                        settings.pedestrianHeight,
+                        MIN_PEDESTRIAN_HEIGHT,
+                        MAX_PEDESTRIAN_HEIGHT);
+
+        final TextView title = itemView.findViewById(android.R.id.title);
+        title.setText(getString(pedestrianHeight, titleRes));
+
+        {
+            final Slider slider = itemView.findViewById(R.id.slider);
+            slider.setValueFrom(toCentiMetres(MIN_PEDESTRIAN_HEIGHT));
+            slider.setValueTo(toCentiMetres(MAX_PEDESTRIAN_HEIGHT));
+            slider.setValue(toCentiMetres(pedestrianHeight));
+            slider.addOnChangeListener(
+                    (s, pedestrianHeightInCentiMetres, fromUser) -> {
+                        settings.pedestrianHeight = fromCentiMetres(pedestrianHeightInCentiMetres);
+                        title.setText(getString(settings.pedestrianHeight, titleRes));
+                        app.getLocationProvider().footPath.setPedestrianHeight(settings.pedestrianHeight);
+                    });
+            UiUtilities.setupSlider(slider, isNightMode(), getActiveProfileColor());
+        }
+    }
+
+    private String getString(final Quantity<Length> pedestrianHeight, final int titleRes) {
+        return getString(
+                R.string.ltr_or_rtl_combine_via_colon,
+                getString(titleRes),
+                getFormattedPedestrianHeight(pedestrianHeight, app));
     }
 
     private static Quantity<Length> fromCentiMetres(final float length) {

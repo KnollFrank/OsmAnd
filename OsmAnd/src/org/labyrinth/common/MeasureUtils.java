@@ -71,4 +71,8 @@ public class MeasureUtils {
     public static Quantity<Length> max(final Quantity<Length> length1, final Quantity<Length> length2) {
         return isGreaterOrEqual(length1, length2) ? length1 : length2;
     }
+
+    public static Quantity<Length> clamp(final Quantity<Length> value, final Quantity<Length> min, final Quantity<Length> max) {
+        return MeasureUtils.max(min, MeasureUtils.min(max, value));
+    }
 }
