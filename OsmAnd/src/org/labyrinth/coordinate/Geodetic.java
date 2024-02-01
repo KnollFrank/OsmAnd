@@ -1,16 +1,5 @@
 package org.labyrinth.coordinate;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.acos;
-import static java.lang.Math.asin;
-import static java.lang.Math.cos;
-import static java.lang.Math.signum;
-import static java.lang.Math.sin;
-import static tec.units.ri.quantity.Quantities.getQuantity;
-import static tec.units.ri.unit.Units.METRE;
-
-import org.labyrinth.model.PathSrcDst;
-
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -19,8 +8,6 @@ import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 
 public class Geodetic implements Serializable {
-
-    public static final Quantity<Length> EARTH_RADIUS = getQuantity(6378137.0, METRE);
 
     private final LocationExtension location;
 
@@ -42,37 +29,6 @@ public class Geodetic implements Serializable {
 
     public Quantity<Length> getDistanceTo(final Geodetic other) {
         return this.location._distanceTo(other.location);
-    }
-
-    // adapted from http://www.movable-type.co.uk/scripts/latlong.html
-    public Quantity<Length> getAlongTrackDistanceTo(final PathSrcDst path) {
-        final javax.measure.Unit<Length> lengthUnit = METRE;
-        if (this.equals(path.getSrc())) {
-            return getQuantity(0.0, lengthUnit);
-        }
-
-        final double R = EARTH_RADIUS.to(lengthUnit).getValue().doubleValue();
-        final double dist13 = path.getSrc().getDistanceTo(this).to(lengthUnit).getValue().doubleValue() / R;
-        final double bearing13 = path.getSrc().getInitialBearingTo(this).to(Angle.Unit.RADIANS);
-        final double bearing12 = path.getSrc().getInitialBearingTo(path.getDst()).to(Angle.Unit.RADIANS);
-        final double deltaxt = asin(sin(dist13) * sin(bearing13 - bearing12));
-        final double deltaat = acos(cos(dist13) / abs(cos(deltaxt)));
-        return getQuantity((deltaat * signum(cos(bearing12 - bearing13))) * R, lengthUnit);
-    }
-
-    // adapted from http://www.movable-type.co.uk/scripts/latlong.html
-    public Quantity<Length> crossTrackDistanceTo(final PathSrcDst path) {
-        final javax.measure.Unit<Length> lengthUnit = METRE;
-        if (this.equals(path.getSrc())) {
-            return getQuantity(0.0, lengthUnit);
-        }
-
-        final double R = EARTH_RADIUS.to(lengthUnit).getValue().doubleValue();
-        final double dist13 = path.getSrc().getDistanceTo(this).to(lengthUnit).getValue().doubleValue() / R;
-        final double bearing13 = path.getSrc().getInitialBearingTo(this).to(Angle.Unit.RADIANS);
-        final double bearing12 = path.getSrc().getInitialBearingTo(path.getDst()).to(Angle.Unit.RADIANS);
-        final double deltaxt = asin(sin(dist13) * sin(bearing13 - bearing12));
-        return getQuantity(abs(deltaxt * R), lengthUnit);
     }
 
     public Angle getInitialBearingTo(final Geodetic other) {
