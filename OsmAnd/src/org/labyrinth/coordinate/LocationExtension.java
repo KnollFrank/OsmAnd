@@ -8,19 +8,15 @@ import net.osmand.Location;
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 
-public class LocationWrapper extends Location {
+public class LocationExtension extends Location {
 
     private static final Angle.Unit UNIT4ANGLES = Angle.Unit.DEGREES;
 
-    public LocationWrapper(final String provider) {
-        super(provider);
-    }
-
-    public LocationWrapper(final String provider, final Angle lat, final Angle lon) {
+    public LocationExtension(final String provider, final Angle lat, final Angle lon) {
         super(provider, lat.to(UNIT4ANGLES), lon.to(UNIT4ANGLES));
     }
 
-    public LocationWrapper(final Location l) {
+    public LocationExtension(final Location l) {
         super(l);
     }
 

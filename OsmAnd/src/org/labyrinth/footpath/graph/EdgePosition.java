@@ -2,8 +2,6 @@ package org.labyrinth.footpath.graph;
 
 import org.labyrinth.coordinate.Geodetic;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Length;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -30,18 +28,6 @@ public class EdgePosition {
 
     public Geodetic getGeodetic() {
         return edge.getSource().getPosition().moveIntoDirection(edge.getTarget().getPosition(), fractionOfEdgeLength);
-    }
-
-    public Quantity<Length> getCoveredLength() {
-        return edge.getLength().multiply(fractionOfEdgeLength);
-    }
-
-    public Quantity<Length> getRestLength() {
-        return edge.getLength().multiply(1 - fractionOfEdgeLength);
-    }
-
-    public EdgePosition reverseRepresentation() {
-        return new EdgePosition(this.edge.reverse(), 1 - this.fractionOfEdgeLength);
     }
 
     public boolean almostEquals(final EdgePosition other, final double eps) {

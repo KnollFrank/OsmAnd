@@ -1,6 +1,5 @@
 package org.labyrinth.footpath.graph;
 
-import java.util.Optional;
 import java.util.Set;
 
 public class Graph {
@@ -19,31 +18,5 @@ public class Graph {
             edge.getSource().getLocEdges().add(edge);
             edge.getTarget().getLocEdges().add(edge);
         }
-    }
-
-    public Optional<Node> findNodeById(final long id) {
-        return this
-                .nodes
-                .stream()
-                .filter(node -> node.getId() == id)
-                .findFirst();
-    }
-
-    public Optional<Edge> findEdgeContainingNodes(final Node a, final Node b) {
-        return a
-                .getLocEdges()
-                .stream()
-                .filter(edge -> edge.containsNodes(a, b))
-                .findFirst();
-    }
-
-    public Node getNodeByName(final String name) {
-        return
-                this
-                        .nodes
-                        .stream()
-                        .filter(node -> node.getName() != null && node.getName().equals(name))
-                        .findFirst()
-                        .get();
     }
 }

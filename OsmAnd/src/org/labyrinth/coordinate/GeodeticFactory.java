@@ -1,14 +1,10 @@
 package org.labyrinth.coordinate;
 
+import net.osmand.Location;
+
 public class GeodeticFactory {
 
-    public static Geodetic createGeodetic(final android.location.Location location) {
-        return new Geodetic(
-                new Angle(location.getLatitude(), Angle.Unit.DEGREES),
-                new Angle(location.getLongitude(), Angle.Unit.DEGREES));
-    }
-
-    public static Geodetic createGeodetic(final net.osmand.Location location) {
+    public static Geodetic createGeodetic(final Location location) {
         return new Geodetic(
                 new Angle(location.getLatitude(), Angle.Unit.DEGREES),
                 new Angle(location.getLongitude(), Angle.Unit.DEGREES));

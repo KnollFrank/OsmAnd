@@ -22,10 +22,10 @@ public class Geodetic implements Serializable {
 
     public static final Quantity<Length> EARTH_RADIUS = getQuantity(6378137.0, METRE);
 
-    private final LocationWrapper location;
+    private final LocationExtension location;
 
     public Geodetic(final Angle latitude, final Angle longitude) {
-        this.location = new LocationWrapper("", latitude, longitude);
+        this.location = new LocationExtension("", latitude, longitude);
     }
 
     public Angle getLatitude() {
@@ -36,23 +36,8 @@ public class Geodetic implements Serializable {
         return this.location._getLongitude();
     }
 
-    public android.location.Location asAndroidLocation() {
-        final android.location.Location location = new android.location.Location("");
-        location.setLatitude(getLatitude().to(Angle.Unit.DEGREES));
-        location.setLongitude(getLongitude().to(Angle.Unit.DEGREES));
-        return location;
-    }
-
-    public LocationWrapper asOsmAndLocation() {
-        return new LocationWrapper(this.location);
-    }
-
-    public boolean equalsDeltaDegrees(final Geodetic other, final double deltaDegrees) {
-        return equalsDeltaDegrees(getLatitude(), other.getLatitude(), deltaDegrees) && equalsDeltaDegrees(getLongitude(), other.getLongitude(), deltaDegrees);
-    }
-
-    private boolean equalsDeltaDegrees(final Angle angle1, final Angle angle2, final double deltaDegrees) {
-        return abs(angle1.to(Angle.Unit.DEGREES) - angle2.to(Angle.Unit.DEGREES)) < deltaDegrees;
+    public LocationExtension asOsmAndLocation() {
+        return new LocationExtension(this.location);
     }
 
     public Quantity<Length> getDistanceTo(final Geodetic other) {
