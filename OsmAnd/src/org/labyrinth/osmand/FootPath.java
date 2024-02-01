@@ -15,24 +15,24 @@ import javax.measure.quantity.Length;
 public class FootPath implements IRouteInformationListener {
 
     private final FootPathDelegate delegate;
-    private final Supplier<Optional<Path>> optionalPathSupplier;
+    private final Supplier<Optional<Path>> getPath;
 
     public FootPath(final OsmandApplication app,
-                    final Supplier<Optional<Path>> optionalPathSupplier,
+                    final Supplier<Optional<Path>> getPath,
                     final Quantity<Length> pedestrianHeight,
                     final boolean enabled) {
         this.delegate =
                 new FootPathDelegate(
                         app,
-                        optionalPathSupplier.get(),
+                        getPath.get(),
                         pedestrianHeight,
                         enabled);
-        this.optionalPathSupplier = optionalPathSupplier;
+        this.getPath = getPath;
     }
 
     @Override
     public void newRouteIsCalculated(final boolean newRoute, final ValueHolder<Boolean> showToast) {
-        delegate.setPath(optionalPathSupplier.get());
+        delegate.setPath(getPath.get());
     }
 
     @Override
