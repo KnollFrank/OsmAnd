@@ -10,6 +10,7 @@ import org.labyrinth.footpath.graph.PathPosition;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 class Converters {
 
@@ -20,17 +21,15 @@ class Converters {
     }
 
     public static List<Node> asNodes(final List<? extends Location> locations) {
-        return locations
-                .stream()
-                .map(Converters::asNode)
+        return IntStream
+                .range(0, locations.size())
+                .mapToObj(i -> asNode(i, locations.get(i)))
                 .collect(Collectors.toList());
     }
 
-    private static long id = 0;
-
-    private static Node asNode(final Location location) {
+    private static Node asNode(final long id, final Location location) {
         return new NodeBuilder()
-                .withId(id++)
+                .withId(id)
                 .withPosition(GeodeticFactory.createGeodetic(location))
                 .withName("")
                 .createNode();

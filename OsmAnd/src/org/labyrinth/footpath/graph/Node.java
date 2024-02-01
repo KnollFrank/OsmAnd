@@ -5,11 +5,12 @@ import org.labyrinth.coordinate.Geodetic;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class Node implements Comparable<Node> {
+public class Node {
 
     private final long id;
     private final Geodetic position;
@@ -45,11 +46,6 @@ public class Node implements Comparable<Node> {
 
     public Set<Edge> getLocEdges() {
         return locEdges;
-    }
-
-    @Override
-    public int compareTo(final Node other) {
-        return Long.compare(this.getId(), other.getId());
     }
 
     @Override
