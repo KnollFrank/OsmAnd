@@ -1,14 +1,14 @@
 package org.labyrinth.footpath.core;
 
-import org.labyrinth.footpath.core.positioner.PositionerBestFit;
+import static org.labyrinth.common.MeasureUtils.divide;
+
 import org.labyrinth.coordinate.Angle;
+import org.labyrinth.footpath.core.positioner.PositionerBestFit;
 import org.labyrinth.footpath.graph.Path;
 import org.labyrinth.footpath.graph.PathPosition;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
-
-import static org.labyrinth.common.MeasureUtils.divide;
 
 public class Navigator {
 
@@ -28,9 +28,5 @@ public class Navigator {
         return new PathPosition(
                 path,
                 divide(positionerBestFit.getCurrentCoveredLength(), path.getLength()));
-    }
-
-    public void resetSteps() {
-        positionerBestFit.resetSteps();
     }
 }

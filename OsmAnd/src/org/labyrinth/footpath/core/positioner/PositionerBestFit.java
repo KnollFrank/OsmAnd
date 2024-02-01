@@ -1,17 +1,19 @@
 package org.labyrinth.footpath.core.positioner;
 
-import com.google.common.primitives.Doubles;
-import org.labyrinth.coordinate.Angle;
-import org.labyrinth.footpath.graph.Edge;
-
-import javax.measure.Quantity;
-import javax.measure.quantity.Length;
-import java.util.List;
-import java.util.stream.IntStream;
-
 import static com.google.common.primitives.Doubles.min;
 import static tec.units.ri.quantity.Quantities.getQuantity;
 import static tec.units.ri.unit.Units.METRE;
+
+import com.google.common.primitives.Doubles;
+
+import org.labyrinth.coordinate.Angle;
+import org.labyrinth.footpath.graph.Edge;
+
+import java.util.List;
+import java.util.stream.IntStream;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
 
 // adapted from the paper "FootPath: Accurate Map-based Indoor Navigation Using Smartphones" https://www.comsys.rwth-aachen.de/fileadmin/papers/2011/2011-IPIN-bitsch-footpath.pdf
 public class PositionerBestFit {
@@ -38,10 +40,6 @@ public class PositionerBestFit {
         return detectedNumberOfSteps == 0 ?
                 getQuantity(0.0, METRE) :
                 stepSize.multiply(getOneBasedArgMinMapStepIndex(getDetectedStepIndex(detectedNumberOfSteps)));
-    }
-
-    public void resetSteps() {
-        initialize();
     }
 
     private void initialize() {

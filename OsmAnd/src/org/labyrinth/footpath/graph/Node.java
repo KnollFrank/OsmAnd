@@ -3,25 +3,21 @@ package org.labyrinth.footpath.graph;
 import org.labyrinth.coordinate.Angle;
 import org.labyrinth.coordinate.Geodetic;
 
+import java.util.Objects;
+
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
-
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 
 public class Node {
 
     private final long id;
     private final Geodetic position;
     private final String name;
-    private final Set<Edge> locEdges;
 
     Node(final long id, final Geodetic position, final String name) {
         this.id = id;
         this.position = position;
         this.name = name;
-        locEdges = new HashSet<>();
     }
 
     public Angle getBearing(final Node other) {
@@ -42,10 +38,6 @@ public class Node {
 
     public long getId() {
         return id;
-    }
-
-    public Set<Edge> getLocEdges() {
-        return locEdges;
     }
 
     @Override

@@ -1,32 +1,23 @@
 package org.labyrinth.common;
 
-import tec.units.ri.function.NaturalOrder;
-import tec.units.ri.quantity.Quantities;
+import static tec.units.ri.quantity.Quantities.getQuantity;
+import static tec.units.ri.unit.Units.METRE;
+
+import java.util.stream.Stream;
 
 import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
-import java.util.Comparator;
-import java.util.stream.Stream;
-
-import static tec.units.ri.quantity.Quantities.getQuantity;
-import static tec.units.ri.unit.Units.METRE;
+import tec.units.ri.quantity.Quantities;
 
 public class MeasureUtils {
-
-    public static final Comparator<Quantity<Length>> COMPARATOR = new NaturalOrder<>();
 
     public static double divide(final Quantity<Length> dividend, final Quantity<Length> divisor) {
         final Unit<Length> commonUnit4Division = METRE;
         return dividend.to(commonUnit4Division)
                 .divide(divisor.to(commonUnit4Division))
                 .getValue().doubleValue();
-    }
-
-    // length1 > length2
-    public static boolean isGreaterThan(final Quantity<Length> length1, final Quantity<Length> length2) {
-        return length1.subtract(length2).getValue().doubleValue() > 0.0;
     }
 
     // length1 >= length2
@@ -37,11 +28,6 @@ public class MeasureUtils {
     // length1 <= length2
     public static boolean isLessOrEqual(final Quantity<Length> length1, final Quantity<Length> length2) {
         return isGreaterOrEqual(length2, length1);
-    }
-
-    // length1 < length2
-    public static boolean isLessThan(final Quantity<Length> length1, final Quantity<Length> length2) {
-        return isGreaterThan(length2, length1);
     }
 
     public static Quantity<Length> abs(final Quantity<Length> length) {
@@ -72,7 +58,9 @@ public class MeasureUtils {
         return isGreaterOrEqual(length1, length2) ? length1 : length2;
     }
 
-    public static Quantity<Length> clamp(final Quantity<Length> value, final Quantity<Length> min, final Quantity<Length> max) {
+    public static Quantity<Length> clampValueToMinMax(final Quantity<Length> value,
+                                                      final Quantity<Length> min,
+                                                      final Quantity<Length> max) {
         return MeasureUtils.max(min, MeasureUtils.min(max, value));
     }
 }

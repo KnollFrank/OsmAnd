@@ -197,7 +197,7 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
         }
 
         final Quantity<Length> pedestrianHeight =
-                MeasureUtils.clamp(
+                MeasureUtils.clampValueToMinMax(
                         settings.pedestrianHeight,
                         MIN_PEDESTRIAN_HEIGHT,
                         MAX_PEDESTRIAN_HEIGHT);
