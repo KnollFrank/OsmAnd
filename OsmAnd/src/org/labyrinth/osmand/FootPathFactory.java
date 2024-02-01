@@ -1,10 +1,12 @@
 package org.labyrinth.osmand;
 
+import static org.labyrinth.footpath.graph.PathFactory.createPath;
+import static org.labyrinth.osmand.Converters.asNodes;
+
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.routing.RouteCalculationResult;
 
 import org.labyrinth.footpath.graph.Path;
-import org.labyrinth.footpath.graph.PathFactory;
 
 import java.util.Optional;
 
@@ -19,8 +21,6 @@ public class FootPathFactory {
     }
 
     private static Optional<Path> asOptionalPath(final RouteCalculationResult route) {
-        return PathFactory.createPath(
-                Converters.asNodes(
-                        route.getImmutableAllLocations()));
+        return createPath(asNodes(route.getImmutableAllLocations()));
     }
 }
