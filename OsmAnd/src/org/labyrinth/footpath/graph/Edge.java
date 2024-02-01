@@ -2,14 +2,15 @@ package org.labyrinth.footpath.graph;
 
 import org.labyrinth.coordinate.Angle;
 
+import java.util.Objects;
+
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
-import java.util.Objects;
 
 public class Edge {
 
-    private final Node source;
-    private final Node target;
+    public final Node source;
+    public final Node target;
     private final Quantity<Length> length;
     private final Angle bearing;
 
@@ -25,20 +26,12 @@ public class Edge {
         return bearing;
     }
 
-    public Node getSource() {
-        return source;
-    }
-
-    public Node getTarget() {
-        return target;
-    }
-
     public Quantity<Length> getLength() {
         return length;
     }
 
     public Edge reverse() {
-        return new Edge(this.getTarget(), this.getSource());
+        return new Edge(target, source);
     }
 
     @Override
@@ -57,8 +50,8 @@ public class Edge {
 
     @Override
     public String toString() {
-        String ret = "\nEdge(" + source.getId() + " to " + target.getId() + "): ";
-        ret += "\n    Length (m): " + length;
+        String ret = "\nEdge(" + source.id + " to " + target.id + "): ";
+        ret += "\n    Length: " + length;
         ret += "\n    Bearing: " + bearing;
         return ret;
     }

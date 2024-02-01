@@ -18,16 +18,16 @@ public class EdgePosition {
 
     public Optional<Node> getNode() {
         if (fractionOfEdgeLength == 0.0) {
-            return Optional.of(edge.getSource());
+            return Optional.of(edge.source);
         }
         if (fractionOfEdgeLength == 1.0) {
-            return Optional.of(edge.getTarget());
+            return Optional.of(edge.target);
         }
         return Optional.empty();
     }
 
     public Geodetic getGeodetic() {
-        return edge.getSource().getPosition().moveIntoDirection(edge.getTarget().getPosition(), fractionOfEdgeLength);
+        return edge.source.position.moveIntoDirection(edge.target.position, fractionOfEdgeLength);
     }
 
     public boolean almostEquals(final EdgePosition other, final double eps) {

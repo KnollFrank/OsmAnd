@@ -10,9 +10,9 @@ import javax.measure.quantity.Length;
 
 public class Node {
 
-    private final long id;
-    private final Geodetic position;
-    private final String name;
+    public final long id;
+    public final Geodetic position;
+    public final String name;
 
     Node(final long id, final Geodetic position, final String name) {
         this.id = id;
@@ -21,23 +21,11 @@ public class Node {
     }
 
     public Angle getBearing(final Node other) {
-        return this.getPosition().getInitialBearingTo(other.getPosition());
+        return position.getInitialBearingTo(other.position);
     }
 
     public Quantity<Length> getDistanceTo(final Node other) {
-        return this.getPosition().getDistanceTo(other.getPosition());
-    }
-
-    public Geodetic getPosition() {
-        return position;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public long getId() {
-        return id;
+        return position.getDistanceTo(other.position);
     }
 
     @Override
