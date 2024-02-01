@@ -6,7 +6,6 @@ import org.labyrinth.footpath.graph.EdgePosition;
 import org.labyrinth.footpath.graph.Node;
 import org.labyrinth.footpath.graph.Path;
 import org.labyrinth.footpath.graph.PathFactory;
-import org.labyrinth.common.Pair;
 import org.labyrinth.footpath.graph.PathPosition;
 
 import javax.measure.Quantity;
@@ -17,6 +16,8 @@ import java.util.List;
 import static org.labyrinth.common.ListUtils.isValidIndex;
 import static org.labyrinth.common.MeasureUtils.divide;
 import static org.labyrinth.common.MeasureUtils.isGreaterThan;
+
+import android.util.Pair;
 
 class SubpathProvider {
 
