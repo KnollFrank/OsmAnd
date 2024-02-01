@@ -15,12 +15,12 @@ public class FootPathFactory {
     public static FootPath createFootPath(final OsmandApplication app, final boolean enabled) {
         return new FootPath(
                 app,
-                () -> asOptionalPath(app.getRoutingHelper().getRoute()),
+                () -> asPath(app.getRoutingHelper().getRoute()),
                 app.getSettings().pedestrianHeight,
                 enabled);
     }
 
-    private static Optional<Path> asOptionalPath(final RouteCalculationResult route) {
+    private static Optional<Path> asPath(final RouteCalculationResult route) {
         return createPath(asNodes(route.getImmutableAllLocations()));
     }
 }
