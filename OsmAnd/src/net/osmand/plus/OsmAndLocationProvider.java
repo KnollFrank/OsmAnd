@@ -750,7 +750,7 @@ public class OsmAndLocationProvider implements SensorEventListener {
             }
         } else if (routingHelper.isRoutePlanningMode() && app.getSettings().getPointToStart() == null) {
             routingHelper.setCurrentLocation(location, false);
-        } else if (getLocationSimulation().isRouteAnimating() /*FK-TODO: || footPathRouteInformationListener.isRunning() ?*/) {
+        } else if (getLocationSimulation().isRouteAnimating() || footPath.isEnabled()) {
             routingHelper.setCurrentLocation(location, false);
         }
         app.getWaypointHelper().locationChanged(location);
