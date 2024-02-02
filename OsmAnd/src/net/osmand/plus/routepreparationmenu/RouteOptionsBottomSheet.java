@@ -28,10 +28,9 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import net.osmand.gpx.GPXFile;
 import net.osmand.PlatformUtil;
 import net.osmand.StateChangedListener;
-import net.osmand.plus.simulation.OsmAndLocationSimulation;
+import net.osmand.gpx.GPXFile;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
@@ -42,13 +41,13 @@ import net.osmand.plus.base.bottomsheetmenu.BottomSheetItemWithDescription;
 import net.osmand.plus.base.bottomsheetmenu.SimpleBottomSheetItem;
 import net.osmand.plus.base.bottomsheetmenu.simpleitems.DividerStartItem;
 import net.osmand.plus.base.bottomsheetmenu.simpleitems.TitleItem;
-import net.osmand.plus.track.helpers.GpxUiHelper;
 import net.osmand.plus.measurementtool.MeasurementToolFragment;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.AvoidPTTypesRoutingParameter;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.AvoidRoadsRoutingParameter;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.CalculateAltitudeItem;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.CustomizeRouteLineRoutingParameter;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.DividerItem;
+import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.FootPathItem;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.GpxLocalRoutingParameter;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.LocalRoutingParameter;
 import net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.LocalRoutingParameterGroup;
@@ -69,8 +68,10 @@ import net.osmand.plus.settings.bottomsheets.ElevationDateBottomSheet;
 import net.osmand.plus.settings.fragments.BaseSettingsFragment;
 import net.osmand.plus.settings.fragments.SettingsScreenType;
 import net.osmand.plus.settings.fragments.voice.VoiceLanguageBottomSheetFragment;
+import net.osmand.plus.simulation.OsmAndLocationSimulation;
 import net.osmand.plus.track.fragments.TrackAltitudeBottomSheet;
 import net.osmand.plus.track.fragments.TrackAltitudeBottomSheet.CalculateAltitudeListener;
+import net.osmand.plus.track.helpers.GpxUiHelper;
 import net.osmand.plus.track.helpers.save.SaveGpxHelper;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.ColorUtilities;
@@ -202,6 +203,8 @@ public class RouteOptionsBottomSheet extends MenuBottomSheetDialogFragment imple
 				items.add(createShowAlongTheRouteItem(optionsItem));
 			} else if (optionsItem instanceof RouteSimulationItem) {
 				items.add(createRouteSimulationItem(optionsItem));
+			} else if (optionsItem instanceof FootPathItem) {
+				items.add(createFootPathItem(optionsItem));
 			} else if (optionsItem instanceof AvoidPTTypesRoutingParameter) {
 				items.add(createAvoidPTTypesItem(optionsItem));
 			} else if (optionsItem instanceof AvoidRoadsRoutingParameter) {
@@ -494,6 +497,44 @@ public class RouteOptionsBottomSheet extends MenuBottomSheetDialogFragment imple
 				.create();
 	}
 
+	private BaseBottomSheetItem createFootPathItem(LocalRoutingParameter optionsItem) {
+		View itemView = UiUtilities.getInflater(app, nightMode).inflate(
+				R.layout.bottom_sheet_item_with_descr_switch_and_additional_button_56dp, null, false);
+		ImageView icon = itemView.findViewById(R.id.icon);
+		TextView tvTitle = itemView.findViewById(R.id.title);
+		itemView.findViewById(R.id.description).setVisibility(View.GONE);
+		View basicItem = itemView.findViewById(R.id.basic_item_body);
+		CompoundButton cb = itemView.findViewById(R.id.compound_button);
+		View settingBtn = itemView.findViewById(R.id.additional_button);
+		ImageView settingBtnImage = itemView.findViewById(R.id.additional_button_icon);
+
+		tvTitle.setText(getString(R.string.foot_path));
+		icon.setImageDrawable(getContentIcon(R.drawable.ic_action_start_navigation));
+		cb.setChecked(settings.footPath);
+		app.getLocationProvider().footPath.setEnabled(settings.footPath);
+		cb.setFocusable(false);
+		UiUtilities.setupCompoundButton(nightMode, selectedModeColor, cb);
+
+		basicItem.setOnClickListener(v -> {
+			settings.footPath = !settings.footPath;
+			cb.setChecked(settings.footPath);
+			app.getLocationProvider().footPath.setEnabled(settings.footPath);
+		});
+
+		Drawable drawable = app.getUIUtilities().getIcon(R.drawable.ic_action_settings,
+				nightMode ? R.color.icon_color_default_dark : R.color.icon_color_default_light);
+		Drawable activeDrawable = app.getUIUtilities().getPaintedIcon(R.drawable.ic_action_settings, selectedModeColor);
+		drawable = AndroidUtils.createPressedStateListDrawable(drawable, activeDrawable);
+		settingBtnImage.setImageDrawable(drawable);
+		settingBtn.setOnClickListener(v -> {
+			BaseSettingsFragment.showInstance(mapActivity, SettingsScreenType.FOOTPATH_NAVIGATION, applicationMode);
+			dismiss();
+		});
+
+		return new BaseBottomSheetItem.Builder()
+				.setCustomView(itemView)
+				.create();
+	}
 
 	private BaseBottomSheetItem createAvoidRoadsItem(LocalRoutingParameter optionsItem) {
 		return new SimpleBottomSheetItem.Builder()
@@ -853,7 +894,8 @@ public class RouteOptionsBottomSheet extends MenuBottomSheetDialogFragment imple
 				DividerItem.KEY,
 				OtherSettingsRoutingParameter.KEY,
 				CustomizeRouteLineRoutingParameter.KEY,
-				RouteSimulationItem.KEY),
+				RouteSimulationItem.KEY,
+				FootPathItem.KEY),
 
 		PUBLIC_TRANSPORT(MuteSoundRoutingParameter.KEY,
 				DividerItem.KEY,

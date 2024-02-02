@@ -652,6 +652,7 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 		}
 
 		routingHelper.addListener(this);
+		routingHelper.addListener(app.getLocationProvider().footPath);
 		app.getMapMarkersHelper().addListener(this);
 
 		if (System.currentTimeMillis() - time > 50) {
@@ -1013,6 +1014,7 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 		mapView.setOnDrawMapListener(null);
 		cancelSplashScreenTimer();
 		app.getMapMarkersHelper().removeListener(this);
+		app.getRoutingHelper().removeListener(app.getLocationProvider().footPath);
 		app.getRoutingHelper().removeListener(this);
 		app.getDownloadThread().resetUiActivity(this);
 
