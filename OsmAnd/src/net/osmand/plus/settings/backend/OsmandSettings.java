@@ -17,7 +17,6 @@ import static net.osmand.plus.views.mapwidgets.WidgetsPanel.PAGE_SEPARATOR;
 import static net.osmand.plus.views.mapwidgets.WidgetsPanel.WIDGET_SEPARATOR;
 import static net.osmand.render.RenderingRuleStorageProperties.A_APP_MODE;
 import static net.osmand.render.RenderingRuleStorageProperties.A_BASE_APP_MODE;
-
 import static tec.units.ri.quantity.Quantities.getQuantity;
 import static tec.units.ri.unit.MetricPrefix.CENTI;
 import static tec.units.ri.unit.Units.METRE;
@@ -93,7 +92,23 @@ import net.osmand.plus.settings.backend.preferences.PreferenceWithListener;
 import net.osmand.plus.settings.backend.preferences.StringPreference;
 import net.osmand.plus.settings.backend.storages.ImpassableRoadsStorage;
 import net.osmand.plus.settings.backend.storages.IntermediatePointsStorage;
-import net.osmand.plus.settings.enums.*;
+import net.osmand.plus.settings.enums.AngularConstants;
+import net.osmand.plus.settings.enums.AutoZoomMap;
+import net.osmand.plus.settings.enums.CompassMode;
+import net.osmand.plus.settings.enums.CompassVisibility;
+import net.osmand.plus.settings.enums.DayNightMode;
+import net.osmand.plus.settings.enums.DistanceByTapTextSize;
+import net.osmand.plus.settings.enums.DrivingRegion;
+import net.osmand.plus.settings.enums.FootPathMode;
+import net.osmand.plus.settings.enums.HistorySource;
+import net.osmand.plus.settings.enums.LocationSource;
+import net.osmand.plus.settings.enums.Map3DModeVisibility;
+import net.osmand.plus.settings.enums.MapsSortMode;
+import net.osmand.plus.settings.enums.MetricsConstants;
+import net.osmand.plus.settings.enums.SimulationMode;
+import net.osmand.plus.settings.enums.SpeedConstants;
+import net.osmand.plus.settings.enums.TracksSortByMode;
+import net.osmand.plus.settings.enums.TracksSortMode;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.FileUtils;
 import net.osmand.plus.views.layers.RadiusRulerControlLayer.RadiusRulerMode;
@@ -1475,6 +1490,7 @@ public class OsmandSettings {
 	public String simulateNavigationMode = SimulationMode.PREVIEW.getKey();
 	public String footPathMode = FootPathMode.PEDESTRIAN_HEIGHT.key;
     public float simulateNavigationSpeed = SIM_MIN_SPEED;
+	// FK-TODO: soll Optional<Quantity<Length>> sein und über den Settingsdialog vom Benutzer beim Aktivieren von FootPath zwingend gesetzt werden müssen.
 	public Quantity<Length> pedestrianHeight = getQuantity(187.0, CENTI(METRE));
 
 	public final CommonPreference<Boolean> SHOW_ROUTING_ALARMS = new BooleanPreference(this, "show_routing_alarms", true).makeProfile().cache();

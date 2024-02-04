@@ -8,7 +8,7 @@ import net.osmand.plus.R;
 
 // FK-TODO: refactor, this is not an enum
 public enum FootPathMode {
-    PEDESTRIAN_HEIGHT("pedestrian_height", R.string.footpath_pedestrianheight_title, R.string.footpath_pedestrianheight_desc, R.layout.preference_simulation_mode_slider);
+    PEDESTRIAN_HEIGHT("pedestrian_height", R.string.footpath_pedestrianheight_title, R.string.footpath_pedestrianheight_desc, R.layout.footpath_slider);
 
     public final String key;
     public final int title;
