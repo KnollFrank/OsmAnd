@@ -20,7 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
-import androidx.preference.CheckBoxPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.PreferenceViewHolder;
@@ -30,7 +29,7 @@ import com.google.android.material.slider.Slider;
 
 import net.osmand.plus.R;
 import net.osmand.plus.activities.OsmandActionBarActivity;
-import net.osmand.plus.settings.enums.FootPathMode;
+import net.osmand.plus.settings.enums.PedestrianHeight;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.ColorUtilities;
 import net.osmand.plus.utils.UiUtilities;
@@ -102,7 +101,6 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
         }
         if (settings.footPath) {
             setFootpathPref(screen);
-            updateView(screen);
         } else {
             screen.removeAll();
         }
@@ -111,12 +109,10 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         super.onPreferenceChange(preference, newValue);
-        settings.footPathMode = preference.getKey();
         final PreferenceScreen screen = getPreferenceScreen();
         if (screen == null) {
             return false;
         }
-        updateView(screen);
         updateAllSettings();
         return false;
     }
@@ -126,25 +122,8 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
         return ColorUtilities.getActivityBgColorId(isNightMode());
     }
 
-    private void updateView(final PreferenceScreen screen) {
-        for (int i = 0; i < screen.getPreferenceCount(); i++) {
-            final Preference preference = screen.getPreference(i);
-            if (preference instanceof CheckBoxPreference) {
-                final String preferenceKey = preference.getKey();
-                final boolean checked = preferenceKey != null && preferenceKey.equals(settings.footPathMode);
-                ((CheckBoxPreference) preference).setChecked(checked);
-            }
-        }
-    }
-
     private void setFootpathPref(final PreferenceScreen screen) {
-        for (final FootPathMode sm : FootPathMode.values()) {
-            final Preference preference = new Preference(activity);
-            preference.setKey(sm.key);
-            preference.setTitle(sm.title);
-            preference.setLayoutResource(sm.layout);
-            screen.addPreference(preference);
-        }
+        screen.addPreference(PedestrianHeight.getPreference(activity));
         {
             final Preference preference = new Preference(activity);
             preference.setLayoutResource(R.layout.card_bottom_divider);
@@ -167,16 +146,15 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
         if (key == null) {
             return;
         }
-        final FootPathMode mode = FootPathMode.getMode(key);
-        if (mode != null) {
+        if (PedestrianHeight.key.equals(key)) {
             final View itemView = holder.itemView;
             final TextView description = itemView.findViewById(R.id.description);
             description.setVisibility(View.VISIBLE);
-            description.setText(new SpannableString(getString(mode.description)));
+            description.setText(new SpannableString(getString(PedestrianHeight.description)));
             final View slider = itemView.findViewById(R.id.slider_group);
             if (slider != null) {
                 slider.setVisibility(View.VISIBLE);
-                setupPedestrianHeightSlider(itemView, mode.title);
+                setupPedestrianHeightSlider(itemView, PedestrianHeight.title);
             }
             itemView.findViewById(R.id.divider).setVisibility(View.INVISIBLE);
         }

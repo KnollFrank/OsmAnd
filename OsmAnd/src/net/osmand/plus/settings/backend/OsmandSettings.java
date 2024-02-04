@@ -99,7 +99,6 @@ import net.osmand.plus.settings.enums.CompassVisibility;
 import net.osmand.plus.settings.enums.DayNightMode;
 import net.osmand.plus.settings.enums.DistanceByTapTextSize;
 import net.osmand.plus.settings.enums.DrivingRegion;
-import net.osmand.plus.settings.enums.FootPathMode;
 import net.osmand.plus.settings.enums.HistorySource;
 import net.osmand.plus.settings.enums.LocationSource;
 import net.osmand.plus.settings.enums.Map3DModeVisibility;
@@ -1488,7 +1487,6 @@ public class OsmandSettings {
 	public boolean simulateNavigation;
 	public boolean footPath = false;
 	public String simulateNavigationMode = SimulationMode.PREVIEW.getKey();
-	public String footPathMode = FootPathMode.PEDESTRIAN_HEIGHT.key;
     public float simulateNavigationSpeed = SIM_MIN_SPEED;
 	// FK-TODO: soll Optional<Quantity<Length>> sein und über den Settingsdialog vom Benutzer beim Aktivieren von FootPath zwingend gesetzt werden müssen.
 	public Quantity<Length> pedestrianHeight = getQuantity(187.0, CENTI(METRE));
