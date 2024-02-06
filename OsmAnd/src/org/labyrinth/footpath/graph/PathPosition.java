@@ -1,15 +1,16 @@
 package org.labyrinth.footpath.graph;
 
+import static org.labyrinth.common.MeasureUtils.divide;
+import static org.labyrinth.common.MeasureUtils.toMetres;
+
 import org.labyrinth.coordinate.Geodetic;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Length;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-import static org.labyrinth.common.MeasureUtils.divide;
-import static org.labyrinth.common.MeasureUtils.toMeters;
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
 
 public class PathPosition {
 
@@ -47,11 +48,11 @@ public class PathPosition {
 
     private int computeEdgeIndex() {
         final List<Edge> edges = this.path.getEdges();
-        final double lengthInMetres = toMeters(getCoveredPathLength());
+        final double lengthInMetres = toMetres(getCoveredPathLength());
         double actualLengthInMeters = 0;
         int edgeIndex = 0;
         while (actualLengthInMeters < lengthInMetres && edgeIndex < edges.size()) {
-            actualLengthInMeters += toMeters(edges.get(edgeIndex).getLength());
+            actualLengthInMeters += toMetres(edges.get(edgeIndex).getLength());
             edgeIndex++;
         }
         return Math.max(edgeIndex - 1, 0);

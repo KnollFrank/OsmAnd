@@ -13,6 +13,8 @@ import net.osmand.plus.plugins.weather.dialogs.WeatherSettingsFragment;
 import net.osmand.plus.settings.datastorage.DataStorageFragment;
 import net.osmand.plus.settings.fragments.voice.VoiceAnnouncesFragment;
 
+import org.labyrinth.settings.FootPathNavigationSettingFragment;
+
 public enum SettingsScreenType {
 
 	MAIN_SETTINGS(MainSettingsFragment.class.getName(), false, null, R.xml.settings_main_screen, R.layout.global_preference_toolbar),

@@ -1,6 +1,7 @@
 package org.labyrinth.common;
 
 import static tec.units.ri.quantity.Quantities.getQuantity;
+import static tec.units.ri.unit.MetricPrefix.CENTI;
 import static tec.units.ri.unit.Units.METRE;
 
 import java.util.stream.Stream;
@@ -36,10 +37,6 @@ public class MeasureUtils {
                 length.getUnit());
     }
 
-    public static double toMeters(final Quantity<Length> length) {
-        return length.to(METRE).getValue().doubleValue();
-    }
-
     public static Quantity<Length> round(final Quantity<Length> lengthQuantity, final Unit<Length> unit) {
         return getQuantity(
                 Math.round(lengthQuantity.to(unit).getValue().doubleValue()),
@@ -62,5 +59,17 @@ public class MeasureUtils {
                                                       final Quantity<Length> min,
                                                       final Quantity<Length> max) {
         return MeasureUtils.max(min, MeasureUtils.min(max, value));
+    }
+
+    public static double toMetres(final Quantity<Length> length) {
+        return length.to(METRE).getValue().doubleValue();
+    }
+
+    public static Quantity<Length> fromCentiMetres(final double lengthInCentiMetres) {
+        return getQuantity(lengthInCentiMetres, CENTI(METRE));
+    }
+
+    public static double toCentiMetres(final Quantity<Length> length) {
+        return length.to(CENTI(METRE)).getValue().doubleValue();
     }
 }

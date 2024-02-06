@@ -17,9 +17,6 @@ import static net.osmand.plus.views.mapwidgets.WidgetsPanel.PAGE_SEPARATOR;
 import static net.osmand.plus.views.mapwidgets.WidgetsPanel.WIDGET_SEPARATOR;
 import static net.osmand.render.RenderingRuleStorageProperties.A_APP_MODE;
 import static net.osmand.render.RenderingRuleStorageProperties.A_BASE_APP_MODE;
-import static tec.units.ri.quantity.Quantities.getQuantity;
-import static tec.units.ri.unit.MetricPrefix.CENTI;
-import static tec.units.ri.unit.Units.METRE;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -136,9 +133,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import javax.measure.Quantity;
-import javax.measure.quantity.Length;
 
 public class OsmandSettings {
 
@@ -1489,7 +1483,7 @@ public class OsmandSettings {
 	public String simulateNavigationMode = SimulationMode.PREVIEW.getKey();
     public float simulateNavigationSpeed = SIM_MIN_SPEED;
 	// FK-TODO: soll Optional<Quantity<Length>> sein und über den Settingsdialog vom Benutzer beim Aktivieren von FootPath zwingend gesetzt werden müssen.
-	public Quantity<Length> pedestrianHeight = getQuantity(187.0, CENTI(METRE));
+	public final CommonPreference<Float> PEDESTRIAN_HEIGHT_IN_CENTIMETRES = new FloatPreference(this, "pedestrian_height", 187f).makeProfile().cache();
 
 	public final CommonPreference<Boolean> SHOW_ROUTING_ALARMS = new BooleanPreference(this, "show_routing_alarms", true).makeProfile().cache();
 

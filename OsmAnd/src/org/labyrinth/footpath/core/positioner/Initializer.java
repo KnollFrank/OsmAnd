@@ -1,13 +1,14 @@
 package org.labyrinth.footpath.core.positioner;
 
-import org.labyrinth.footpath.graph.Edge;
+import static org.labyrinth.common.MeasureUtils.toMetres;
+
 import org.labyrinth.coordinate.Angle;
+import org.labyrinth.footpath.graph.Edge;
+
+import java.util.List;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
-import java.util.List;
-
-import static org.labyrinth.common.MeasureUtils.toMeters;
 
 class Initializer {
 
@@ -43,7 +44,7 @@ class Initializer {
         double accumulatedTrackLength = 0;
         for (int edgeIndex = 0; edgeIndex < edges.size(); edgeIndex++) {
             final Edge edge = edges.get(edgeIndex);
-            accumulatedTrackLength += toMeters(edge.getLength());
+            accumulatedTrackLength += toMetres(edge.getLength());
             accumulatedTrackLengthAnglePairByEdgeIndex[edgeIndex] =
                     new AccumulatedTrackLengthAnglePair(accumulatedTrackLength, edge.getDirection());
         }
@@ -51,11 +52,11 @@ class Initializer {
     }
 
     private static int getNumberOfSteps(final double lengthInMeters, final Quantity<Length> stepSize) {
-        return (int) (lengthInMeters / toMeters(stepSize));
+        return (int) (lengthInMeters / toMetres(stepSize));
     }
 
     private static double getTrackLengthByStartOfStepIndex(final int stepIndex, final Quantity<Length> stepSize) {
-        return toMeters(stepSize) * stepIndex;
+        return toMetres(stepSize) * stepIndex;
     }
 
     private static int getEdgeIndex4TrackLength(final AccumulatedTrackLengthAnglePair[] accumulatedTrackLengthAnglePairByEdgeIndex,

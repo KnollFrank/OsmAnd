@@ -1,0 +1,6 @@
+<resources>
+    <string-array name="units_array">
+        <item>Zentimeter</item>
+        <item>Fuß &amp; Zoll</item>
+    </string-array>
+</resources>

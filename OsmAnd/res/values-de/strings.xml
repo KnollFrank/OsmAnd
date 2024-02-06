@@ -3011,6 +3011,7 @@
     <string name="shared_string_min_speed">Min. Geschwindigkeit</string>
     <string name="shared_string_max_speed">Max. Geschwindigkeit</string>
     <string name="default_speed_setting_title">Standardgeschwindigkeit</string>
+    <string name="preferences_height_title">Körpergröße</string>
     <string name="default_speed_setting_descr">Standardeinstellungen für Geschwindigkeiten</string>
     <string name="minmax_speed_dialog_title">Min./Max. Geschwindigkeit einstellen</string>
     <string name="new_profile">Neues Profil</string>

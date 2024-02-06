@@ -16,7 +16,7 @@ public class FootPathFactory {
         return new FootPath(
                 app,
                 () -> asPath(app.getRoutingHelper().getRoute()),
-                app.getSettings().pedestrianHeight,
+                app.getSettings().getApplicationMode().getPedestrianHeight(),
                 enabled);
     }
 

@@ -1,0 +1,6 @@
+<resources>
+    <string-array name="units_array">
+        <item>centimetre</item>
+        <item>feet &amp; inches</item>
+    </string-array>
+</resources>
