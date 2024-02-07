@@ -21,7 +21,6 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
 import androidx.recyclerview.widget.RecyclerView;
 
-import net.osmand.StateChangedListener;
 import net.osmand.plus.R;
 import net.osmand.plus.settings.fragments.BaseSettingsFragment;
 import net.osmand.plus.utils.AndroidUtils;
@@ -118,29 +117,13 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
     }
 
     private Preference createPedestrianHeightPreference(final Context context) {
-        // FK-TODO: extract class for this type of Preference
         final Preference preference =
-                new Preference(context) {
-
-                    private final StateChangedListener<Float> setSummaryListener =
-                            pedestrianHeightInCentiMetres ->
-                                    this.setSummary(getPedestrianHeightPreferenceSummary());
-
-                    @Override
-                    public void onAttached() {
-                        super.onAttached();
-                        settings.PEDESTRIAN_HEIGHT_IN_CENTIMETRES.addListener(setSummaryListener);
-                    }
-
-                    @Override
-                    public void onDetached() {
-                        super.onDetached();
-                        settings.PEDESTRIAN_HEIGHT_IN_CENTIMETRES.removeListener(setSummaryListener);
-                    }
-                };
+                new PreferenceWithSummaryFromOsmandPreference<>(
+                        context,
+                        settings.PEDESTRIAN_HEIGHT_IN_CENTIMETRES,
+                        _preference -> getPedestrianHeightPreferenceSummary());
         preference.setKey(PEDESTRIAN_HEIGHT_KEY);
         preference.setTitle(R.string.footpath_pedestrianheight_title);
-        preference.setSummary(getPedestrianHeightPreferenceSummary());
         preference.setLayoutResource(R.layout.preference_with_descr);
         return preference;
     }
