@@ -481,7 +481,6 @@ public class RoutePlannerFrontEnd {
 				LatLon startPoint = pnt.getFirstRouteRes().getStartPoint();
 				if (lastStraightLine != null) {
 					lastStraightLine.add(startPoint);
-					System.out.println(startPoint);
 					addStraightLine(gctx, lastStraightLine, straightPointStart, reg);
 					lastStraightLine = null;
 				}
@@ -846,6 +845,7 @@ public class RoutePlannerFrontEnd {
 				if (i > 0) {
 					ctx.config.penaltyForReverseDirection /= 2; // relax reverse-penalty (only for inter-points)
 				}
+				ctx.calculationProgress.hhTargetsProgress(i, targets.size());
 				HHNetworkRouteRes res = calculateHHRoute(routePlanner, ctx, i == 0 ? start : targets.get(i - 1),
 						targets.get(i), dir);
 				ctx.config.penaltyForReverseDirection = initialPenalty;
@@ -909,7 +909,6 @@ public class RoutePlannerFrontEnd {
 			if (intermediates != null) {
 				for (LatLon l : intermediates) {
 					if (!addSegment(l, ctx, indexNotFound++, points, false)) {
-						System.out.println(points.get(points.size() - 1).getRoad().toString());
 						return new RouteCalcResult("Intermediate point is not located");
 					}
 				}
