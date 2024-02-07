@@ -38,8 +38,8 @@ import net.osmand.binary.RouteDataObject;
 import net.osmand.data.LatLon;
 import net.osmand.plus.auto.NavigationSession;
 import net.osmand.plus.helpers.CurrentPositionHelper;
-import net.osmand.plus.helpers.LocationServiceHelper;
 import net.osmand.plus.helpers.LocationCallback;
+import net.osmand.plus.helpers.LocationServiceHelper;
 import net.osmand.plus.helpers.TargetPointsHelper.TargetPoint;
 import net.osmand.plus.plugins.PluginsHelper;
 import net.osmand.plus.plugins.accessibility.NavigationInfo;
@@ -183,7 +183,7 @@ public class OsmAndLocationProvider implements SensorEventListener {
 							location = locations.get(locations.size() - 1);
 							lastTimeGPSLocationFixed = System.currentTimeMillis();
 						}
-						if (!locationSimulation.isRouteAnimating()) {
+                        if (!locationSimulation.isRouteAnimating() && !footPath.isEnabled()) {
 							setLocation(location);
 						}
 					}
@@ -198,7 +198,7 @@ public class OsmAndLocationProvider implements SensorEventListener {
 				locationServiceHelper.requestNetworkLocationUpdates(new LocationCallback() {
 					@Override
 					public void onLocationResult(@NonNull List<net.osmand.Location> locations) {
-						if (!locations.isEmpty() && !useOnlyGPS() && !locationSimulation.isRouteAnimating()) {
+                        if (!locations.isEmpty() && !useOnlyGPS() && !locationSimulation.isRouteAnimating() && !footPath.isEnabled()) {
 							setLocation(locations.get(locations.size() - 1));
 						}
 					}
@@ -754,7 +754,7 @@ public class OsmAndLocationProvider implements SensorEventListener {
 			}
 		} else if (routingHelper.isRoutePlanningMode() && app.getSettings().getPointToStart() == null) {
 			routingHelper.setCurrentLocation(location, false);
-		} else if (getLocationSimulation().isRouteAnimating()) {
+		} else if (getLocationSimulation().isRouteAnimating() || footPath.isEnabled()) {
 			routingHelper.setCurrentLocation(location, false);
 		}
 		app.getWaypointHelper().locationChanged(location);
