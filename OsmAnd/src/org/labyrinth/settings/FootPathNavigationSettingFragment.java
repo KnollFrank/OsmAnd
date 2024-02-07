@@ -1,6 +1,8 @@
 package org.labyrinth.settings;
 
 import static net.osmand.plus.utils.UiUtilities.CompoundButtonType.TOOLBAR;
+import static org.labyrinth.common.MeasureUtils.toCentiMetres;
+import static org.labyrinth.settings.LengthUnitsConverter.centimetres2FeetAndInches;
 
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
@@ -19,11 +21,15 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.osmand.StateChangedListener;
 import net.osmand.plus.R;
 import net.osmand.plus.settings.fragments.BaseSettingsFragment;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.ColorUtilities;
 import net.osmand.plus.utils.UiUtilities;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
 
 public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
 
@@ -111,14 +117,53 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
         screen.addPreference(createPedestrianHeightPreference(context));
     }
 
-    private static Preference createPedestrianHeightPreference(final Context context) {
-        final Preference preference = new Preference(context);
+    private Preference createPedestrianHeightPreference(final Context context) {
+        // FK-TODO: extract class for this type of Preference
+        final Preference preference =
+                new Preference(context) {
+
+                    private final StateChangedListener<Float> setSummaryListener =
+                            pedestrianHeightInCentiMetres ->
+                                    this.setSummary(getPedestrianHeightPreferenceSummary());
+
+                    @Override
+                    public void onAttached() {
+                        super.onAttached();
+                        settings.PEDESTRIAN_HEIGHT_IN_CENTIMETRES.addListener(setSummaryListener);
+                    }
+
+                    @Override
+                    public void onDetached() {
+                        super.onDetached();
+                        settings.PEDESTRIAN_HEIGHT_IN_CENTIMETRES.removeListener(setSummaryListener);
+                    }
+                };
         preference.setKey(PEDESTRIAN_HEIGHT_KEY);
         preference.setTitle(R.string.footpath_pedestrianheight_title);
-        // FK-TODO: im summary die aktuelle PedestrianHeight anzeigen.
-        preference.setSummary(R.string.footpath_pedestrianheight_desc);
+        // FK-TODO: R.string.footpath_pedestrianheight_desc entfernen?
+        preference.setSummary(getPedestrianHeightPreferenceSummary());
         preference.setLayoutResource(R.layout.preference_with_descr);
         return preference;
+    }
+
+    private String getPedestrianHeightPreferenceSummary() {
+        return this
+                .getSelectedAppMode()
+                .getPedestrianHeight()
+                .map(FootPathNavigationSettingFragment::getString)
+                .orElse("Please enter your body height");
+    }
+
+    private static String getString(final Quantity<Length> length) {
+        final double heightInCM = toCentiMetres(length);
+        final FeetAndInches feetAndInches = centimetres2FeetAndInches(heightInCM);
+        return "" +
+                round(heightInCM) + " cm = " +
+                feetAndInches.feet + " ft, " + round(feetAndInches.inches) + " in";
+    }
+
+    private static int round(final double value) {
+        return (int) Math.round(value);
     }
 
     @Override

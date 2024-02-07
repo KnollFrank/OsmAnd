@@ -1,3 +1,6 @@
 frankknoll@frankknoll-XPS-13-9370:~/AndroidStudioProjects/OsmAnd/android/OsmAnd
 ../gradlew assembleNightlyFreeOpenglArm64Debug
 ../gradlew assembleNightlyFreeLegacyFatDebug
+
+FK-TODO:
+- Titel (z.B. "Körpergröße") im Dialog für Körpergröße setzen.
