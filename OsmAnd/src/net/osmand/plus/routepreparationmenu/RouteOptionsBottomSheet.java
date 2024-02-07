@@ -82,6 +82,7 @@ import net.osmand.router.GeneralRouter.RoutingParameter;
 import net.osmand.util.Algorithms;
 
 import org.apache.commons.logging.Log;
+import org.labyrinth.settings.PedestrianHeightDialogHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -515,11 +516,15 @@ public class RouteOptionsBottomSheet extends MenuBottomSheetDialogFragment imple
 		cb.setFocusable(false);
 		UiUtilities.setupCompoundButton(nightMode, selectedModeColor, cb);
 
-		basicItem.setOnClickListener(v -> {
-			settings.footPath = !settings.footPath;
-			cb.setChecked(settings.footPath);
-			app.getLocationProvider().footPath.setEnabled(settings.footPath);
-		});
+		basicItem.setOnClickListener(
+				v -> {
+					settings.footPath = !settings.footPath;
+					cb.setChecked(settings.footPath);
+					app.getLocationProvider().footPath.setEnabled(settings.footPath);
+					if (shallPromptUserForPedestrianHeight()) {
+						PedestrianHeightDialogHelper.showPedestrianHeightDialog(app, applicationMode, mapActivity);
+					}
+				});
 
 		Drawable drawable = app.getUIUtilities().getIcon(R.drawable.ic_action_settings,
 				nightMode ? R.color.icon_color_default_dark : R.color.icon_color_default_light);
@@ -534,6 +539,10 @@ public class RouteOptionsBottomSheet extends MenuBottomSheetDialogFragment imple
 		return new BaseBottomSheetItem.Builder()
 				.setCustomView(itemView)
 				.create();
+	}
+
+	private boolean shallPromptUserForPedestrianHeight() {
+		return settings.footPath && !applicationMode.getPedestrianHeight().isPresent();
 	}
 
 	private BaseBottomSheetItem createAvoidRoadsItem(LocalRoutingParameter optionsItem) {

@@ -1,5 +1,9 @@
 package org.labyrinth.settings;
 
+import static tec.units.ri.quantity.Quantities.getQuantity;
+import static tec.units.ri.unit.MetricPrefix.CENTI;
+import static tec.units.ri.unit.Units.METRE;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,19 +16,20 @@ import net.osmand.plus.R;
 import net.osmand.plus.settings.backend.ApplicationMode;
 import net.osmand.plus.utils.UiUtilities;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 
-class PedestrianHeightDialogHelper {
+public class PedestrianHeightDialogHelper {
 
     public static void showPedestrianHeightDialog(final OsmandApplication app,
                                                   final ApplicationMode mode,
                                                   final Context context) {
         PedestrianHeightDialogHelper
                 .createPedestrianHeightDialog(
-                        Height.fromQuantity(mode.getPedestrianHeight()),
+                        Height.fromQuantity(getInitialPedestrianHeight(mode.getPedestrianHeight())),
                         pedestrianHeight -> {
                             mode.setPedestrianHeight(pedestrianHeight);
                             app.getLocationProvider().footPath.setPedestrianHeight(pedestrianHeight);
@@ -45,8 +50,12 @@ class PedestrianHeightDialogHelper {
                 .setPositiveButton(
                         R.string.shared_string_ok,
                         (dialog, which) -> onOkButtonClicked.accept(pedestrianHeightDialog.getHeight().toQuantity()))
-                .setNegativeButton(R.string.shared_string_cancel, null)
+                .setCancelable(false)
                 .create();
+    }
+
+    private static Quantity<Length> getInitialPedestrianHeight(final Optional<Quantity<Length>> pedestrianHeight) {
+        return pedestrianHeight.orElseGet(() -> getQuantity(170.0, CENTI(METRE)));
     }
 
     private static boolean isNightMode(final OsmandApplication app, final ApplicationMode mode) {

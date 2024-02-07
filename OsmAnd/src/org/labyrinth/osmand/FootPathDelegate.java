@@ -14,12 +14,12 @@ class FootPathDelegate {
     private final OsmandApplication app;
     private Optional<FootPathDriver> footPathDriver = Optional.empty();
     private Optional<Path> path;
-    private Quantity<Length> pedestrianHeight;
+    private Optional<Quantity<Length>> pedestrianHeight;
     private boolean enabled;
 
     public FootPathDelegate(final OsmandApplication app,
                             final Optional<Path> path,
-                            final Quantity<Length> pedestrianHeight,
+                            final Optional<Quantity<Length>> pedestrianHeight,
                             final boolean enabled) {
         this.app = app;
         this.path = path;
@@ -54,7 +54,7 @@ class FootPathDelegate {
     }
 
     public void setPedestrianHeight(final Quantity<Length> pedestrianHeight) {
-        this.pedestrianHeight = pedestrianHeight;
+        this.pedestrianHeight = Optional.of(pedestrianHeight);
         if (this.enabled) {
             tryRestart();
         }
@@ -71,13 +71,17 @@ class FootPathDelegate {
     }
 
     private Optional<FootPathDriver> createFootPathDriver() {
-        return this
-                .path
-                .map(path ->
-                        new FootPathDriver(
-                                this.app,
-                                location -> this.app.getLocationProvider().setLocationFromSimulation(location),
-                                path,
-                                this.pedestrianHeight));
+        if (!this.path.isPresent() || !this.pedestrianHeight.isPresent()) {
+            return Optional.empty();
+        }
+        return Optional.of(createFootPathDriver(this.path.get(), this.pedestrianHeight.get()));
+    }
+
+    private FootPathDriver createFootPathDriver(final Path path, final Quantity<Length> pedestrianHeight) {
+        return new FootPathDriver(
+                this.app,
+                location -> this.app.getLocationProvider().setLocationFromSimulation(location),
+                path,
+                pedestrianHeight);
     }
 }

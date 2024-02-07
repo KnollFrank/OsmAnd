@@ -13,10 +13,8 @@ import android.widget.TextView;
 
 import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,11 +28,6 @@ import net.osmand.plus.utils.UiUtilities;
 public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
 
     private static final String PEDESTRIAN_HEIGHT_KEY = "pedestrian_height";
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Override
     protected void createToolbar(@NonNull LayoutInflater inflater, @NonNull View view) {
@@ -122,17 +115,18 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
         final Preference preference = new Preference(context);
         preference.setKey(PEDESTRIAN_HEIGHT_KEY);
         preference.setTitle(R.string.footpath_pedestrianheight_title);
+        // FK-TODO: im summary die aktuelle PedestrianHeight anzeigen.
         preference.setSummary(R.string.footpath_pedestrianheight_desc);
         preference.setLayoutResource(R.layout.preference_with_descr);
         return preference;
     }
 
     @Override
-    public boolean onPreferenceClick(Preference preference) {
+    public boolean onPreferenceClick(final Preference preference) {
         if (preference.getKey().equals(PEDESTRIAN_HEIGHT_KEY)) {
-            final FragmentActivity activity = getActivity();
-            if (activity != null) {
-                PedestrianHeightDialogHelper.showPedestrianHeightDialog(app, getSelectedAppMode(), activity);
+            final Context context = getContext();
+            if (context != null) {
+                PedestrianHeightDialogHelper.showPedestrianHeightDialog(app, getSelectedAppMode(), context);
             }
             return true;
         }
