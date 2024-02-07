@@ -29,10 +29,6 @@ class PedestrianHeightDialogHelper {
                             mode.setPedestrianHeight(pedestrianHeight);
                             app.getLocationProvider().footPath.setPedestrianHeight(pedestrianHeight);
                         },
-                        () -> {
-                            mode.resetDefaultPedestrianHeight();
-                            app.getLocationProvider().footPath.setPedestrianHeight(mode.getPedestrianHeight());
-                        },
                         UiUtilities.getThemedContext(context, isNightMode(app, mode)))
                 .show();
     }
@@ -40,7 +36,6 @@ class PedestrianHeightDialogHelper {
     private static Dialog createPedestrianHeightDialog(
             final Height initialHeight,
             final Consumer<Quantity<Length>> onOkButtonClicked,
-            final Runnable onRevertButtonClicked,
             final Context context) {
         final PedestrianHeightDialog pedestrianHeightDialog =
                 new PedestrianHeightDialog(initialHeight, createView(context));
@@ -51,9 +46,6 @@ class PedestrianHeightDialogHelper {
                         R.string.shared_string_ok,
                         (dialog, which) -> onOkButtonClicked.accept(pedestrianHeightDialog.getHeight().toQuantity()))
                 .setNegativeButton(R.string.shared_string_cancel, null)
-                .setNeutralButton(
-                        R.string.shared_string_revert,
-                        (dialog, which) -> onRevertButtonClicked.run())
                 .create();
     }
 
