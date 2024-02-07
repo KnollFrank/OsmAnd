@@ -47,6 +47,7 @@ public class PedestrianHeightDialogHelper {
         return new AlertDialog
                 .Builder(context)
                 .setView(pedestrianHeightDialog.view)
+                .setTitle(R.string.preferences_height_title)
                 .setPositiveButton(
                         R.string.shared_string_ok,
                         (dialog, which) -> onOkButtonClicked.accept(pedestrianHeightDialog.getHeight().toQuantity()))
