@@ -151,7 +151,7 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
                 .getSelectedAppMode()
                 .getPedestrianHeight()
                 .map(FootPathNavigationSettingFragment::getString)
-                .orElse("Please enter your body height");
+                .orElseGet(() -> getString(R.string.footpath_pedestrianheight_desc));
     }
 
     private static String getString(final Quantity<Length> length) {
