@@ -140,7 +140,6 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
                 };
         preference.setKey(PEDESTRIAN_HEIGHT_KEY);
         preference.setTitle(R.string.footpath_pedestrianheight_title);
-        // FK-TODO: R.string.footpath_pedestrianheight_desc entfernen?
         preference.setSummary(getPedestrianHeightPreferenceSummary());
         preference.setLayoutResource(R.layout.preference_with_descr);
         return preference;
