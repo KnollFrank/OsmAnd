@@ -6,9 +6,13 @@ import static org.labyrinth.osmand.Converters.asNodes;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.routing.RouteCalculationResult;
 
+import org.labyrinth.footpath.StepLengthProvider;
 import org.labyrinth.footpath.graph.Path;
 
 import java.util.Optional;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
 
 public class FootPathFactory {
 
@@ -16,11 +20,19 @@ public class FootPathFactory {
         return new FootPath(
                 app,
                 () -> asPath(app.getRoutingHelper().getRoute()),
-                app.getSettings().getApplicationMode().getPedestrianHeight(),
+                getStepLength(app),
                 enabled);
     }
 
     private static Optional<Path> asPath(final RouteCalculationResult route) {
         return createPath(asNodes(route.getImmutableAllLocations()));
+    }
+
+    private static Optional<Quantity<Length>> getStepLength(final OsmandApplication app) {
+        return app
+                .getSettings()
+                .getApplicationMode()
+                .getPedestrianHeight()
+                .map(StepLengthProvider::getStepLength);
     }
 }

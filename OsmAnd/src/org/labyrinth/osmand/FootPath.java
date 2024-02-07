@@ -19,13 +19,13 @@ public class FootPath implements IRouteInformationListener {
 
     public FootPath(final OsmandApplication app,
                     final Supplier<Optional<Path>> getActualPath,
-                    final Optional<Quantity<Length>> pedestrianHeight,
+                    final Optional<Quantity<Length>> stepLength,
                     final boolean enabled) {
         this.delegate =
                 new FootPathDelegate(
                         app,
                         getActualPath.get(),
-                        pedestrianHeight,
+                        stepLength,
                         enabled);
         this.getActualPath = getActualPath;
     }
@@ -53,7 +53,7 @@ public class FootPath implements IRouteInformationListener {
         return delegate.isEnabled();
     }
 
-    public void setPedestrianHeight(final Quantity<Length> pedestrianHeight) {
-        delegate.setPedestrianHeight(pedestrianHeight);
+    public void setStepLength(final Quantity<Length> stepLength) {
+        delegate.setStepLength(stepLength);
     }
 }

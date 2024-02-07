@@ -6,7 +6,6 @@ import android.hardware.SensorManager;
 import net.osmand.Location;
 import net.osmand.plus.OsmandApplication;
 
-import org.labyrinth.footpath.StepLengthProvider;
 import org.labyrinth.footpath.core.IStepListener;
 import org.labyrinth.footpath.core.Navigator;
 import org.labyrinth.footpath.core.StepDetection;
@@ -24,12 +23,12 @@ class FootPathDriver {
     public FootPathDriver(final OsmandApplication app,
                           final Consumer<Location> setLocation,
                           final Path path,
-                          final Quantity<Length> pedestrianHeight) {
+                          final Quantity<Length> stepLength) {
         this.stepDetection =
                 new StepDetection(
                         app::runInUIThread,
                         (SensorManager) app.getSystemService(Context.SENSOR_SERVICE),
-                        createStepListener(setLocation, path, pedestrianHeight));
+                        createStepListener(setLocation, path, stepLength));
     }
 
     public void start() {
@@ -46,11 +45,8 @@ class FootPathDriver {
 
     private static IStepListener createStepListener(final Consumer<Location> setLocation,
                                                     final Path path,
-                                                    final Quantity<Length> pedestrianHeight) {
-        final Navigator navigator =
-                new Navigator(
-                        path,
-                        StepLengthProvider.getStepLength(pedestrianHeight));
+                                                    final Quantity<Length> stepLength) {
+        final Navigator navigator = new Navigator(path, stepLength);
         return stepDirection -> {
             navigator.stepInDirection(stepDirection);
             setLocation.accept(Converters.asLocation(navigator.getCurrentPathPosition()));
