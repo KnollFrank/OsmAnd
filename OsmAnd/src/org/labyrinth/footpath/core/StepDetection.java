@@ -57,7 +57,7 @@ public class StepDetection {
                     lastAcc[2] = lowpassFilter(lastAcc[2], event.values[2], a);
                     break;
                 case Sensor.TYPE_ORIENTATION:
-                    lastComp[0] = new Angle(-event.values[0], Angle.Unit.DEGREES).wrap0To360Degrees();
+                    lastComp[0] = new Angle(event.values[0], Angle.Unit.DEGREES).wrap0To360Degrees();
                     lastComp[1] = new Angle(event.values[1], Angle.Unit.DEGREES);
                     lastComp[2] = new Angle(event.values[2], Angle.Unit.DEGREES);
                     break;
