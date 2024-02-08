@@ -31,7 +31,6 @@ public class FootPathFactory {
     private static Optional<Quantity<Length>> getStepLength(final OsmandApplication app) {
         return app
                 .getSettings()
-                .getApplicationMode()
                 .getPedestrianHeight()
                 .map(StepLengthProvider::getStepLength);
     }

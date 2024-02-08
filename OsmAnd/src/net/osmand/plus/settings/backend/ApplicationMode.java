@@ -22,19 +22,13 @@ import net.osmand.plus.routing.RouteService;
 import net.osmand.plus.settings.backend.OsmAndAppCustomization.OsmAndAppCustomizationListener;
 import net.osmand.util.Algorithms;
 
-import org.labyrinth.common.MeasureUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-
-import javax.measure.Quantity;
-import javax.measure.quantity.Length;
 
 public class ApplicationMode {
 
@@ -288,19 +282,6 @@ public class ApplicationMode {
 
     public void setDefaultSpeed(float defaultSpeed) {
         app.getSettings().DEFAULT_SPEED.setModeValue(this, defaultSpeed);
-    }
-
-    public Optional<Quantity<Length>> getPedestrianHeight() {
-        final float pedestrianHeightInCentiMetres = app.getSettings().PEDESTRIAN_HEIGHT_IN_CENTIMETRES.get();
-        if (pedestrianHeightInCentiMetres < 0) {
-            return Optional.empty();
-        }
-        return Optional.of(MeasureUtils.fromCentiMetres(pedestrianHeightInCentiMetres));
-    }
-
-    public void setPedestrianHeight(final Quantity<Length> pedestrianHeight) {
-        final double pedestrianHeightInCentiMetres = MeasureUtils.toCentiMetres(pedestrianHeight);
-        app.getSettings().PEDESTRIAN_HEIGHT_IN_CENTIMETRES.set((float) pedestrianHeightInCentiMetres);
     }
 
     public void resetDefaultSpeed() {

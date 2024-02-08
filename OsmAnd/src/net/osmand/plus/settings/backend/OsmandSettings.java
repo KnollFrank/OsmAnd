@@ -117,6 +117,7 @@ import net.osmand.util.Algorithms;
 import org.apache.commons.logging.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.labyrinth.common.MeasureUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -131,8 +132,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
 
 public class OsmandSettings {
 
@@ -1483,6 +1488,19 @@ public class OsmandSettings {
 	public String simulateNavigationMode = SimulationMode.PREVIEW.getKey();
     public float simulateNavigationSpeed = SIM_MIN_SPEED;
 	public final CommonPreference<Float> PEDESTRIAN_HEIGHT_IN_CENTIMETRES = new FloatPreference(this, "pedestrian_height", -1).makeGlobal().makeShared();
+
+	public Optional<Quantity<Length>> getPedestrianHeight() {
+		final float pedestrianHeightInCentiMetres = PEDESTRIAN_HEIGHT_IN_CENTIMETRES.get();
+		if (pedestrianHeightInCentiMetres < 0) {
+			return Optional.empty();
+		}
+		return Optional.of(MeasureUtils.fromCentiMetres(pedestrianHeightInCentiMetres));
+	}
+
+	public void setPedestrianHeight(final Quantity<Length> pedestrianHeight) {
+		final double pedestrianHeightInCentiMetres = MeasureUtils.toCentiMetres(pedestrianHeight);
+		PEDESTRIAN_HEIGHT_IN_CENTIMETRES.set((float) pedestrianHeightInCentiMetres);
+	}
 
 	public final CommonPreference<Boolean> SHOW_ROUTING_ALARMS = new BooleanPreference(this, "show_routing_alarms", true).makeProfile().cache();
 

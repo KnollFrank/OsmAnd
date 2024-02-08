@@ -30,9 +30,9 @@ public class PedestrianHeightDialogHelper {
                                                   final Context context) {
         PedestrianHeightDialogHelper
                 .createPedestrianHeightDialog(
-                        Height.fromQuantity(getInitialPedestrianHeight(mode.getPedestrianHeight())),
+                        Height.fromQuantity(getInitialPedestrianHeight(app.getSettings().getPedestrianHeight())),
                         pedestrianHeight -> {
-                            mode.setPedestrianHeight(pedestrianHeight);
+                            app.getSettings().setPedestrianHeight(pedestrianHeight);
                             app.getLocationProvider().footPath.setStepLength(getStepLength(pedestrianHeight));
                         },
                         UiUtilities.getThemedContext(context, isNightMode(app, mode)))

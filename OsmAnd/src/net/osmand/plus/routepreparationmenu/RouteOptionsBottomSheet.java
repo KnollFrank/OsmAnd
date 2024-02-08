@@ -542,7 +542,7 @@ public class RouteOptionsBottomSheet extends MenuBottomSheetDialogFragment imple
 	}
 
 	private boolean shallPromptUserForPedestrianHeight() {
-		return settings.footPath && !applicationMode.getPedestrianHeight().isPresent();
+		return settings.footPath && !settings.getPedestrianHeight().isPresent();
 	}
 
 	private BaseBottomSheetItem createAvoidRoadsItem(LocalRoutingParameter optionsItem) {

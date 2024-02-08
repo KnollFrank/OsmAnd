@@ -130,7 +130,7 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
 
     private String getPedestrianHeightPreferenceSummary() {
         return this
-                .getSelectedAppMode()
+                .getSettings()
                 .getPedestrianHeight()
                 .map(FootPathNavigationSettingFragment::getString)
                 .orElseGet(() -> getString(R.string.footpath_pedestrianheight_desc));
