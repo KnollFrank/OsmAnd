@@ -39,8 +39,8 @@ import net.osmand.plus.activities.RestartActivity;
 import net.osmand.plus.api.SQLiteAPI;
 import net.osmand.plus.api.SQLiteAPIImpl;
 import net.osmand.plus.auto.NavigationCarAppService;
-import net.osmand.plus.auto.screens.NavigationScreen;
 import net.osmand.plus.auto.NavigationSession;
+import net.osmand.plus.auto.screens.NavigationScreen;
 import net.osmand.plus.backup.BackupHelper;
 import net.osmand.plus.backup.NetworkSettingsHelper;
 import net.osmand.plus.base.MapViewTrackingUtilities;
@@ -677,6 +677,8 @@ public class OsmandApplication extends MultiDexApplication {
 		if (locationSimulation.isRouteAnimating() || locationSimulation.isLoadingRouteLocations()) {
 			locationSimulation.stop();
 		}
+		settings.footPath = false;
+		locationProvider.footPath.setEnabled(settings.footPath);
 		routingHelper.getVoiceRouter().interruptRouteCommands();
 		routingHelper.clearCurrentRoute(null, new ArrayList<LatLon>());
 		routingHelper.setRoutePlanningMode(false);

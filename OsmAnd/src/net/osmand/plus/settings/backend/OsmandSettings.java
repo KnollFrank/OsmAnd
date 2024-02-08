@@ -1484,9 +1484,10 @@ public class OsmandSettings {
 	public final CommonPreference<Boolean> ENABLE_TIME_CONDITIONAL_ROUTING = new BooleanPreference(this, "enable_time_conditional_routing", true).makeProfile();
 
 	public boolean simulateNavigation;
-	public boolean footPath = false;
 	public String simulateNavigationMode = SimulationMode.PREVIEW.getKey();
     public float simulateNavigationSpeed = SIM_MIN_SPEED;
+
+	public boolean footPath = false;
 	public final CommonPreference<Float> PEDESTRIAN_HEIGHT_IN_CENTIMETRES = new FloatPreference(this, "pedestrian_height", -1).makeGlobal().makeShared();
 
 	public Optional<Quantity<Length>> getPedestrianHeight() {
@@ -1498,8 +1499,7 @@ public class OsmandSettings {
 	}
 
 	public void setPedestrianHeight(final Quantity<Length> pedestrianHeight) {
-		final double pedestrianHeightInCentiMetres = MeasureUtils.toCentiMetres(pedestrianHeight);
-		PEDESTRIAN_HEIGHT_IN_CENTIMETRES.set((float) pedestrianHeightInCentiMetres);
+		PEDESTRIAN_HEIGHT_IN_CENTIMETRES.set((float) MeasureUtils.toCentiMetres(pedestrianHeight));
 	}
 
 	public final CommonPreference<Boolean> SHOW_ROUTING_ALARMS = new BooleanPreference(this, "show_routing_alarms", true).makeProfile().cache();
