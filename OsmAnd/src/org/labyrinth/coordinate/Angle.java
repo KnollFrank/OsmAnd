@@ -1,11 +1,11 @@
 package org.labyrinth.coordinate;
 
-import static math.geom2d.Angle2D.M_2PI;
-
 import java.io.Serializable;
 import java.util.Objects;
 
 public class Angle implements Serializable {
+
+    private static final double M_2PI = Math.PI * 2;
 
     public enum Unit {
 
