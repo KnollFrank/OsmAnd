@@ -1482,7 +1482,7 @@ public class OsmandSettings {
 	public boolean footPath = false;
 	public String simulateNavigationMode = SimulationMode.PREVIEW.getKey();
     public float simulateNavigationSpeed = SIM_MIN_SPEED;
-	public final CommonPreference<Float> PEDESTRIAN_HEIGHT_IN_CENTIMETRES = new FloatPreference(this, "pedestrian_height", -1).makeProfile().cache();
+	public final CommonPreference<Float> PEDESTRIAN_HEIGHT_IN_CENTIMETRES = new FloatPreference(this, "pedestrian_height", -1).makeGlobal().makeShared();
 
 	public final CommonPreference<Boolean> SHOW_ROUTING_ALARMS = new BooleanPreference(this, "show_routing_alarms", true).makeProfile().cache();
 

@@ -291,7 +291,7 @@ public class ApplicationMode {
     }
 
     public Optional<Quantity<Length>> getPedestrianHeight() {
-        final float pedestrianHeightInCentiMetres = app.getSettings().PEDESTRIAN_HEIGHT_IN_CENTIMETRES.getModeValue(this);
+        final float pedestrianHeightInCentiMetres = app.getSettings().PEDESTRIAN_HEIGHT_IN_CENTIMETRES.get();
         if (pedestrianHeightInCentiMetres < 0) {
             return Optional.empty();
         }
@@ -300,7 +300,7 @@ public class ApplicationMode {
 
     public void setPedestrianHeight(final Quantity<Length> pedestrianHeight) {
         final double pedestrianHeightInCentiMetres = MeasureUtils.toCentiMetres(pedestrianHeight);
-        app.getSettings().PEDESTRIAN_HEIGHT_IN_CENTIMETRES.setModeValue(this, (float) pedestrianHeightInCentiMetres);
+        app.getSettings().PEDESTRIAN_HEIGHT_IN_CENTIMETRES.set((float) pedestrianHeightInCentiMetres);
     }
 
     public void resetDefaultSpeed() {
