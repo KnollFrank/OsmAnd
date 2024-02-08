@@ -105,12 +105,12 @@ public class PositionerBestFit {
     }
 
     private double getPenalty(final Angle x, final Angle y) {
-        final double angle0To180 = x.get0To180DegreesDifferenceTo(y).to(Angle.Unit.DEGREES);
-        if (angle0To180 < 45) {
+        final double angle0To180Degrees = x.get0To180DegreesDifferenceTo(y);
+        if (angle0To180Degrees < 45) {
             return 0;
-        } else if (angle0To180 < 90) {
+        } else if (angle0To180Degrees < 90) {
             return 1;
-        } else if (angle0To180 < 120) {
+        } else if (angle0To180Degrees < 120) {
             return 2;
         } else {
             return 10;
