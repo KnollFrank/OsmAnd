@@ -39,10 +39,10 @@ public class Angle implements Serializable {
         return new Angle(this.angleInRadians0To2PI - other.angleInRadians0To2PI, Unit.RADIANS);
     }
 
-    public double get0To180DegreesDifferenceTo(final Angle other) {
+    public Angle get0To180DegreesDifferenceTo(final Angle other) {
         final double angle0To360Degrees = this.sub(other).to(Unit.DEGREES);
         final double angle0To180Degrees = angle0To360Degrees > 180 ? 360 - angle0To360Degrees : angle0To360Degrees;
-        return angle0To180Degrees;
+        return new Angle(angle0To180Degrees, Unit.DEGREES);
     }
 
     @Override
