@@ -129,7 +129,9 @@ public class StepDetection {
         System.arraycopy(lastAcc, 0, oldAcc, 0, 3);
         final Angle[] oldComp = new Angle[3];
         System.arraycopy(lastComp, 0, oldComp, 0, 3);
+        // FK-TODO: change oldComp from array to a single value
         final Angle lCompass = oldComp[0];
+        // FK-TODO: change oldAcc from array to a single value
         final double lOld_z = oldAcc[2];
 
         addData(lOld_z);

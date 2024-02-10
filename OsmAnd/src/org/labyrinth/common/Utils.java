@@ -2,9 +2,13 @@ package org.labyrinth.common;
 
 import android.util.Pair;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class Utils {
 
@@ -21,5 +25,11 @@ public class Utils {
         return IntStream
                 .range(firstElementOfFirstPair, secondElementOfLastPair)
                 .mapToObj(i -> Pair.create(i, i + 1));
+    }
+
+    public static <T> Stream<T> asStream(final Iterator<T> iterator) {
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED),
+                false);
     }
 }

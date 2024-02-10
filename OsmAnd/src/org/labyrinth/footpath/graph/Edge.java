@@ -30,8 +30,16 @@ public class Edge {
         return length;
     }
 
+    public boolean containsNodes(final Node a, final Node b) {
+        return isSource2Target(a, b) || isSource2Target(b, a);
+    }
+
     public Edge reverse() {
         return new Edge(target, source);
+    }
+
+    private boolean isSource2Target(final Node source, final Node target) {
+        return this.source.equals(source) && this.target.equals(target);
     }
 
     @Override
