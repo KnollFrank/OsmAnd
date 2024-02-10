@@ -24,7 +24,7 @@ public enum RouteService {
 	}
 
 	public boolean isOnline() {
-		return this != OSMAND && this != BROUTER;
+		return this != OSMAND && this != BROUTER && this != POSTMAN_TOUR;
 	}
 
 	boolean isAvailable(OsmandApplication ctx) {
