@@ -4500,7 +4500,7 @@
     <string name="location_source_descr">Si se instala OsmAnd desde Google Play, de forma predefinida se usa «%1$s» para definir la ubicación.
 \n
 \nSi obtienes información inexacta de la ubicación o usas un dispositivo sin «%2$s», intenta cambiar a «%3$s»</string>
-    <string name="location_source">Proveedor de ubicación</string>
+    <string name="location_source">Fuente de la ubicación</string>
     <string name="shared_string_shape">Forma</string>
     <string name="default_appearance_desc">El color, el icono y la forma predeterminados se aplicarán a los puntos favoritos añadidos al grupo.</string>
     <string name="default_appearance">Aspecto predefinido</string>
@@ -5325,7 +5325,7 @@
     <string name="shared_string_not_checked">Sin revisar</string>
     <string name="rendering_value_sacScale_description">Club Alpino Suizo</string>
     <string name="rendering_value_caiScale_description">Club Alpino Italiano</string>
-    <string name="rendering_attr_alpineHiking_name">Clasificación de la facilidad</string>
+    <string name="rendering_attr_alpineHiking_name">Clasificación de la dificultad</string>
     <string name="rendering_value_caiScale_name">CAI</string>
     <string name="rendering_value_sacScale_name">SAC</string>
     <string name="rendering_attr_alpineHiking_description">Tipos de la clasificación de la dificultad de las rutas.</string>
@@ -5615,4 +5615,7 @@
     <string name="battery_optimization_desc">La optimización de la batería en Android puede causar lagunas e imprecisiones en las pistas grabadas.
 \n
 \nSi experimentas alguno de estos problemas, puedes probar a cambiar el uso de la batería a \'Sin restricciones\'</string>
+    <string name="sort_subfolders">Clasificar las subcarpetas</string>
+    <string name="sorted_sufolders_toast">Las subcarpetas de \"%1$s\" están ordenadas por: \"%2$s\"</string>
+    <string name="special_routing_cpp">Tipo de ruta especial</string>
 </resources>
