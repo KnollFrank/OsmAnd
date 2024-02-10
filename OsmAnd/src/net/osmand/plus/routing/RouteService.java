@@ -10,7 +10,8 @@ public enum RouteService {
 	BROUTER("BRouter (offline)"),
 	STRAIGHT("Straight line"),
 	DIRECT_TO("Direct To"),
-	ONLINE("Online engine");
+	ONLINE("Online engine"),
+	POSTMAN_TOUR("Postman Tour (offline)");
 
 	private final String name;
 

@@ -6,17 +6,17 @@ import android.util.Base64;
 
 import androidx.annotation.NonNull;
 
-import net.osmand.gpx.GPXUtilities;
-import net.osmand.gpx.GPXFile;
-import net.osmand.gpx.GPXUtilities.Route;
-import net.osmand.gpx.GPXUtilities.TrkSegment;
-import net.osmand.gpx.GPXUtilities.WptPt;
 import net.osmand.Location;
 import net.osmand.LocationsHolder;
 import net.osmand.PlatformUtil;
 import net.osmand.ResultMatcher;
 import net.osmand.binary.BinaryMapIndexReader;
 import net.osmand.data.LatLon;
+import net.osmand.gpx.GPXFile;
+import net.osmand.gpx.GPXUtilities;
+import net.osmand.gpx.GPXUtilities.Route;
+import net.osmand.gpx.GPXUtilities.TrkSegment;
+import net.osmand.gpx.GPXUtilities.WptPt;
 import net.osmand.map.WorldRegion;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
@@ -110,6 +110,8 @@ public class RouteProvider {
 
 	public RouteCalculationResult calculateRouteImpl(RouteCalculationParams params) {
 		long time = System.currentTimeMillis();
+		// FK-FIXME: remove the following line and replace with UI
+		params.mode.setRouteService(RouteService.POSTMAN_TOUR);
 		if (params.start != null && params.end != null) {
 			params.calculationProgress.routeCalculationStartTime = time;
 			if (log.isInfoEnabled()) {
@@ -123,6 +125,24 @@ public class RouteProvider {
 				if (calcGPXRoute && !params.gpxRoute.calculateOsmAndRoute) {
 					res = calculateGpxRoute(params);
 				} else if (params.mode.getRouteService() == RouteService.OSMAND) {
+					if (params.inPublicTransportMode) {
+						res = findVectorMapsRoute(params, calcGPXRoute);
+					} else {
+						MissingMapsHelper missingMapsHelper = new MissingMapsHelper(params);
+						List<Location> points = missingMapsHelper.getStartFinishIntermediatePoints();
+						List<WorldRegion> missingMaps = missingMapsHelper.getMissingMaps(points);
+						List<Location> pathPoints = missingMapsHelper.getDistributedPathPoints(points);
+						if (!Algorithms.isEmpty(missingMaps)) {
+							res = new RouteCalculationResult("Additional maps available");
+							res.missingMaps = missingMapsHelper.getMissingMaps(pathPoints);
+						} else {
+							if (!missingMapsHelper.isAnyPointOnWater(pathPoints)) {
+								params.calculationProgress.missingMaps = missingMapsHelper.getMissingMaps(pathPoints);
+							}
+							res = findVectorMapsRoute(params, calcGPXRoute);
+						}
+					}
+				} else if (params.mode.getRouteService() == RouteService.POSTMAN_TOUR) {
 					if (params.inPublicTransportMode) {
 						res = findVectorMapsRoute(params, calcGPXRoute);
 					} else {
