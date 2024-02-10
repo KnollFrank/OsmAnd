@@ -139,9 +139,7 @@ public class FootPathNavigationSettingFragment extends BaseSettingsFragment {
     private static String getString(final Quantity<Length> length) {
         final double heightInCM = toCentiMetres(length);
         final FeetAndInches feetAndInches = centimetres2FeetAndInches(heightInCM);
-        return "" +
-                round(heightInCM) + " cm = " +
-                feetAndInches.feet + " ft, " + round(feetAndInches.inches) + " in";
+        return round(heightInCM) + " cm = " + feetAndInches.feet + " ft, " + round(feetAndInches.inches) + " in";
     }
 
     private static int round(final double value) {

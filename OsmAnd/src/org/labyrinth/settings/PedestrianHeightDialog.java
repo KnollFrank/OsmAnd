@@ -151,7 +151,7 @@ class PedestrianHeightDialog {
         final int maxValue = range.upperEndpoint();
         final String[] displayedValues = new String[maxValue - minValue + 1];
         for (int value = minValue; value <= maxValue; value++) {
-            displayedValues[value - minValue] = "" + value + " " + unit;
+            displayedValues[value - minValue] = value + " " + unit;
         }
         return displayedValues;
     }

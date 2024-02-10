@@ -12,7 +12,7 @@ import javax.measure.quantity.Length;
 
 public class Navigator {
 
-    public final Path path;
+    private final Path path;
     private final PositionerBestFit positionerBestFit;
 
     public Navigator(final Path path, final Quantity<Length> stepLength) {
