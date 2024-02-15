@@ -143,13 +143,14 @@ public class RouteProvider {
 						}
 					}
 				} else if (params.mode.getRouteService() == RouteService.POSTMAN_TOUR) {
+					// FK-TODO: calculate postman tour
 					if (params.inPublicTransportMode) {
 						res = findVectorMapsRoute(params, calcGPXRoute);
 					} else {
-						MissingMapsHelper missingMapsHelper = new MissingMapsHelper(params);
-						List<Location> points = missingMapsHelper.getStartFinishIntermediatePoints();
-						List<WorldRegion> missingMaps = missingMapsHelper.getMissingMaps(points);
-						List<Location> pathPoints = missingMapsHelper.getDistributedPathPoints(points);
+						final MissingMapsHelper missingMapsHelper = new MissingMapsHelper(params);
+						final List<Location> points = missingMapsHelper.getStartFinishIntermediatePoints();
+						final List<WorldRegion> missingMaps = missingMapsHelper.getMissingMaps(points);
+						final List<Location> pathPoints = missingMapsHelper.getDistributedPathPoints(points);
 						if (!Algorithms.isEmpty(missingMaps)) {
 							res = new RouteCalculationResult("Additional maps available");
 							res.missingMaps = missingMapsHelper.getMissingMaps(pathPoints);
