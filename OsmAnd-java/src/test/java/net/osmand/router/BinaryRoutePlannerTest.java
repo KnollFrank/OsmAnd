@@ -27,30 +27,45 @@ public class BinaryRoutePlannerTest {
 
     @Test
     public void testRouting() throws Exception {
+        // Given
         // BinaryRoutePlanner.TRACE_ROUTING = true;
         // BinaryRoutePlanner.DEBUG_BREAK_EACH_SEGMENT = true;
         // BinaryRoutePlanner.DEBUG_PRECISE_DIST_MEASUREMENT = true;
-        final BinaryMapIndexReader binaryMapIndexReader = createBinaryMapIndexReader("src/test/resources/routing/Labyrinth.obf");
-        for (int planRoadDirection = -1; planRoadDirection <= 1; planRoadDirection++) {
-            System.out.println("planRoadDirection: " + planRoadDirection);
-            final List<RouteSegmentResult> routeSegments =
-                    new RoutePlannerFrontEnd()
-                            .searchRoute(
-                                    createRoutingContext(
-                                            binaryMapIndexReader,
-                                            createRoutingConfiguration(planRoadDirection)),
-                                    new LatLon(49.4460638, 10.3180879),
-                                    new LatLon(49.4459823, 10.3178143),
-                                    Collections.<LatLon>emptyList())
-                            .getList();
-            Assert.assertEquals(
-                    Sets.newHashSet(-1594L, -1593L),
-                    getReachedSegments(routeSegments));
-        }
+        final RoutingContext routingContext =
+                createRoutingContext(
+                        createBinaryMapIndexReader("src/test/resources/routing/Labyrinth.obf"),
+                        RoutingConfiguration
+                                .getDefault()
+                                .build(
+                                        "pedestrian",
+                                        new RoutingMemoryLimits(
+                                                RoutingConfiguration.DEFAULT_MEMORY_LIMIT * 3,
+                                                RoutingConfiguration.DEFAULT_NATIVE_MEMORY_LIMIT),
+                                        null));
+
+        // When
+        final RouteResultPreparation.RouteCalcResult routeCalcResult =
+                new RoutePlannerFrontEnd()
+                        .searchRoute(
+                                routingContext,
+                                new LatLon(49.4460638, 10.3180879),
+                                new LatLon(49.4459823, 10.3178143),
+                                Collections.<LatLon>emptyList());
+
+        // Then
+        Assert.assertEquals(
+                Sets.newHashSet(-1594L, -1593L),
+                getReachedSegments(routeCalcResult.getList()));
     }
 
-    private RoutingContext createRoutingContext(final BinaryMapIndexReader binaryMapIndexReader,
-                                                final RoutingConfiguration config) {
+    private static BinaryMapIndexReader createBinaryMapIndexReader(final String fileName) throws IOException {
+        return new BinaryMapIndexReader(
+                new RandomAccessFile(fileName, "r"),
+                new File(fileName));
+    }
+
+    private static RoutingContext createRoutingContext(final BinaryMapIndexReader binaryMapIndexReader,
+                                                       final RoutingConfiguration config) {
         final RoutingContext ctx =
                 new RoutePlannerFrontEnd()
                         .buildRoutingContext(
@@ -63,26 +78,6 @@ public class BinaryRoutePlannerTest {
                                 RoutePlannerFrontEnd.RouteCalculationMode.NORMAL);
         ctx.leftSideNavigation = false;
         return ctx;
-    }
-
-    private RoutingConfiguration createRoutingConfiguration(final int planRoadDirection) {
-        final RoutingConfiguration config =
-                RoutingConfiguration
-                        .getDefault()
-                        .build(
-                                "pedestrian",
-                                new RoutingMemoryLimits(
-                                        RoutingConfiguration.DEFAULT_MEMORY_LIMIT * 3,
-                                        RoutingConfiguration.DEFAULT_NATIVE_MEMORY_LIMIT),
-                                null);
-        config.planRoadDirection = planRoadDirection;
-        return config;
-    }
-
-    private static BinaryMapIndexReader createBinaryMapIndexReader(final String fileName) throws IOException {
-        return new BinaryMapIndexReader(
-                new RandomAccessFile(fileName, "r"),
-                new File(fileName));
     }
 
     private static Set<Long> getReachedSegments(final List<RouteSegmentResult> routeSegments) {
