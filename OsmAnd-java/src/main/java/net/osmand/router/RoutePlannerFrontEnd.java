@@ -1,19 +1,6 @@
 package net.osmand.router;
 
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-
-import gnu.trove.list.array.TIntArrayList;
 import net.osmand.LocationsHolder;
 import net.osmand.NativeLibrary;
 import net.osmand.PlatformUtil;
@@ -32,6 +19,20 @@ import net.osmand.router.HHRouteDataStructure.NetworkDBPoint;
 import net.osmand.router.RouteCalculationProgress.HHIteration;
 import net.osmand.router.RouteResultPreparation.RouteCalcResult;
 import net.osmand.util.MapUtils;
+
+import org.apache.commons.logging.Log;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import gnu.trove.list.array.TIntArrayList;
 
 
 public class RoutePlannerFrontEnd {
@@ -1118,7 +1119,8 @@ public class RoutePlannerFrontEnd {
 		} else {
 			refreshProgressDistance(ctx);
 			// Split into 2 methods to let GC work in between
-			ctx.finalRouteSegment = new BinaryRoutePlanner().searchRouteInternal(ctx, start, recalculationEnd != null ? recalculationEnd : end, null);
+			// FK-TODO: reactivate ctx.finalRouteSegment = new BinaryRoutePlanner().searchRouteInternal(ctx, start, recalculationEnd != null ? recalculationEnd : end, null);
+			ctx.finalRouteSegment = new PostmanTourPlanner().searchRouteInternal(ctx, start, recalculationEnd != null ? recalculationEnd : end, null);
 			RouteResultPreparation rrp = new RouteResultPreparation();
 			// 4. Route is found : collect all segments and prepare result
 			List<RouteSegmentResult> result  = rrp.convertFinalSegmentToResults(ctx, ctx.finalRouteSegment);
