@@ -39,7 +39,7 @@ public class PostmanTourPlanner {
     public static boolean DEBUG_BREAK_EACH_SEGMENT = false;
 
 
-    public static double squareRootDist(int x1, int y1, int x2, int y2) {
+    private static double squareRootDist(int x1, int y1, int x2, int y2) {
         if (DEBUG_PRECISE_DIST_MEASUREMENT) {
             return MapUtils.measuredDist31(x1, y1, x2, y2);
         }
@@ -77,7 +77,7 @@ public class PostmanTourPlanner {
      * Calculate route between start.segmentEnd and end.segmentStart (using A* algorithm)
      * return list of segments
      */
-    FinalRouteSegment searchRouteInternal(
+    public FinalRouteSegment searchRouteInternal(
             final RoutingContext ctx,
             RouteSegmentPoint start,
             RouteSegmentPoint end,
@@ -88,8 +88,8 @@ public class PostmanTourPlanner {
         PriorityQueue<RouteSegmentCost> graphDirectSegments = new PriorityQueue<>(50, new SegmentsComparator());
         PriorityQueue<RouteSegmentCost> graphReverseSegments = new PriorityQueue<>(50, new SegmentsComparator());
         // Set to not visit one segment twice (stores road.id << X + segmentStart)
-        TLongObjectHashMap<RouteSegment> visitedDirectSegments = new TLongObjectHashMap<RouteSegment>();
-        TLongObjectHashMap<RouteSegment> visitedOppositeSegments = new TLongObjectHashMap<RouteSegment>();
+        TLongObjectHashMap<RouteSegment> visitedDirectSegments = new TLongObjectHashMap<>();
+        TLongObjectHashMap<RouteSegment> visitedOppositeSegments = new TLongObjectHashMap<>();
         initQueuesWithStartEnd(ctx, start, end, graphDirectSegments, graphReverseSegments);
 
         boolean onlyBackward = ctx.getPlanRoadDirection() < 0;
@@ -245,9 +245,9 @@ public class PostmanTourPlanner {
         return finalSegment;
     }
 
-    protected boolean checkIfGraphIsEmpty(final RoutingContext ctx, boolean allowDirection,
-                                          boolean reverseWaySearch, PriorityQueue<RouteSegmentCost> graphSegments, RouteSegmentPoint pnt, TLongObjectMap<RouteSegment> visited,
-                                          String msg) {
+    private boolean checkIfGraphIsEmpty(final RoutingContext ctx, boolean allowDirection,
+                                        boolean reverseWaySearch, PriorityQueue<RouteSegmentCost> graphSegments, RouteSegmentPoint pnt, TLongObjectMap<RouteSegment> visited,
+                                        String msg) {
         if (allowDirection && graphSegments.isEmpty()) {
             if (pnt.others != null) {
                 Iterator<RouteSegmentPoint> pntIterator = pnt.others.iterator();
@@ -285,7 +285,7 @@ public class PostmanTourPlanner {
         return false;
     }
 
-    public RouteSegment initEdgeSegment(final RoutingContext ctx, RouteSegmentPoint pnt, boolean originalDir, PriorityQueue<RouteSegmentCost> graphSegments, boolean reverseSearchWay) {
+    private RouteSegment initEdgeSegment(final RoutingContext ctx, RouteSegmentPoint pnt, boolean originalDir, PriorityQueue<RouteSegmentCost> graphSegments, boolean reverseSearchWay) {
         if (pnt == null) {
             return null;
         }
@@ -335,7 +335,7 @@ public class PostmanTourPlanner {
         return null;
     }
 
-    public float calculatePreciseStartTime(final RoutingContext ctx, int projX, int projY, RouteSegment seg) {
+    private float calculatePreciseStartTime(final RoutingContext ctx, int projX, int projY, RouteSegment seg) {
         // compensate first segment difference to mid point (length) https://github.com/osmandapp/OsmAnd/issues/14148
         double fullTime = calcRoutingSegmentTimeOnlyDist(ctx.getRouter(), seg);
         double full = squareRootDist(seg.getStartPointX(), seg.getStartPointY(), seg.getEndPointX(), seg.getEndPointY()) + 0.01; // avoid div 0
@@ -421,7 +421,7 @@ public class PostmanTourPlanner {
         return (float) (distance / ctx.getRouter().getMaxSpeed());
     }
 
-    protected static float h(RoutingContext ctx, int begX, int begY, int endX, int endY) {
+    private static float h(RoutingContext ctx, int begX, int begY, int endX, int endY) {
         if (ctx.dijkstraMode != 0) {
             return 0;
         }
@@ -463,7 +463,7 @@ public class PostmanTourPlanner {
     }
 
 
-    public float calcRoutingSegmentTimeOnlyDist(VehicleRouter router, RouteSegment segment) {
+    private float calcRoutingSegmentTimeOnlyDist(VehicleRouter router, RouteSegment segment) {
         int prevX = segment.road.getPoint31XTile(segment.getSegmentStart());
         int prevY = segment.road.getPoint31YTile(segment.getSegmentStart());
         int x = segment.road.getPoint31XTile(segment.getSegmentEnd());
@@ -707,8 +707,8 @@ public class PostmanTourPlanner {
     }
 
 
-    protected void processRestriction(RoutingContext ctx, RouteSegment inputNext, boolean reverseWay, long viaId,
-                                      RouteDataObject road) {
+    private void processRestriction(RoutingContext ctx, RouteSegment inputNext, boolean reverseWay, long viaId,
+                                    RouteDataObject road) {
         boolean via = viaId != 0;
         RouteSegment next = inputNext;
         boolean exclusiveRestriction = false;
