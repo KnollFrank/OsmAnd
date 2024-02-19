@@ -2,4 +2,18 @@ frankknoll@frankknoll-XPS-13-9370:~/AndroidStudioProjects/OsmAnd/android/OsmAnd
 ../gradlew assembleNightlyFreeOpenglArm64Debug
 ../gradlew assembleNightlyFreeLegacyFatDebug
 
-FK-TODO:
+RouteDataObject
+RoutePlannerFrontEnd
+wichtig: - BinaryRoutePlanner.searchRouteInternal()
+         - RouteResultPreparation.convertFinalSegmentToResults()
+RouteSegment, RoutingContext, RouteSegmentResult, RouteCalculationResult
+MapUtils.get31LatitudeY
+RouteTestingTest
+
+lese
+- https://en.wikipedia.org/wiki/Tiled_web_map
+- https://en.wikipedia.org/wiki/Web_Mercator_projection
+- https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+- https://en.wikipedia.org/wiki/Mercator_projection
+
+
