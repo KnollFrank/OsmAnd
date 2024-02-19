@@ -31,17 +31,7 @@ public class PostmanTourPlannerTest {
         // BinaryRoutePlanner.TRACE_ROUTING = true;
         // BinaryRoutePlanner.DEBUG_BREAK_EACH_SEGMENT = true;
         // BinaryRoutePlanner.DEBUG_PRECISE_DIST_MEASUREMENT = true;
-        final RoutingContext routingContext =
-                createRoutingContext(
-                        createBinaryMapIndexReader("src/test/resources/routing/Labyrinth.obf"),
-                        RoutingConfiguration
-                                .getDefault()
-                                .build(
-                                        "pedestrian",
-                                        new RoutingMemoryLimits(
-                                                RoutingConfiguration.DEFAULT_MEMORY_LIMIT * 3,
-                                                RoutingConfiguration.DEFAULT_NATIVE_MEMORY_LIMIT),
-                                        null));
+        final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Labyrinth.obf");
 
         // When
         final RouteResultPreparation.RouteCalcResult routeCalcResult =
@@ -64,16 +54,22 @@ public class PostmanTourPlannerTest {
                 new File(fileName));
     }
 
-    private static RoutingContext createRoutingContext(final BinaryMapIndexReader binaryMapIndexReader,
-                                                       final RoutingConfiguration config) {
+    private static RoutingContext createRoutingContext(final String obfFileName) throws IOException {
         final RoutingContext ctx =
                 new RoutePlannerFrontEnd()
                         .buildRoutingContext(
-                                config,
+                                RoutingConfiguration
+                                        .getDefault()
+                                        .build(
+                                                "pedestrian",
+                                                new RoutingMemoryLimits(
+                                                        RoutingConfiguration.DEFAULT_MEMORY_LIMIT * 3,
+                                                        RoutingConfiguration.DEFAULT_NATIVE_MEMORY_LIMIT),
+                                                null),
                                 null,
                                 new BinaryMapIndexReader[]
                                         {
-                                                binaryMapIndexReader
+                                                createBinaryMapIndexReader(obfFileName)
                                         },
                                 RoutePlannerFrontEnd.RouteCalculationMode.NORMAL);
         ctx.leftSideNavigation = false;
