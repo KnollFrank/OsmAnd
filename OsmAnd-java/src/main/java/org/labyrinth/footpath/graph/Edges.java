@@ -1,10 +1,11 @@
 package org.labyrinth.footpath.graph;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Length;
+import static org.labyrinth.common.MeasureUtils.sum;
+
 import java.util.List;
 
-import static org.labyrinth.common.MeasureUtils.sum;
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
 
 public class Edges {
 

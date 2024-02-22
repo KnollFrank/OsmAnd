@@ -9,7 +9,7 @@ import org.labyrinth.footpath.graph.Edge;
 import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
 
-public class FootpathGraph2JGraphConverter {
+public class Graph2JGraphConverter {
 
     public org.jgrapht.Graph<Node, DefaultWeightedEdge> convert(final Graph graph) {
         final org.jgrapht.Graph<Node, DefaultWeightedEdge> jgraph = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);

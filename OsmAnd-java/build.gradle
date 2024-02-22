@@ -7,8 +7,8 @@ configurations {
 }
 
 tasks.withType(JavaCompile) {
-	sourceCompatibility = "1.7"
-	targetCompatibility = "1.7"
+	sourceCompatibility = "1.8"
+	targetCompatibility = "1.8"
 	options.encoding = 'UTF-8'
 }
 
@@ -140,5 +140,11 @@ dependencies {
 	//implementation 'com.atilika.kuromoji:kuromoji-ipadic:0.9.0'
 	implementation 'net.sf.kxml:kxml2:2.1.8'
 	implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+	// https://mvnrepository.com/artifact/tec.units/unit-ri
+	implementation group: 'tec.units', name: 'unit-ri', version: '1.0.3'
+	// https://mvnrepository.com/artifact/org.jgrapht/jgrapht-core
+	implementation group: 'org.jgrapht', name: 'jgrapht-core', version: '1.5.2'
+	implementation 'com.google.guava:guava:30.1.1-jre'
 }
 

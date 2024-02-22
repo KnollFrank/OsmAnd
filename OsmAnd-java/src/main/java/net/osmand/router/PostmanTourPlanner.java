@@ -13,15 +13,20 @@ import net.osmand.util.MapUtils;
 
 import org.apache.commons.logging.Log;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 
 public class PostmanTourPlanner {
-
 
     private static final int REVERSE_WAY_RESTRICTION_ONLY = 1024;
     /*private*/ static final int STANDARD_ROAD_IN_QUEUE_OVERHEAD = 220;
@@ -84,9 +89,22 @@ public class PostmanTourPlanner {
             TLongObjectMap<RouteSegment> boundaries) throws InterruptedException {
         // measure time
         ctx.memoryOverhead = 1000;
+        createGraph(ctx, start);
         // Initializing priority queue to visit way segments
-        PriorityQueue<RouteSegmentCost> graphDirectSegments = new PriorityQueue<>(50, new SegmentsComparator());
-        PriorityQueue<RouteSegmentCost> graphReverseSegments = new PriorityQueue<>(50, new SegmentsComparator());
+        PriorityQueue<RouteSegmentCost> graphDirectSegments = new PriorityQueue<RouteSegmentCost>(50, new SegmentsComparator()) {
+
+            @Override
+            public boolean add(final RouteSegmentCost routeSegmentCost) {
+                return super.add(routeSegmentCost);
+            }
+        };
+        PriorityQueue<RouteSegmentCost> graphReverseSegments = new PriorityQueue<RouteSegmentCost>(50, new SegmentsComparator()) {
+
+            @Override
+            public boolean add(final RouteSegmentCost routeSegmentCost) {
+                return super.add(routeSegmentCost);
+            }
+        };
         // Set to not visit one segment twice (stores road.id << X + segmentStart)
         TLongObjectHashMap<RouteSegment> visitedDirectSegments = new TLongObjectHashMap<>();
         TLongObjectHashMap<RouteSegment> visitedOppositeSegments = new TLongObjectHashMap<>();
@@ -243,6 +261,69 @@ public class PostmanTourPlanner {
             ctx.calculationProgress.oppositeQueueSize += graphReverseSegments.size();
         }
         return finalSegment;
+    }
+
+    private void createGraph(final RoutingContext ctx, final RouteSegmentPoint start) {
+        // final Set<RouteSegmentWrapper> routeSegments = getAllRouteSegments(ctx, new RouteSegmentWrapper(start));
+//        System.out.println("FK-TEST: routeSegments " + " size: " + routeSegments.size());
+//        for (final RouteSegmentWrapper routeSegment : routeSegments) {
+//            System.out.println(" " + routeSegment);
+//        }
+        // createGraph(routeSegments);
+    }
+
+    private void createGraph(final Set<RouteSegmentWrapper> routeSegments) {
+
+    }
+
+    private Set<RouteSegmentWrapper> getAllRouteSegments(final RoutingContext ctx,
+                                                         final RouteSegmentWrapper routeSegment) {
+        Set<RouteSegmentWrapper> routeSegments = Collections.singleton(routeSegment);
+        boolean newRouteSegmentsFound;
+        do {
+            final Set<RouteSegmentWrapper> newRouteSegments = addConnectedRouteSegments(ctx, routeSegments);
+            newRouteSegmentsFound = !newRouteSegments.equals(routeSegments);
+            routeSegments = newRouteSegments;
+        } while (newRouteSegmentsFound);
+        return routeSegments;
+    }
+
+    private void processIntersections2(
+            final RoutingContext ctx,
+            final RouteSegment currentSegment,
+            final boolean reverseWaySearch) {
+        RouteSegment nextCurrentSegment = null;
+        final int x = currentSegment.getRoad().getPoint31XTile(currentSegment.getSegmentEnd());
+        final int y = currentSegment.getRoad().getPoint31YTile(currentSegment.getSegmentEnd());
+
+        final RouteSegment connectedNextSegment = ctx.loadRouteSegment(x, y, ctx.config.memoryLimitation - ctx.memoryOverhead, reverseWaySearch);
+        RouteSegment roadIter = connectedNextSegment;
+        boolean directionAllowed = true;
+        while (roadIter != null) {
+            log.info("roadIter: " + roadIter);
+            if (currentSegment.getSegmentEnd() == roadIter.getSegmentStart() && roadIter.road.getId() == currentSegment.getRoad().getId()) {
+                nextCurrentSegment = roadIter.initRouteSegment(currentSegment.isPositive());
+                if (nextCurrentSegment == null) {
+                    // end of route (-1 or length + 1)
+                } else {
+                    if (nextCurrentSegment.isSegmentAttachedToStart()) {
+                        if (!directionAllowed) {
+                            nextCurrentSegment = null;
+                        }
+                    } else {
+                        nextCurrentSegment.setParentRoute(currentSegment);
+                        nextCurrentSegment.distanceFromStart = currentSegment.distanceFromStart;
+                        final int nx = nextCurrentSegment.getRoad().getPoint31XTile(nextCurrentSegment.getSegmentEnd());
+                        final int ny = nextCurrentSegment.getRoad().getPoint31YTile(nextCurrentSegment.getSegmentEnd());
+                        if (nx == x && ny == y) {
+                            // don't process other intersections (let process further segment)
+                            return;
+                        }
+                    }
+                }
+            }
+            roadIter = roadIter.getNext();
+        }
     }
 
     private boolean checkIfGraphIsEmpty(final RoutingContext ctx, boolean allowDirection,
@@ -670,7 +751,10 @@ public class PostmanTourPlanner {
         return false;
     }
 
-    private long calculateRoutePointInternalId(final RouteDataObject road, int pntId, int nextPntId) {
+    private long calculateRoutePointInternalId(
+            final RouteDataObject road,
+            final int pntId,
+            final int nextPntId) {
         int positive = nextPntId - pntId;
         int pntLen = road.getPointsLength();
         if (pntId < 0 || nextPntId < 0 || pntId >= pntLen || nextPntId >= pntLen || (positive != -1 && positive != 1)) {
@@ -680,12 +764,12 @@ public class PostmanTourPlanner {
         return (road.getId() << ROUTE_POINTS) + (pntId << 1) + (positive > 0 ? 1 : 0);
     }
 
-    private long calculateRoutePointId(RouteSegment segm) {
-        return calculateRoutePointInternalId(segm.getRoad(), segm.getSegmentStart(),
+    private long calculateRoutePointId(final RouteSegment segm) {
+        return calculateRoutePointInternalId(
+                segm.getRoad(),
+                segm.getSegmentStart(),
                 segm.isPositive() ? segm.getSegmentStart() + 1 : segm.getSegmentStart() - 1);
-        // return calculateRoutePointInternalId(segm.getRoad(), segm.getSegmentStart(), segm.getSegmentEnd());
     }
-
 
     private boolean proccessRestrictions(RoutingContext ctx, RouteSegment segment, RouteSegment inputNext, boolean reverseWay) {
         if (!ctx.getRouter().restrictionsAware()) {
@@ -798,9 +882,13 @@ public class PostmanTourPlanner {
         }
     }
 
-    private RouteSegment processIntersections(RoutingContext ctx, PriorityQueue<RouteSegmentCost> graphSegments,
-                                              TLongObjectMap<RouteSegment> visitedSegments, RouteSegment currentSegment,
-                                              boolean reverseWaySearch, boolean doNotAddIntersections) {
+    private RouteSegment processIntersections(
+            RoutingContext ctx,
+            PriorityQueue<RouteSegmentCost> graphSegments,
+            TLongObjectMap<RouteSegment> visitedSegments,
+            RouteSegment currentSegment,
+            boolean reverseWaySearch,
+            boolean doNotAddIntersections) {
         RouteSegment nextCurrentSegment = null;
         int targetEndX = reverseWaySearch ? ctx.startX : ctx.targetX;
         int targetEndY = reverseWaySearch ? ctx.startY : ctx.targetY;
@@ -903,6 +991,117 @@ public class PostmanTourPlanner {
             }
         }
         return nextCurrentSegment;
+    }
+
+    public static class RouteSegmentWrapper {
+
+        public final RouteSegment delegate;
+
+        public RouteSegmentWrapper(final RouteSegment delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final RouteSegmentWrapper that = (RouteSegmentWrapper) o;
+            return this.delegate.getRoad().id == that.delegate.getRoad().id &&
+                    this.delegate.getSegmentStart() == that.delegate.getSegmentStart() &&
+                    this.delegate.getSegmentEnd() == that.delegate.getSegmentEnd();
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(delegate.getRoad().id, delegate.getSegmentStart(), delegate.getSegmentEnd());
+        }
+
+        @Override
+        public String toString() {
+            return "RouteSegmentWrapper{" +
+                    "delegate=" + delegate +
+                    '}';
+        }
+    }
+
+    private Set<RouteSegmentWrapper> addConnectedRouteSegments(final RoutingContext ctx, final Set<RouteSegmentWrapper> routeSegments) {
+        return routeSegments
+                .stream()
+                .flatMap(routeSegment -> getConnectedRouteSegments(loadConnectedRouteSegment(ctx, routeSegment)).stream())
+                .collect(Collectors.toSet());
+/*
+        RouteSegmentWrapper roadIter = connectedNextSegment;
+        while (roadIter != null) {
+            if (isConnectedOnSameRoad(routeSegment, roadIter)) {
+                {
+                    final RouteSegment pos = roadIter.initRouteSegment(true);
+                    if (pos != null) {
+                        final long routePointId = calculateRoutePointId(pos);
+                        if (!visitedRouteSegments.containsKey(routePointId)) {
+                            visitedRouteSegments.put(routePointId, pos);
+                            return Optional.of(pos);
+                        }
+                    }
+                }
+                {
+                    final RouteSegment neg = roadIter.initRouteSegment(false);
+                    if (neg != null) {
+                        final long routePointId = calculateRoutePointId(neg);
+                        if (!visitedRouteSegments.containsKey(routePointId)) {
+                            visitedRouteSegments.put(routePointId, neg);
+                            return Optional.of(neg);
+                        }
+                    }
+                }
+            }
+            roadIter = roadIter.getNext();
+        }
+        {
+            final long routePointId = calculateRoutePointId(connectedNextSegment);
+            if (!visitedRouteSegments.containsKey(routePointId)) {
+                visitedRouteSegments.put(routePointId, connectedNextSegment);
+                return Optional.of(connectedNextSegment);
+            }
+            return Optional.empty();
+        }
+*/
+    }
+
+    private static Set<RouteSegmentWrapper> getConnectedRouteSegments(final RouteSegmentWrapper routeSegment) {
+        final Iterable<RouteSegment> iterable = routeSegment.delegate::getIterator;
+        return StreamSupport
+                .stream(iterable.spliterator(), false)
+                .flatMap(_routeSegment -> Stream.of(_routeSegment.initRouteSegment(true), _routeSegment.initRouteSegment(false)))
+                .filter(Objects::nonNull)
+                .map(RouteSegmentWrapper::new)
+                .collect(Collectors.toSet());
+    }
+
+    private static RouteSegmentWrapper loadConnectedRouteSegment(final RoutingContext ctx, final RouteSegmentWrapper segment) {
+        final RouteDataObject road = segment.delegate.getRoad();
+        final short segmentEnd = segment.delegate.getSegmentEnd();
+        return new RouteSegmentWrapper(
+                ctx.loadRouteSegment(
+                        road.getPoint31XTile(segmentEnd),
+                        road.getPoint31YTile(segmentEnd),
+                        0,
+                        false));
+    }
+
+    private static boolean isConnectedOnSameRoad(final RouteSegmentWrapper currentSegment, final RouteSegmentWrapper roadIter) {
+        return isConnected(currentSegment, roadIter) && isSameRoad(currentSegment, roadIter);
+    }
+
+    private static boolean isConnected(final RouteSegmentWrapper routeSegment1, final RouteSegmentWrapper routeSegment2) {
+        return routeSegment1.delegate.getSegmentEnd() == routeSegment2.delegate.getSegmentStart();
+    }
+
+    private static boolean isSameRoad(final RouteSegmentWrapper routeSegment1, final RouteSegmentWrapper routeSegment2) {
+        return isSameRoad(routeSegment1.delegate.getRoad(), routeSegment2.delegate.getRoad());
+    }
+
+    private static boolean isSameRoad(final RouteDataObject road1, final RouteDataObject road2) {
+        return road1.id == road2.id;
     }
 
     private boolean processOneRoadIntersection(RoutingContext ctx, boolean reverseWaySearch, PriorityQueue<RouteSegmentCost> graphSegments,

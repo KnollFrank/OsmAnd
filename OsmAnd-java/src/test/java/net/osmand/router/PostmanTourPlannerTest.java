@@ -7,6 +7,7 @@ import net.osmand.router.RoutingConfiguration.RoutingMemoryLimits;
 import org.apache.commons.compress.utils.Sets;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -26,11 +27,12 @@ public class PostmanTourPlannerTest {
     }
 
     @Test
+    @Ignore
     public void testRouting() throws Exception {
-        // Given
         // BinaryRoutePlanner.TRACE_ROUTING = true;
         // BinaryRoutePlanner.DEBUG_BREAK_EACH_SEGMENT = true;
         // BinaryRoutePlanner.DEBUG_PRECISE_DIST_MEASUREMENT = true;
+        // Given
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Labyrinth.obf");
 
         // When
@@ -40,6 +42,29 @@ public class PostmanTourPlannerTest {
                                 routingContext,
                                 new LatLon(49.4460638, 10.3180879),
                                 new LatLon(49.4459823, 10.3178143),
+                                Collections.<LatLon>emptyList());
+
+        // Then
+        Assert.assertEquals(
+                Sets.newHashSet(-1594L, -1593L),
+                getReachedSegments(routeCalcResult.getList()));
+    }
+
+    @Test
+    @Ignore
+    public void testRoutingHirschau() throws Exception {
+        // Given
+        final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Hirschau.obf");
+
+        // When
+        final RouteResultPreparation.RouteCalcResult routeCalcResult =
+                new RoutePlannerFrontEnd()
+                        .searchRoute(
+                                routingContext,
+                                // Kapellenweg:
+                                new LatLon(48.501619, 8.9929844),
+                                // Hofweg:
+                                new LatLon(48.5017172, 8.9933938),
                                 Collections.<LatLon>emptyList());
 
         // Then

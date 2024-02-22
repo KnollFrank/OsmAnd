@@ -5,7 +5,7 @@ import org.jgrapht.graph.AsSubgraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.traverse.DepthFirstIterator;
 import org.labyrinth.common.Utils;
-import org.labyrinth.footpath.converter.FootpathGraph2JGraphConverter;
+import org.labyrinth.footpath.converter.Graph2JGraphConverter;
 import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
 
@@ -22,7 +22,7 @@ public class ShortestClosedPathProvider {
 
     private static List<Node> getShortestClosedPathContainingNode(final Graph graph, final Node node) {
         return getShortestClosedPathContainingNode(
-                new FootpathGraph2JGraphConverter().convert(graph),
+                new Graph2JGraphConverter().convert(graph),
                 node);
     }
 

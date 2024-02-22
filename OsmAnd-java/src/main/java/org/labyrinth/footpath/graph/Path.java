@@ -1,14 +1,16 @@
 package org.labyrinth.footpath.graph;
 
 import com.google.common.collect.ImmutableList;
+
 import org.labyrinth.common.Utils;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Length;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
 
 public class Path {
 
@@ -29,7 +31,7 @@ public class Path {
         if (edges == null) {
             edges = Utils
                     .getConsecutivePairs(getNodes())
-                    .map(sourceTargetPair -> new Edge(sourceTargetPair.first, sourceTargetPair.second))
+                    .map(sourceTargetPair -> new Edge(sourceTargetPair.getFirst(), sourceTargetPair.getSecond()))
                     .collect(Collectors.toList());
         }
         return edges;

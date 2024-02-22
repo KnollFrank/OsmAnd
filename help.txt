@@ -10,6 +10,9 @@ RouteSegment, RoutingContext, RouteSegmentResult, RouteCalculationResult
 MapUtils.get31LatitudeY
 RouteTestingTest
 
+RoutingContext.loadRouteSegment() ist wichtig, um den Graph aufzubauen
+BinaryRoutePlanner.processIntersections()
+
 lese
 - https://en.wikipedia.org/wiki/Tiled_web_map
 - https://en.wikipedia.org/wiki/Web_Mercator_projection
