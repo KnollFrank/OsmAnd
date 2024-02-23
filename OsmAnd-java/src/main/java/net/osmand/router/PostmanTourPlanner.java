@@ -89,7 +89,7 @@ public class PostmanTourPlanner {
             TLongObjectMap<RouteSegment> boundaries) throws InterruptedException {
         // measure time
         ctx.memoryOverhead = 1000;
-        // createGraph(ctx, start);
+        createGraph(ctx, start);
         // Initializing priority queue to visit way segments
         PriorityQueue<RouteSegmentCost> graphDirectSegments = new PriorityQueue<RouteSegmentCost>(50, new SegmentsComparator()) {
 
@@ -1088,8 +1088,8 @@ public class PostmanTourPlanner {
                         false));
     }
 
-    private static boolean isConnectedOnSameRoad(final RouteSegmentWrapper currentSegment, final RouteSegmentWrapper roadIter) {
-        return isConnected(currentSegment, roadIter) && isSameRoad(currentSegment, roadIter);
+    private static boolean isConnectedOnSameRoad(final RouteSegmentWrapper routeSegment1, final RouteSegmentWrapper routeSegment2) {
+        return isConnected(routeSegment1, routeSegment2) && isSameRoad(routeSegment1, routeSegment2);
     }
 
     private static boolean isConnected(final RouteSegmentWrapper routeSegment1, final RouteSegmentWrapper routeSegment2) {
