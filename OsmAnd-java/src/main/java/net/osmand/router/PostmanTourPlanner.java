@@ -12,6 +12,8 @@ import net.osmand.osm.MapRenderingTypes;
 import net.osmand.util.MapUtils;
 
 import org.apache.commons.logging.Log;
+import org.labyrinth.footpath.converter.ConnectedRouteSegmentsProvider;
+import org.labyrinth.footpath.converter.IConnectedRouteSegmentsProvider;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,8 +22,6 @@ import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
@@ -264,8 +264,11 @@ public class PostmanTourPlanner {
     }
 
     private void createGraph(final RoutingContext ctx, final RouteSegmentPoint start) {
-        final Set<RouteSegmentWrapper> routeSegments = getAllRouteSegments(ctx, new RouteSegmentWrapper(start));
-        System.out.println("FK-TEST: routeSegments " + " size: " + routeSegments.size());
+        final Set<RouteSegmentWrapper> routeSegments =
+                getAllRouteSegments(
+                        new ConnectedRouteSegmentsProvider(ctx),
+                        new RouteSegmentWrapper(start));
+        System.out.println("FK-TEST: routeSegments " + "size: " + routeSegments.size());
         for (final RouteSegmentWrapper routeSegment : routeSegments) {
             System.out.println(" " + routeSegment);
         }
@@ -276,12 +279,13 @@ public class PostmanTourPlanner {
 
     }
 
-    private Set<RouteSegmentWrapper> getAllRouteSegments(final RoutingContext ctx,
-                                                         final RouteSegmentWrapper routeSegment) {
+    private Set<RouteSegmentWrapper> getAllRouteSegments(
+            final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider,
+            final RouteSegmentWrapper routeSegment) {
         Set<RouteSegmentWrapper> routeSegments = Collections.singleton(routeSegment);
         boolean newRouteSegmentsFound;
         do {
-            final Set<RouteSegmentWrapper> newRouteSegments = addConnectedRouteSegments(ctx, routeSegments);
+            final Set<RouteSegmentWrapper> newRouteSegments = addConnectedRouteSegments(connectedRouteSegmentsProvider, routeSegments);
             newRouteSegmentsFound = !newRouteSegments.equals(routeSegments);
             routeSegments = newRouteSegments;
         } while (newRouteSegmentsFound);
@@ -1024,68 +1028,22 @@ public class PostmanTourPlanner {
         }
     }
 
-    private Set<RouteSegmentWrapper> addConnectedRouteSegments(final RoutingContext ctx, final Set<RouteSegmentWrapper> routeSegments) {
+    private Set<RouteSegmentWrapper> addConnectedRouteSegments(
+            final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider,
+            final Set<RouteSegmentWrapper> routeSegments) {
         return routeSegments
                 .stream()
-                .flatMap(routeSegment -> getConnectedRouteSegments(loadConnectedRouteSegment(ctx, routeSegment)).stream())
+                .flatMap(
+                        routeSegment -> {
+                            final Set<RouteSegmentWrapper> connectedRouteSegments = connectedRouteSegmentsProvider.getConnectedRouteSegments(routeSegment);
+                            System.out.println("routeSegment: " + routeSegment.delegate);
+                            int i = 1;
+                            for (final RouteSegmentWrapper connectedRouteSegment : connectedRouteSegments) {
+                                System.out.println(String.format(" %d: %s", i++, connectedRouteSegment.delegate));
+                            }
+                            return connectedRouteSegments.stream();
+                        })
                 .collect(Collectors.toSet());
-/*
-        RouteSegmentWrapper roadIter = connectedNextSegment;
-        while (roadIter != null) {
-            if (isConnectedOnSameRoad(routeSegment, roadIter)) {
-                {
-                    final RouteSegment pos = roadIter.initRouteSegment(true);
-                    if (pos != null) {
-                        final long routePointId = calculateRoutePointId(pos);
-                        if (!visitedRouteSegments.containsKey(routePointId)) {
-                            visitedRouteSegments.put(routePointId, pos);
-                            return Optional.of(pos);
-                        }
-                    }
-                }
-                {
-                    final RouteSegment neg = roadIter.initRouteSegment(false);
-                    if (neg != null) {
-                        final long routePointId = calculateRoutePointId(neg);
-                        if (!visitedRouteSegments.containsKey(routePointId)) {
-                            visitedRouteSegments.put(routePointId, neg);
-                            return Optional.of(neg);
-                        }
-                    }
-                }
-            }
-            roadIter = roadIter.getNext();
-        }
-        {
-            final long routePointId = calculateRoutePointId(connectedNextSegment);
-            if (!visitedRouteSegments.containsKey(routePointId)) {
-                visitedRouteSegments.put(routePointId, connectedNextSegment);
-                return Optional.of(connectedNextSegment);
-            }
-            return Optional.empty();
-        }
-*/
-    }
-
-    private static Set<RouteSegmentWrapper> getConnectedRouteSegments(final RouteSegmentWrapper routeSegment) {
-        final Iterable<RouteSegment> iterable = routeSegment.delegate::getIterator;
-        return StreamSupport
-                .stream(iterable.spliterator(), false)
-                .flatMap(_routeSegment -> Stream.of(_routeSegment.initRouteSegment(true), _routeSegment.initRouteSegment(false)))
-                .filter(Objects::nonNull)
-                .map(RouteSegmentWrapper::new)
-                .collect(Collectors.toSet());
-    }
-
-    private static RouteSegmentWrapper loadConnectedRouteSegment(final RoutingContext ctx, final RouteSegmentWrapper segment) {
-        final RouteDataObject road = segment.delegate.getRoad();
-        final short segmentEnd = segment.delegate.getSegmentEnd();
-        return new RouteSegmentWrapper(
-                ctx.loadRouteSegment(
-                        road.getPoint31XTile(segmentEnd),
-                        road.getPoint31YTile(segmentEnd),
-                        0,
-                        false));
     }
 
     private static boolean isConnectedOnSameRoad(final RouteSegmentWrapper routeSegment1, final RouteSegmentWrapper routeSegment2) {

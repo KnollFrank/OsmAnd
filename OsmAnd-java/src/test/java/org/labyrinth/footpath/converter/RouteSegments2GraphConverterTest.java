@@ -39,11 +39,15 @@ public class RouteSegments2GraphConverterTest {
     @Test
     public void test_routeSegments2Graph() {
         // Given
-        final RouteSegment routeSegment = new RouteSegment(createRouteDataObject(4711), 5, 6);
+        final RouteSegment routeSegment1 = new RouteSegment(createRouteDataObject(4711), 0, 1);
+        final RouteSegment routeSegment2 = new RouteSegment(createRouteDataObject(4711), 1, 2);
+        final RouteSegment routeSegment3 = new RouteSegment(createRouteDataObject(4711), 1, 3);
         final Set<RouteSegmentWrapper> routeSegments =
                 ImmutableSet
                         .<RouteSegmentWrapper>builder()
-                        .add(new RouteSegmentWrapper(routeSegment))
+                        .add(new RouteSegmentWrapper(routeSegment1))
+                        .add(new RouteSegmentWrapper(routeSegment2))
+                        .add(new RouteSegmentWrapper(routeSegment3))
                         .build();
         final RouteSegments2GraphConverter routeSegments2GraphConverter = new RouteSegments2GraphConverter();
 
@@ -53,14 +57,14 @@ public class RouteSegments2GraphConverterTest {
         // Then
         final Node nodeStart =
                 new Node(
-                        new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentStart()),
-                        getGeodetic(routeSegment, routeSegment.getSegmentStart()),
-                        routeSegment.getRoad().getName() + "-start");
+                        new RoadPosition(routeSegment1.getRoad().id, routeSegment1.getSegmentStart()),
+                        getGeodetic(routeSegment1, routeSegment1.getSegmentStart()),
+                        routeSegment1.getRoad().getName() + "-start");
         final Node nodeEnd =
                 new Node(
-                        new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentEnd()),
-                        getGeodetic(routeSegment, routeSegment.getSegmentEnd()),
-                        routeSegment.getRoad().getName() + "-end");
+                        new RoadPosition(routeSegment1.getRoad().id, routeSegment1.getSegmentEnd()),
+                        getGeodetic(routeSegment1, routeSegment1.getSegmentEnd()),
+                        routeSegment1.getRoad().getName() + "-end");
         final Graph graphExpected =
                 new Graph(
                         ImmutableSet.of(nodeStart, nodeEnd),
