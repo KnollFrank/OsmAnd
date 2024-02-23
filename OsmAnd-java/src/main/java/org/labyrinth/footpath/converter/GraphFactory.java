@@ -17,11 +17,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class RouteSegments2GraphConverter2 {
+public class GraphFactory {
 
     private final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider;
 
-    public RouteSegments2GraphConverter2(final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider) {
+    public GraphFactory(final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider) {
         this.connectedRouteSegmentsProvider = connectedRouteSegmentsProvider;
     }
 

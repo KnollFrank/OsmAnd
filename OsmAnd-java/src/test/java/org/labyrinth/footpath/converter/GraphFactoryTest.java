@@ -17,7 +17,7 @@ import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
 import org.labyrinth.footpath.graph.RoadPosition;
 
-public class RouteSegments2GraphConverter2Test {
+public class GraphFactoryTest {
 
     @Test
     public void test_createGraph() {
@@ -26,9 +26,21 @@ public class RouteSegments2GraphConverter2Test {
         //  1: Road (1112230517), ref ('L 371'), name ('Kingersheimer Straße') [0-1] 2.9 m
         //  2: Road (1112230517), ref ('L 371'), name ('Kingersheimer Straße') [1-2] 10.8 m
         //  3: Road (195999884), name ('Kreuzlinger Weg') [12-11] 4.8 m
-        final RouteSegment kingersheimerStrasse_0_1 = new RouteSegment(createRouteDataObject(1112230517, "Kingersheimer Straße"), 0, 1);
-        final RouteSegment kingersheimerStrasse_1_2 = new RouteSegment(createRouteDataObject(1112230517, "Kingersheimer Straße"), 1, 2);
-        final RouteSegment kreuzlingerWeg_12_11 = new RouteSegment(createRouteDataObject(195999884, "Kreuzlinger Weg"), 12, 11);
+        final RouteSegment kingersheimerStrasse_0_1 =
+                new RouteSegment(
+                        createRouteDataObject(1112230517, "Kingersheimer Straße"),
+                        0,
+                        1);
+        final RouteSegment kingersheimerStrasse_1_2 =
+                new RouteSegment(
+                        createRouteDataObject(1112230517, "Kingersheimer Straße"),
+                        1,
+                        2);
+        final RouteSegment kreuzlingerWeg_12_11 =
+                new RouteSegment(
+                        createRouteDataObject(195999884, "Kreuzlinger Weg"),
+                        12,
+                        11);
         final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider =
                 routeSegment ->
                         ImmutableSet
@@ -37,11 +49,10 @@ public class RouteSegments2GraphConverter2Test {
                                 .add(new RouteSegmentWrapper(kingersheimerStrasse_1_2))
                                 .add(new RouteSegmentWrapper(kreuzlingerWeg_12_11))
                                 .build();
-        final RouteSegments2GraphConverter2 routeSegments2GraphConverter =
-                new RouteSegments2GraphConverter2(connectedRouteSegmentsProvider);
+        final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
 
         // When
-        final Graph graph = routeSegments2GraphConverter.createGraph(new RouteSegmentWrapper(kingersheimerStrasse_0_1));
+        final Graph graph = graphFactory.createGraph(new RouteSegmentWrapper(kingersheimerStrasse_0_1));
 
         // Then
         final Node kingersheimerStrasse_0 =
