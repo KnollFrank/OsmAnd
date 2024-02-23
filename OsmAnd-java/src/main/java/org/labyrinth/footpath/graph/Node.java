@@ -12,12 +12,13 @@ import javax.measure.quantity.Length;
 
 public class Node implements Comparable<Node> {
 
-    public final long id;
+    public final RoadPosition id;
     public final Geodetic position;
+    // FK-TODO: remove name field
     public final String name;
     public final Set<Edge> locEdges;
 
-    public Node(final long id, final Geodetic position, final String name) {
+    public Node(final RoadPosition id, final Geodetic position, final String name) {
         this.id = id;
         this.position = position;
         this.name = name;
@@ -34,7 +35,7 @@ public class Node implements Comparable<Node> {
 
     @Override
     public int compareTo(final Node other) {
-        return Long.compare(id, other.id);
+        return this.id.compareTo(other.id);
     }
 
     @Override
@@ -42,7 +43,7 @@ public class Node implements Comparable<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final Node node = (Node) o;
-        return id == node.id;
+        return Objects.equals(id, node.id);
     }
 
     @Override

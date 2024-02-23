@@ -15,6 +15,7 @@ import org.labyrinth.coordinate.Geodetic;
 import org.labyrinth.footpath.graph.Edge;
 import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
+import org.labyrinth.footpath.graph.RoadPosition;
 
 import java.util.Collections;
 import java.util.Set;
@@ -52,12 +53,12 @@ public class RouteSegments2GraphConverterTest {
         // Then
         final Node nodeStart =
                 new Node(
-                        1,
+                        new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentStart()),
                         getGeodetic(routeSegment, routeSegment.getSegmentStart()),
                         routeSegment.getRoad().getName() + "-start");
         final Node nodeEnd =
                 new Node(
-                        2,
+                        new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentEnd()),
                         getGeodetic(routeSegment, routeSegment.getSegmentEnd()),
                         routeSegment.getRoad().getName() + "-end");
         final Graph graphExpected =

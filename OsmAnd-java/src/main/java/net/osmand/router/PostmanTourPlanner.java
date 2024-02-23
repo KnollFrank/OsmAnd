@@ -89,7 +89,7 @@ public class PostmanTourPlanner {
             TLongObjectMap<RouteSegment> boundaries) throws InterruptedException {
         // measure time
         ctx.memoryOverhead = 1000;
-        createGraph(ctx, start);
+        // createGraph(ctx, start);
         // Initializing priority queue to visit way segments
         PriorityQueue<RouteSegmentCost> graphDirectSegments = new PriorityQueue<RouteSegmentCost>(50, new SegmentsComparator()) {
 

@@ -5,8 +5,8 @@ import net.osmand.Location;
 import org.labyrinth.coordinate.GeodeticFactory;
 import org.labyrinth.coordinate.LocationExtension;
 import org.labyrinth.footpath.graph.Node;
-import org.labyrinth.footpath.graph.NodeBuilder;
 import org.labyrinth.footpath.graph.PathPosition;
+import org.labyrinth.footpath.graph.RoadPosition;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,11 +27,10 @@ class Converters {
                 .collect(Collectors.toList());
     }
 
-    private static Node asNode(final long id, final Location location) {
-        return new NodeBuilder()
-                .withId(id)
-                .withPosition(GeodeticFactory.createGeodetic(location))
-                .withName("")
-                .createNode();
+    private static Node asNode(final int id, final Location location) {
+        return new Node(
+                new RoadPosition(-1, id),
+                GeodeticFactory.createGeodetic(location),
+                "");
     }
 }

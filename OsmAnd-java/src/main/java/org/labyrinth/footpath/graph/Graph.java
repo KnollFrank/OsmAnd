@@ -22,11 +22,11 @@ public class Graph {
         }
     }
 
-    public Optional<Node> findNodeById(final long id) {
+    public Optional<Node> findNodeById(final RoadPosition id) {
         return this
                 .nodes
                 .stream()
-                .filter(node -> node.id == id)
+                .filter(node -> node.id.equals(id))
                 .findFirst();
     }
 
