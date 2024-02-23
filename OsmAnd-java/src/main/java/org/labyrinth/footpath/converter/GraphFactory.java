@@ -25,7 +25,7 @@ public class GraphFactory {
         this.connectedRouteSegmentsProvider = connectedRouteSegmentsProvider;
     }
 
-    public Graph createGraph(final RouteSegmentWrapper startRouteSegment) {
+    public Graph createGraph(final RouteSegmentWrapper start) {
 //        final Set<Edge> edges = getEdges(routeSegments);
 //        return new Graph(getNodes(edges), edges);
         return null;
