@@ -1,17 +1,18 @@
 package org.labyrinth.footpath.converter;
 
-import net.osmand.router.PostmanTourPlanner;
+import static net.osmand.router.PostmanTourPlanner.RouteSegmentWrapper;
 
 import org.labyrinth.footpath.graph.Graph;
 
+import java.util.Collections;
 import java.util.Set;
 
 public class RouteSegments2GraphConverter {
 
-    public Graph osm2FootpathGraph(final Set<PostmanTourPlanner.RouteSegmentWrapper> routeSegments) {
+    public Graph routeSegments2Graph(final Set<RouteSegmentWrapper> routeSegments) {
         // final Set<Edge> footpathEdges = getFootpathEdges(osm, getFootpathNodes(osm));
         // return new Graph(getNodes(footpathEdges), footpathEdges);
-        return null;
+        return new Graph(Collections.emptySet(), Collections.emptySet());
     }
 
 //    private Set<Node> getNodes(final Set<Edge> edges) {

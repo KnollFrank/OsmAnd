@@ -17,7 +17,7 @@ public class Node implements Comparable<Node> {
     public final String name;
     public final Set<Edge> locEdges;
 
-    Node(final long id, final Geodetic position, final String name) {
+    public Node(final long id, final Geodetic position, final String name) {
         this.id = id;
         this.position = position;
         this.name = name;

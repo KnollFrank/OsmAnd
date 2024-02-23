@@ -264,11 +264,11 @@ public class PostmanTourPlanner {
     }
 
     private void createGraph(final RoutingContext ctx, final RouteSegmentPoint start) {
-        // final Set<RouteSegmentWrapper> routeSegments = getAllRouteSegments(ctx, new RouteSegmentWrapper(start));
-//        System.out.println("FK-TEST: routeSegments " + " size: " + routeSegments.size());
-//        for (final RouteSegmentWrapper routeSegment : routeSegments) {
-//            System.out.println(" " + routeSegment);
-//        }
+        final Set<RouteSegmentWrapper> routeSegments = getAllRouteSegments(ctx, new RouteSegmentWrapper(start));
+        System.out.println("FK-TEST: routeSegments " + " size: " + routeSegments.size());
+        for (final RouteSegmentWrapper routeSegment : routeSegments) {
+            System.out.println(" " + routeSegment);
+        }
         // createGraph(routeSegments);
     }
 

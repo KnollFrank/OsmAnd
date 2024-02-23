@@ -8,6 +8,7 @@ public class Graph {
     public final Set<Node> nodes;
     public final Set<Edge> edges;
 
+    // FK-TODO: Parameter nodes entfernen und im Konstruktor aus edges selbst berechnen wie in RouteSegments2GraphConverter.getNodes()
     public Graph(final Set<Node> nodes, final Set<Edge> edges) {
         this.nodes = nodes;
         this.edges = edges;

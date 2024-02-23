@@ -42,7 +42,7 @@ public class PostmanTourPlannerTest {
                                 routingContext,
                                 new LatLon(49.4460638, 10.3180879),
                                 new LatLon(49.4459823, 10.3178143),
-                                Collections.<LatLon>emptyList());
+                                Collections.emptyList());
 
         // Then
         Assert.assertEquals(
@@ -51,7 +51,7 @@ public class PostmanTourPlannerTest {
     }
 
     @Test
-    @Ignore
+    // @Ignore
     public void testRoutingHirschau() throws Exception {
         // Given
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Hirschau.obf");
@@ -65,7 +65,7 @@ public class PostmanTourPlannerTest {
                                 new LatLon(48.501619, 8.9929844),
                                 // Hofweg:
                                 new LatLon(48.5017172, 8.9933938),
-                                Collections.<LatLon>emptyList());
+                                Collections.emptyList());
 
         // Then
         Assert.assertEquals(

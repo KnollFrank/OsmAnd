@@ -56,12 +56,7 @@ public class Path {
     private Node createNode(final EdgePosition edgePosition, final int newid, final String newName) {
         return edgePosition
                 .getNode()
-                .orElseGet(() ->
-                        new NodeBuilder()
-                                .withId(newid)
-                                .withPosition(edgePosition.getGeodetic())
-                                .withName(newName)
-                                .createNode());
+                .orElseGet(() -> new Node(newid, edgePosition.getGeodetic(), newName));
     }
 
     @Override
