@@ -17,11 +17,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class RouteSegments2GraphConverter {
+public class RouteSegments2GraphConverter2 {
 
-    public Graph routeSegments2Graph(final Set<RouteSegmentWrapper> routeSegments) {
-        final Set<Edge> edges = getEdges(routeSegments);
-        return new Graph(getNodes(edges), edges);
+    private final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider;
+
+    public RouteSegments2GraphConverter2(final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider) {
+        this.connectedRouteSegmentsProvider = connectedRouteSegmentsProvider;
+    }
+
+    public Graph createGraph(final RouteSegmentWrapper startRouteSegment) {
+//        final Set<Edge> edges = getEdges(routeSegments);
+//        return new Graph(getNodes(edges), edges);
+        return null;
     }
 
     private Set<Node> getNodes(final Set<Edge> edges) {

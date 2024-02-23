@@ -75,7 +75,6 @@ public class GraphUtils {
         final double error = 0.0001;
         assertThat(actual.position.getLatitude().to(Angle.Unit.DEGREES), is(closeTo(expected.position.getLatitude().to(Angle.Unit.DEGREES), error)));
         assertThat(actual.position.getLongitude().to(Angle.Unit.DEGREES), is(closeTo(expected.position.getLongitude().to(Angle.Unit.DEGREES), error)));
-        assertThat(actual.name, is(expected.name));
         assertThat(actual.id, is(expected.id));
         // assertThat(actual.getLocEdges(), is(expected.getLocEdges()));
     }

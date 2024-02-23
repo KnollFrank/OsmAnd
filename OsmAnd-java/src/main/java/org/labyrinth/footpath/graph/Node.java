@@ -14,14 +14,11 @@ public class Node implements Comparable<Node> {
 
     public final RoadPosition id;
     public final Geodetic position;
-    // FK-TODO: remove name field
-    public final String name;
     public final Set<Edge> locEdges;
 
-    public Node(final RoadPosition id, final Geodetic position, final String name) {
+    public Node(final RoadPosition id, final Geodetic position) {
         this.id = id;
         this.position = position;
-        this.name = name;
         locEdges = new HashSet<>();
     }
 
@@ -56,7 +53,6 @@ public class Node implements Comparable<Node> {
         return "Node{" +
                 "id=" + id +
                 ", position=" + position +
-                ", name='" + name + '\'' +
                 '}';
     }
 }

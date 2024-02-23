@@ -37,14 +37,4 @@ public class Graph {
                 .filter(edge -> edge.containsNodes(a, b))
                 .findFirst();
     }
-
-    public Node getNodeByName(final String name) {
-        return
-                this
-                        .nodes
-                        .stream()
-                        .filter(node -> node.name != null && node.name.equals(name))
-                        .findFirst()
-                        .get();
-    }
 }

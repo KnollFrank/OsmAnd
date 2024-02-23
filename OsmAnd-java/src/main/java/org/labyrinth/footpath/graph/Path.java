@@ -47,16 +47,16 @@ public class Path {
     public List<Node> getNodes() {
         return ImmutableList
                 .<Node>builder()
-                .add(createNode(src, new RoadPosition(-1, 0), "src"))
+                .add(createNode(src, new RoadPosition(-1, 0)))
                 .addAll(intermediateNodes)
-                .add(createNode(dst, new RoadPosition(-1, 1), "dst"))
+                .add(createNode(dst, new RoadPosition(-1, 1)))
                 .build();
     }
 
-    private Node createNode(final EdgePosition edgePosition, final RoadPosition newid, final String newName) {
+    private Node createNode(final EdgePosition edgePosition, final RoadPosition newid) {
         return edgePosition
                 .getNode()
-                .orElseGet(() -> new Node(newid, edgePosition.getGeodetic(), newName));
+                .orElseGet(() -> new Node(newid, edgePosition.getGeodetic()));
     }
 
     @Override

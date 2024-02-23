@@ -58,13 +58,11 @@ public class RouteSegments2GraphConverterTest {
         final Node nodeStart =
                 new Node(
                         new RoadPosition(routeSegment1.getRoad().id, routeSegment1.getSegmentStart()),
-                        getGeodetic(routeSegment1, routeSegment1.getSegmentStart()),
-                        routeSegment1.getRoad().getName() + "-start");
+                        getGeodetic(routeSegment1, routeSegment1.getSegmentStart()));
         final Node nodeEnd =
                 new Node(
                         new RoadPosition(routeSegment1.getRoad().id, routeSegment1.getSegmentEnd()),
-                        getGeodetic(routeSegment1, routeSegment1.getSegmentEnd()),
-                        routeSegment1.getRoad().getName() + "-end");
+                        getGeodetic(routeSegment1, routeSegment1.getSegmentEnd()));
         final Graph graphExpected =
                 new Graph(
                         ImmutableSet.of(nodeStart, nodeEnd),
