@@ -38,12 +38,12 @@ public class GraphFactory {
         return ImmutableSet
                 .<Edge>builder()
                 .addAll(asEdges(routeSegments))
-                .addAll(getEdgesFromStart2OtherRoad(start, routeSegments))
+                .addAll(getEdgesFromStartToOtherRoad(start, routeSegments))
                 .build();
     }
 
-    private static Set<Edge> getEdgesFromStart2OtherRoad(final RouteSegmentWrapper start,
-                                                         final Set<RouteSegmentWrapper> routeSegments) {
+    private static Set<Edge> getEdgesFromStartToOtherRoad(final RouteSegmentWrapper start,
+                                                          final Set<RouteSegmentWrapper> routeSegments) {
         final Node targetOfStart = getTargetNode(start.delegate);
         return routeSegments
                 .stream()
