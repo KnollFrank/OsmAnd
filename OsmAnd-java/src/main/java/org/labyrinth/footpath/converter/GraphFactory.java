@@ -3,12 +3,14 @@ package org.labyrinth.footpath.converter;
 import static net.osmand.router.BinaryRoutePlanner.RouteSegment;
 import static net.osmand.router.PostmanTourPlanner.RouteSegmentWrapper;
 import static net.osmand.router.PostmanTourPlanner.isSameRoad;
+import static org.labyrinth.common.SetUtils.union;
 
 import com.google.common.collect.ImmutableSet;
 
 import net.osmand.binary.RouteDataObject;
 import net.osmand.util.MapUtils;
 
+import org.jgrapht.alg.util.Pair;
 import org.labyrinth.coordinate.Angle;
 import org.labyrinth.coordinate.Geodetic;
 import org.labyrinth.footpath.graph.Edge;
@@ -16,6 +18,8 @@ import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
 import org.labyrinth.footpath.graph.RoadPosition;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,12 +33,41 @@ public class GraphFactory {
     }
 
     public Graph createGraph(final RouteSegmentWrapper start) {
-        final Set<Edge> edges = getEdges(start);
+        final Set<Edge> edges = getEdgesReachableFrom(start);
         return new Graph(getNodes(edges), edges);
     }
 
-    private Set<Edge> getEdges(final RouteSegmentWrapper start) {
+    private Set<Edge> getEdgesReachableFrom(final RouteSegmentWrapper start) {
+        Set<RouteSegmentWrapper> routeSegments = Collections.singleton(start);
+        Set<Edge> edges;
+        boolean newRouteSegmentsFound;
+        do {
+            final Pair<Set<Edge>, Set<RouteSegmentWrapper>> newEdgesAndNewRouteSegments = getEdgesAndRouteSegments(routeSegments);
+            final Set<RouteSegmentWrapper> newRouteSegments = newEdgesAndNewRouteSegments.getSecond();
+            edges = newEdgesAndNewRouteSegments.getFirst();
+            newRouteSegmentsFound = !newRouteSegments.equals(routeSegments);
+            routeSegments = newRouteSegments;
+        } while (newRouteSegmentsFound);
+        return edges;
+    }
+
+    private Pair<Set<Edge>, Set<RouteSegmentWrapper>> getEdgesAndRouteSegments(final Set<RouteSegmentWrapper> routeSegments) {
+        final List<Pair<Set<Edge>, Set<RouteSegmentWrapper>>> edgesAndRouteSegmentsList =
+                routeSegments
+                        .stream()
+                        .map(this::getEdgesAndRouteSegments)
+                        .collect(Collectors.toList());
+        return Pair.of(
+                getEdges(edgesAndRouteSegmentsList),
+                getRouteSegments(edgesAndRouteSegmentsList));
+    }
+
+    private Pair<Set<Edge>, Set<RouteSegmentWrapper>> getEdgesAndRouteSegments(final RouteSegmentWrapper start) {
         final Set<RouteSegmentWrapper> routeSegments = connectedRouteSegmentsProvider.getConnectedRouteSegments(start);
+        return Pair.of(getEdges(start, routeSegments), routeSegments);
+    }
+
+    private static Set<Edge> getEdges(final RouteSegmentWrapper start, final Set<RouteSegmentWrapper> routeSegments) {
         return ImmutableSet
                 .<Edge>builder()
                 .addAll(asEdges(routeSegments))
@@ -98,5 +131,27 @@ public class GraphFactory {
 
     private static Angle getLongitude(final RouteDataObject road, final short i) {
         return new Angle(MapUtils.get31LongitudeX(road.getPoint31XTile(i)), Angle.Unit.DEGREES);
+    }
+
+    private static Set<Edge> getEdges(final List<Pair<Set<Edge>, Set<RouteSegmentWrapper>>> edgesAndRouteSegmentsList) {
+        return union(getFirstList(edgesAndRouteSegmentsList));
+    }
+
+    private static Set<RouteSegmentWrapper> getRouteSegments(final List<Pair<Set<Edge>, Set<RouteSegmentWrapper>>> edgesAndRouteSegmentsList) {
+        return union(getSecondList(edgesAndRouteSegmentsList));
+    }
+
+    private static <A, B> List<A> getFirstList(final List<Pair<A, B>> pairList) {
+        return pairList
+                .stream()
+                .map(Pair::getFirst)
+                .collect(Collectors.toList());
+    }
+
+    private static <A, B> List<B> getSecondList(final List<Pair<A, B>> pairList) {
+        return pairList
+                .stream()
+                .map(Pair::getSecond)
+                .collect(Collectors.toList());
     }
 }

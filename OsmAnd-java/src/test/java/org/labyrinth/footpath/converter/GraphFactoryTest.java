@@ -45,12 +45,14 @@ public class GraphFactoryTest {
                         11);
         final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider =
                 routeSegment ->
-                        ImmutableSet
-                                .<RouteSegmentWrapper>builder()
-                                .add(new RouteSegmentWrapper(kingersheimerStrasse_0_1))
-                                .add(new RouteSegmentWrapper(kingersheimerStrasse_1_2))
-                                .add(new RouteSegmentWrapper(kreuzlingerWeg_12_11))
-                                .build();
+                        routeSegment.equals(new RouteSegmentWrapper(kingersheimerStrasse_0_1)) ?
+                                ImmutableSet
+                                        .<RouteSegmentWrapper>builder()
+                                        .add(new RouteSegmentWrapper(kingersheimerStrasse_0_1))
+                                        .add(new RouteSegmentWrapper(kingersheimerStrasse_1_2))
+                                        .add(new RouteSegmentWrapper(kreuzlingerWeg_12_11))
+                                        .build() :
+                                Collections.singleton(routeSegment);
         final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
 
         // When
@@ -101,12 +103,12 @@ public class GraphFactoryTest {
         final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider =
                 routeSegment -> {
                     if (routeSegment.equals(new RouteSegmentWrapper(kingersheimerStrasse_0_1))) {
-                        return Collections.singleton(new RouteSegmentWrapper(kingersheimerStrasse_1_2));
+                        return ImmutableSet.of(routeSegment, new RouteSegmentWrapper(kingersheimerStrasse_1_2));
                     }
                     if (routeSegment.equals(new RouteSegmentWrapper(kingersheimerStrasse_1_2))) {
-                        return Collections.singleton(new RouteSegmentWrapper(kingersheimerStrasse_2_3));
+                        return ImmutableSet.of(routeSegment, new RouteSegmentWrapper(kingersheimerStrasse_2_3));
                     }
-                    throw new IllegalArgumentException(routeSegment.toString());
+                    return Collections.singleton(routeSegment);
                 };
         final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
 
