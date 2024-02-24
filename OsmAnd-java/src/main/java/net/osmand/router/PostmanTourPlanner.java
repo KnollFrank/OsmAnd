@@ -1054,7 +1054,7 @@ public class PostmanTourPlanner {
         return routeSegment1.delegate.getSegmentEnd() == routeSegment2.delegate.getSegmentStart();
     }
 
-    private static boolean isSameRoad(final RouteSegmentWrapper routeSegment1, final RouteSegmentWrapper routeSegment2) {
+    public static boolean isSameRoad(final RouteSegmentWrapper routeSegment1, final RouteSegmentWrapper routeSegment2) {
         return isSameRoad(routeSegment1.delegate.getRoad(), routeSegment2.delegate.getRoad());
     }
 

@@ -55,26 +55,11 @@ public class GraphFactoryTest {
         final Graph graph = graphFactory.createGraph(new RouteSegmentWrapper(kingersheimerStrasse_0_1));
 
         // Then
-        final Node kingersheimerStrasse_0 =
-                new Node(
-                        new RoadPosition(kingersheimerStrasse_0_1.getRoad().id, kingersheimerStrasse_0_1.getSegmentStart()),
-                        getGeodetic(kingersheimerStrasse_0_1, kingersheimerStrasse_0_1.getSegmentStart()));
-        final Node kingersheimerStrasse_1 =
-                new Node(
-                        new RoadPosition(kingersheimerStrasse_0_1.getRoad().id, kingersheimerStrasse_0_1.getSegmentEnd()),
-                        getGeodetic(kingersheimerStrasse_0_1, kingersheimerStrasse_0_1.getSegmentEnd()));
-        final Node kingersheimerStrasse_2 =
-                new Node(
-                        new RoadPosition(kingersheimerStrasse_1_2.getRoad().id, kingersheimerStrasse_1_2.getSegmentEnd()),
-                        getGeodetic(kingersheimerStrasse_1_2, kingersheimerStrasse_1_2.getSegmentEnd()));
-        final Node kreuzlingerWeg_12 =
-                new Node(
-                        new RoadPosition(kreuzlingerWeg_12_11.getRoad().id, kreuzlingerWeg_12_11.getSegmentStart()),
-                        getGeodetic(kreuzlingerWeg_12_11, kreuzlingerWeg_12_11.getSegmentStart()));
-        final Node kreuzlingerWeg_11 =
-                new Node(
-                        new RoadPosition(kreuzlingerWeg_12_11.getRoad().id, kreuzlingerWeg_12_11.getSegmentEnd()),
-                        getGeodetic(kreuzlingerWeg_12_11, kreuzlingerWeg_12_11.getSegmentEnd()));
+        final Node kingersheimerStrasse_0 = getStartNode(kingersheimerStrasse_0_1);
+        final Node kingersheimerStrasse_1 = getEndNode(kingersheimerStrasse_0_1);
+        final Node kingersheimerStrasse_2 = getEndNode(kingersheimerStrasse_1_2);
+        final Node kreuzlingerWeg_12 = getStartNode(kreuzlingerWeg_12_11);
+        final Node kreuzlingerWeg_11 = getEndNode(kreuzlingerWeg_12_11);
         final Graph graphExpected =
                 new Graph(
                         ImmutableSet
@@ -91,6 +76,18 @@ public class GraphFactoryTest {
                                 new Edge(kingersheimerStrasse_1, kreuzlingerWeg_12),
                                 new Edge(kreuzlingerWeg_12, kreuzlingerWeg_11)));
         GraphUtils.assertActualEqualsExpected(graph, graphExpected);
+    }
+
+    private static Node getStartNode(final RouteSegment routeSegment) {
+        return new Node(
+                new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentStart()),
+                getGeodetic(routeSegment, routeSegment.getSegmentStart()));
+    }
+
+    private static Node getEndNode(final RouteSegment routeSegment) {
+        return new Node(
+                new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentEnd()),
+                getGeodetic(routeSegment, routeSegment.getSegmentEnd()));
     }
 
     private static Geodetic getGeodetic(final RouteSegment routeSegment, final short i) {

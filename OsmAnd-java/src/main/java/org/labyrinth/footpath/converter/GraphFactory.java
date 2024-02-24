@@ -2,6 +2,9 @@ package org.labyrinth.footpath.converter;
 
 import static net.osmand.router.BinaryRoutePlanner.RouteSegment;
 import static net.osmand.router.PostmanTourPlanner.RouteSegmentWrapper;
+import static net.osmand.router.PostmanTourPlanner.isSameRoad;
+
+import com.google.common.collect.ImmutableSet;
 
 import net.osmand.binary.RouteDataObject;
 import net.osmand.util.MapUtils;
@@ -26,9 +29,37 @@ public class GraphFactory {
     }
 
     public Graph createGraph(final RouteSegmentWrapper start) {
-//        final Set<Edge> edges = getEdges(routeSegments);
-//        return new Graph(getNodes(edges), edges);
-        return null;
+        final Set<RouteSegmentWrapper> routeSegmentsWithoutStart = getRouteSegmentsWithoutStart(start);
+        final Set<Edge> edges =
+                ImmutableSet
+                        .<Edge>builder()
+                        .add(asEdge(start.delegate))
+                        .addAll(asEdges(routeSegmentsWithoutStart))
+                        .addAll(getStart2OtherRoad(routeSegmentsWithoutStart, start))
+                        .build();
+        return new Graph(getNodes(edges), edges);
+    }
+
+    private Set<RouteSegmentWrapper> getRouteSegmentsWithoutStart(final RouteSegmentWrapper start) {
+        return connectedRouteSegmentsProvider
+                // FK-TODO: ev. getConnectedRouteSegments() ohne start zurückliefern?
+                .getConnectedRouteSegments(start)
+                .stream()
+                .filter(routeSegmentWrapper -> !routeSegmentWrapper.equals(start))
+                .collect(Collectors.toSet());
+    }
+
+    private static Set<Edge> getStart2OtherRoad(final Set<RouteSegmentWrapper> routeSegments,
+                                                final RouteSegmentWrapper start) {
+        final Node startTarget = getTargetNode(start.delegate);
+        return routeSegments
+                .stream()
+                .filter(routeSegment -> !isSameRoad(routeSegment, start))
+                .map(routeSegmentFromOtherRoad ->
+                        new Edge(
+                                startTarget,
+                                getSourceNode(routeSegmentFromOtherRoad.delegate)))
+                .collect(Collectors.toSet());
     }
 
     private Set<Node> getNodes(final Set<Edge> edges) {
@@ -38,21 +69,25 @@ public class GraphFactory {
                 .collect(Collectors.toSet());
     }
 
-    private Set<Edge> getEdges(final Set<RouteSegmentWrapper> routeSegments) {
+    private static Set<Edge> asEdges(final Set<RouteSegmentWrapper> routeSegments) {
         return routeSegments
                 .stream()
                 .map(routeSegmentWrapper -> routeSegmentWrapper.delegate)
-                .map(routeSegment -> new Edge(getSourceNode(routeSegment), getTargetNode(routeSegment)))
+                .map(GraphFactory::asEdge)
                 .collect(Collectors.toSet());
     }
 
-    private Node getSourceNode(final RouteSegment routeSegment) {
+    private static Edge asEdge(final RouteSegment routeSegment) {
+        return new Edge(getSourceNode(routeSegment), getTargetNode(routeSegment));
+    }
+
+    private static Node getSourceNode(final RouteSegment routeSegment) {
         return new Node(
                 new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentStart()),
                 getGeodetic(routeSegment, routeSegment.getSegmentStart()));
     }
 
-    private Node getTargetNode(final RouteSegment routeSegment) {
+    private static Node getTargetNode(final RouteSegment routeSegment) {
         return new Node(
                 new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentEnd()),
                 getGeodetic(routeSegment, routeSegment.getSegmentEnd()));
