@@ -11,6 +11,7 @@ import net.osmand.binary.RouteDataObject;
 import net.osmand.util.MapUtils;
 
 import org.jgrapht.alg.util.Pair;
+import org.labyrinth.common.ListUtils;
 import org.labyrinth.coordinate.Angle;
 import org.labyrinth.coordinate.Geodetic;
 import org.labyrinth.footpath.graph.Edge;
@@ -134,24 +135,10 @@ public class GraphFactory {
     }
 
     private static Set<Edge> getEdges(final List<Pair<Set<Edge>, Set<RouteSegmentWithEquality>>> edgesAndRouteSegmentsList) {
-        return union(getFirstList(edgesAndRouteSegmentsList));
+        return union(ListUtils.getFirsts(edgesAndRouteSegmentsList));
     }
 
     private static Set<RouteSegmentWithEquality> getRouteSegments(final List<Pair<Set<Edge>, Set<RouteSegmentWithEquality>>> edgesAndRouteSegmentsList) {
-        return union(getSecondList(edgesAndRouteSegmentsList));
-    }
-
-    private static <A, B> List<A> getFirstList(final List<Pair<A, B>> pairList) {
-        return pairList
-                .stream()
-                .map(Pair::getFirst)
-                .collect(Collectors.toList());
-    }
-
-    private static <A, B> List<B> getSecondList(final List<Pair<A, B>> pairList) {
-        return pairList
-                .stream()
-                .map(Pair::getSecond)
-                .collect(Collectors.toList());
+        return union(ListUtils.getSeconds(edgesAndRouteSegmentsList));
     }
 }
