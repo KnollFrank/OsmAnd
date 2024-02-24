@@ -17,10 +17,12 @@ import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
 import org.labyrinth.footpath.graph.RoadPosition;
 
+import java.util.Collections;
+
 public class GraphFactoryTest {
 
     @Test
-    public void test_createGraph() {
+    public void test_createGraph_depth1() {
         // Given
         // routeSegment: Road (1), ref ('L 371'), name ('Kingersheimer Straße') [0-1] 2.9 m
         //  1: Road (1), ref ('L 371'), name ('Kingersheimer Straße') [0-1] 2.9 m
@@ -75,6 +77,60 @@ public class GraphFactoryTest {
                                 new Edge(kingersheimerStrasse_1, kingersheimerStrasse_2),
                                 new Edge(kingersheimerStrasse_1, kreuzlingerWeg_12),
                                 new Edge(kreuzlingerWeg_12, kreuzlingerWeg_11)));
+        GraphUtils.assertActualEqualsExpected(graph, graphExpected);
+    }
+
+    @Test
+    public void test_createGraph_depth2() {
+        // Given
+        final RouteSegment kingersheimerStrasse_0_1 =
+                new RouteSegment(
+                        createRouteDataObject(1, "Kingersheimer Straße"),
+                        0,
+                        1);
+        final RouteSegment kingersheimerStrasse_1_2 =
+                new RouteSegment(
+                        createRouteDataObject(1, "Kingersheimer Straße"),
+                        1,
+                        2);
+        final RouteSegment kingersheimerStrasse_2_3 =
+                new RouteSegment(
+                        createRouteDataObject(1, "Kingersheimer Straße"),
+                        2,
+                        3);
+        final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider =
+                routeSegment -> {
+                    if (routeSegment.equals(new RouteSegmentWrapper(kingersheimerStrasse_0_1))) {
+                        return Collections.singleton(new RouteSegmentWrapper(kingersheimerStrasse_1_2));
+                    }
+                    if (routeSegment.equals(new RouteSegmentWrapper(kingersheimerStrasse_1_2))) {
+                        return Collections.singleton(new RouteSegmentWrapper(kingersheimerStrasse_2_3));
+                    }
+                    throw new IllegalArgumentException(routeSegment.toString());
+                };
+        final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
+
+        // When
+        final Graph graph = graphFactory.createGraph(new RouteSegmentWrapper(kingersheimerStrasse_0_1));
+
+        // Then
+        final Node kingersheimerStrasse_0 = getStartNode(kingersheimerStrasse_0_1);
+        final Node kingersheimerStrasse_1 = getEndNode(kingersheimerStrasse_0_1);
+        final Node kingersheimerStrasse_2 = getEndNode(kingersheimerStrasse_1_2);
+        final Node kingersheimerStrasse_3 = getEndNode(kingersheimerStrasse_2_3);
+        final Graph graphExpected =
+                new Graph(
+                        ImmutableSet
+                                .<Node>builder()
+                                .add(kingersheimerStrasse_0)
+                                .add(kingersheimerStrasse_1)
+                                .add(kingersheimerStrasse_2)
+                                .add(kingersheimerStrasse_3)
+                                .build(),
+                        ImmutableSet.of(
+                                new Edge(kingersheimerStrasse_0, kingersheimerStrasse_1),
+                                new Edge(kingersheimerStrasse_1, kingersheimerStrasse_2),
+                                new Edge(kingersheimerStrasse_2, kingersheimerStrasse_3)));
         GraphUtils.assertActualEqualsExpected(graph, graphExpected);
     }
 
