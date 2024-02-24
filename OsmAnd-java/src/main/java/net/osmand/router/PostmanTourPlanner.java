@@ -268,30 +268,30 @@ public class PostmanTourPlanner {
     private void createGraph(final RoutingContext ctx, final RouteSegmentPoint start) {
         final ConnectedRouteSegmentsProvider connectedRouteSegmentsProvider = new ConnectedRouteSegmentsProvider(ctx);
         final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
-        final Graph graph = graphFactory.createGraph(new RouteSegmentWrapper(start));
+        final Graph graph = graphFactory.createGraph(new RouteSegmentWithEquality(start));
 
-        final Set<RouteSegmentWrapper> routeSegments =
+        final Set<RouteSegmentWithEquality> routeSegments =
                 getAllRouteSegments(
                         connectedRouteSegmentsProvider,
-                        new RouteSegmentWrapper(start));
+                        new RouteSegmentWithEquality(start));
         System.out.println("FK-TEST: routeSegments " + "size: " + routeSegments.size());
-        for (final RouteSegmentWrapper routeSegment : routeSegments) {
+        for (final RouteSegmentWithEquality routeSegment : routeSegments) {
             System.out.println(" " + routeSegment);
         }
         // createGraph(routeSegments);
     }
 
-    private void createGraph(final Set<RouteSegmentWrapper> routeSegments) {
+    private void createGraph(final Set<RouteSegmentWithEquality> routeSegments) {
 
     }
 
-    private Set<RouteSegmentWrapper> getAllRouteSegments(
+    private Set<RouteSegmentWithEquality> getAllRouteSegments(
             final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider,
-            final RouteSegmentWrapper routeSegment) {
-        Set<RouteSegmentWrapper> routeSegments = Collections.singleton(routeSegment);
+            final RouteSegmentWithEquality routeSegment) {
+        Set<RouteSegmentWithEquality> routeSegments = Collections.singleton(routeSegment);
         boolean newRouteSegmentsFound;
         do {
-            final Set<RouteSegmentWrapper> newRouteSegments = addConnectedRouteSegments(connectedRouteSegmentsProvider, routeSegments);
+            final Set<RouteSegmentWithEquality> newRouteSegments = addConnectedRouteSegments(connectedRouteSegmentsProvider, routeSegments);
             newRouteSegmentsFound = !newRouteSegments.equals(routeSegments);
             routeSegments = newRouteSegments;
         } while (newRouteSegmentsFound);
@@ -1003,12 +1003,11 @@ public class PostmanTourPlanner {
         return nextCurrentSegment;
     }
 
-    // FK-TODO: rename to RouteSegmentWithEquality
-    public static class RouteSegmentWrapper {
+    public static class RouteSegmentWithEquality {
 
         public final RouteSegment delegate;
 
-        public RouteSegmentWrapper(final RouteSegment delegate) {
+        public RouteSegmentWithEquality(final RouteSegment delegate) {
             this.delegate = delegate;
         }
 
@@ -1016,7 +1015,7 @@ public class PostmanTourPlanner {
         public boolean equals(final Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            final RouteSegmentWrapper that = (RouteSegmentWrapper) o;
+            final RouteSegmentWithEquality that = (RouteSegmentWithEquality) o;
             return this.delegate.getRoad().id == that.delegate.getRoad().id &&
                     this.delegate.getSegmentStart() == that.delegate.getSegmentStart() &&
                     this.delegate.getSegmentEnd() == that.delegate.getSegmentEnd();
@@ -1035,17 +1034,17 @@ public class PostmanTourPlanner {
         }
     }
 
-    private Set<RouteSegmentWrapper> addConnectedRouteSegments(
+    private Set<RouteSegmentWithEquality> addConnectedRouteSegments(
             final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider,
-            final Set<RouteSegmentWrapper> routeSegments) {
+            final Set<RouteSegmentWithEquality> routeSegments) {
         return routeSegments
                 .stream()
                 .flatMap(
                         routeSegment -> {
-                            final Set<RouteSegmentWrapper> connectedRouteSegments = connectedRouteSegmentsProvider.getConnectedRouteSegments(routeSegment);
+                            final Set<RouteSegmentWithEquality> connectedRouteSegments = connectedRouteSegmentsProvider.getConnectedRouteSegments(routeSegment);
                             System.out.println("routeSegment: " + routeSegment.delegate);
                             int i = 1;
-                            for (final RouteSegmentWrapper connectedRouteSegment : connectedRouteSegments) {
+                            for (final RouteSegmentWithEquality connectedRouteSegment : connectedRouteSegments) {
                                 System.out.println(String.format(" %d: %s", i++, connectedRouteSegment.delegate));
                             }
                             return connectedRouteSegments.stream();
@@ -1053,15 +1052,15 @@ public class PostmanTourPlanner {
                 .collect(Collectors.toSet());
     }
 
-    private static boolean isConnectedOnSameRoad(final RouteSegmentWrapper routeSegment1, final RouteSegmentWrapper routeSegment2) {
+    private static boolean isConnectedOnSameRoad(final RouteSegmentWithEquality routeSegment1, final RouteSegmentWithEquality routeSegment2) {
         return isConnected(routeSegment1, routeSegment2) && isSameRoad(routeSegment1, routeSegment2);
     }
 
-    private static boolean isConnected(final RouteSegmentWrapper routeSegment1, final RouteSegmentWrapper routeSegment2) {
+    private static boolean isConnected(final RouteSegmentWithEquality routeSegment1, final RouteSegmentWithEquality routeSegment2) {
         return routeSegment1.delegate.getSegmentEnd() == routeSegment2.delegate.getSegmentStart();
     }
 
-    public static boolean isSameRoad(final RouteSegmentWrapper routeSegment1, final RouteSegmentWrapper routeSegment2) {
+    public static boolean isSameRoad(final RouteSegmentWithEquality routeSegment1, final RouteSegmentWithEquality routeSegment2) {
         return isSameRoad(routeSegment1.delegate.getRoad(), routeSegment2.delegate.getRoad());
     }
 

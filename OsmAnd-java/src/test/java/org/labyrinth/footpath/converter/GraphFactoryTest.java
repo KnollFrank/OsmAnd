@@ -2,7 +2,7 @@ package org.labyrinth.footpath.converter;
 
 import static net.osmand.binary.BinaryMapRouteReaderAdapter.RouteRegion;
 import static net.osmand.router.BinaryRoutePlanner.RouteSegment;
-import static net.osmand.router.PostmanTourPlanner.RouteSegmentWrapper;
+import static net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -45,18 +45,18 @@ public class GraphFactoryTest {
                         11);
         final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider =
                 routeSegment ->
-                        routeSegment.equals(new RouteSegmentWrapper(kingersheimerStrasse_0_1)) ?
+                        routeSegment.equals(new RouteSegmentWithEquality(kingersheimerStrasse_0_1)) ?
                                 ImmutableSet
-                                        .<RouteSegmentWrapper>builder()
-                                        .add(new RouteSegmentWrapper(kingersheimerStrasse_0_1))
-                                        .add(new RouteSegmentWrapper(kingersheimerStrasse_1_2))
-                                        .add(new RouteSegmentWrapper(kreuzlingerWeg_12_11))
+                                        .<RouteSegmentWithEquality>builder()
+                                        .add(new RouteSegmentWithEquality(kingersheimerStrasse_0_1))
+                                        .add(new RouteSegmentWithEquality(kingersheimerStrasse_1_2))
+                                        .add(new RouteSegmentWithEquality(kreuzlingerWeg_12_11))
                                         .build() :
                                 Collections.singleton(routeSegment);
         final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
 
         // When
-        final Graph graph = graphFactory.createGraph(new RouteSegmentWrapper(kingersheimerStrasse_0_1));
+        final Graph graph = graphFactory.createGraph(new RouteSegmentWithEquality(kingersheimerStrasse_0_1));
 
         // Then
         final Node kingersheimerStrasse_0 = getStartNode(kingersheimerStrasse_0_1);
@@ -102,18 +102,18 @@ public class GraphFactoryTest {
                         3);
         final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider =
                 routeSegment -> {
-                    if (routeSegment.equals(new RouteSegmentWrapper(kingersheimerStrasse_0_1))) {
-                        return ImmutableSet.of(routeSegment, new RouteSegmentWrapper(kingersheimerStrasse_1_2));
+                    if (routeSegment.equals(new RouteSegmentWithEquality(kingersheimerStrasse_0_1))) {
+                        return ImmutableSet.of(routeSegment, new RouteSegmentWithEquality(kingersheimerStrasse_1_2));
                     }
-                    if (routeSegment.equals(new RouteSegmentWrapper(kingersheimerStrasse_1_2))) {
-                        return ImmutableSet.of(routeSegment, new RouteSegmentWrapper(kingersheimerStrasse_2_3));
+                    if (routeSegment.equals(new RouteSegmentWithEquality(kingersheimerStrasse_1_2))) {
+                        return ImmutableSet.of(routeSegment, new RouteSegmentWithEquality(kingersheimerStrasse_2_3));
                     }
                     return Collections.singleton(routeSegment);
                 };
         final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
 
         // When
-        final Graph graph = graphFactory.createGraph(new RouteSegmentWrapper(kingersheimerStrasse_0_1));
+        final Graph graph = graphFactory.createGraph(new RouteSegmentWithEquality(kingersheimerStrasse_0_1));
 
         // Then
         final Node kingersheimerStrasse_0 = getStartNode(kingersheimerStrasse_0_1);

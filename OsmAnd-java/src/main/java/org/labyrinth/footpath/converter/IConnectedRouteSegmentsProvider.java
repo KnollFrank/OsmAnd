@@ -1,11 +1,11 @@
 package org.labyrinth.footpath.converter;
 
-import net.osmand.router.PostmanTourPlanner.RouteSegmentWrapper;
+import net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
 
 import java.util.Set;
 
 @FunctionalInterface
 public interface IConnectedRouteSegmentsProvider {
 
-    Set<RouteSegmentWrapper> getConnectedRouteSegments(final RouteSegmentWrapper routeSegment);
+    Set<RouteSegmentWithEquality> getConnectedRouteSegments(final RouteSegmentWithEquality routeSegment);
 }

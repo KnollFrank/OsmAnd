@@ -1,7 +1,7 @@
 package org.labyrinth.footpath.converter;
 
 import static net.osmand.router.BinaryRoutePlanner.RouteSegment;
-import static net.osmand.router.PostmanTourPlanner.RouteSegmentWrapper;
+import static net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
 import static net.osmand.router.PostmanTourPlanner.isSameRoad;
 import static org.labyrinth.common.SetUtils.union;
 
@@ -32,18 +32,18 @@ public class GraphFactory {
         this.connectedRouteSegmentsProvider = connectedRouteSegmentsProvider;
     }
 
-    public Graph createGraph(final RouteSegmentWrapper start) {
+    public Graph createGraph(final RouteSegmentWithEquality start) {
         final Set<Edge> edges = getEdgesReachableFrom(start);
         return new Graph(getNodes(edges), edges);
     }
 
-    private Set<Edge> getEdgesReachableFrom(final RouteSegmentWrapper start) {
-        Set<RouteSegmentWrapper> routeSegments = Collections.singleton(start);
+    private Set<Edge> getEdgesReachableFrom(final RouteSegmentWithEquality start) {
+        Set<RouteSegmentWithEquality> routeSegments = Collections.singleton(start);
         Set<Edge> edges;
         boolean newRouteSegmentsFound;
         do {
-            final Pair<Set<Edge>, Set<RouteSegmentWrapper>> newEdgesAndNewRouteSegments = getEdgesAndRouteSegments(routeSegments);
-            final Set<RouteSegmentWrapper> newRouteSegments = newEdgesAndNewRouteSegments.getSecond();
+            final Pair<Set<Edge>, Set<RouteSegmentWithEquality>> newEdgesAndNewRouteSegments = getEdgesAndRouteSegments(routeSegments);
+            final Set<RouteSegmentWithEquality> newRouteSegments = newEdgesAndNewRouteSegments.getSecond();
             edges = newEdgesAndNewRouteSegments.getFirst();
             newRouteSegmentsFound = !newRouteSegments.equals(routeSegments);
             routeSegments = newRouteSegments;
@@ -51,8 +51,8 @@ public class GraphFactory {
         return edges;
     }
 
-    private Pair<Set<Edge>, Set<RouteSegmentWrapper>> getEdgesAndRouteSegments(final Set<RouteSegmentWrapper> routeSegments) {
-        final List<Pair<Set<Edge>, Set<RouteSegmentWrapper>>> edgesAndRouteSegmentsList =
+    private Pair<Set<Edge>, Set<RouteSegmentWithEquality>> getEdgesAndRouteSegments(final Set<RouteSegmentWithEquality> routeSegments) {
+        final List<Pair<Set<Edge>, Set<RouteSegmentWithEquality>>> edgesAndRouteSegmentsList =
                 routeSegments
                         .stream()
                         .map(this::getEdgesAndRouteSegments)
@@ -62,12 +62,12 @@ public class GraphFactory {
                 getRouteSegments(edgesAndRouteSegmentsList));
     }
 
-    private Pair<Set<Edge>, Set<RouteSegmentWrapper>> getEdgesAndRouteSegments(final RouteSegmentWrapper start) {
-        final Set<RouteSegmentWrapper> routeSegments = connectedRouteSegmentsProvider.getConnectedRouteSegments(start);
+    private Pair<Set<Edge>, Set<RouteSegmentWithEquality>> getEdgesAndRouteSegments(final RouteSegmentWithEquality start) {
+        final Set<RouteSegmentWithEquality> routeSegments = connectedRouteSegmentsProvider.getConnectedRouteSegments(start);
         return Pair.of(getEdges(start, routeSegments), routeSegments);
     }
 
-    private static Set<Edge> getEdges(final RouteSegmentWrapper start, final Set<RouteSegmentWrapper> routeSegments) {
+    private static Set<Edge> getEdges(final RouteSegmentWithEquality start, final Set<RouteSegmentWithEquality> routeSegments) {
         return ImmutableSet
                 .<Edge>builder()
                 .addAll(asEdges(routeSegments))
@@ -75,8 +75,8 @@ public class GraphFactory {
                 .build();
     }
 
-    private static Set<Edge> getEdgesFromStartToOtherRoad(final RouteSegmentWrapper start,
-                                                          final Set<RouteSegmentWrapper> routeSegments) {
+    private static Set<Edge> getEdgesFromStartToOtherRoad(final RouteSegmentWithEquality start,
+                                                          final Set<RouteSegmentWithEquality> routeSegments) {
         final Node targetOfStart = getTargetNode(start.delegate);
         return routeSegments
                 .stream()
@@ -93,7 +93,7 @@ public class GraphFactory {
                 .collect(Collectors.toSet());
     }
 
-    private static Set<Edge> asEdges(final Set<RouteSegmentWrapper> routeSegments) {
+    private static Set<Edge> asEdges(final Set<RouteSegmentWithEquality> routeSegments) {
         return routeSegments
                 .stream()
                 .map(routeSegmentWrapper -> routeSegmentWrapper.delegate)
@@ -133,11 +133,11 @@ public class GraphFactory {
         return new Angle(MapUtils.get31LongitudeX(road.getPoint31XTile(i)), Angle.Unit.DEGREES);
     }
 
-    private static Set<Edge> getEdges(final List<Pair<Set<Edge>, Set<RouteSegmentWrapper>>> edgesAndRouteSegmentsList) {
+    private static Set<Edge> getEdges(final List<Pair<Set<Edge>, Set<RouteSegmentWithEquality>>> edgesAndRouteSegmentsList) {
         return union(getFirstList(edgesAndRouteSegmentsList));
     }
 
-    private static Set<RouteSegmentWrapper> getRouteSegments(final List<Pair<Set<Edge>, Set<RouteSegmentWrapper>>> edgesAndRouteSegmentsList) {
+    private static Set<RouteSegmentWithEquality> getRouteSegments(final List<Pair<Set<Edge>, Set<RouteSegmentWithEquality>>> edgesAndRouteSegmentsList) {
         return union(getSecondList(edgesAndRouteSegmentsList));
     }
 

@@ -2,7 +2,7 @@ package org.labyrinth.footpath.converter;
 
 import static net.osmand.binary.BinaryMapRouteReaderAdapter.RouteRegion;
 import static net.osmand.router.BinaryRoutePlanner.RouteSegment;
-import static net.osmand.router.PostmanTourPlanner.RouteSegmentWrapper;
+import static net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -25,7 +25,7 @@ public class RouteSegments2GraphConverterTest {
     @Test
     public void test_routeSegments2Graph_empty() {
         // Given
-        final Set<RouteSegmentWrapper> noRouteSegments = Collections.emptySet();
+        final Set<RouteSegmentWithEquality> noRouteSegments = Collections.emptySet();
         final RouteSegments2GraphConverter routeSegments2GraphConverter = new RouteSegments2GraphConverter();
 
         // When
@@ -42,12 +42,12 @@ public class RouteSegments2GraphConverterTest {
         final RouteSegment routeSegment1 = new RouteSegment(createRouteDataObject(4711), 0, 1);
         final RouteSegment routeSegment2 = new RouteSegment(createRouteDataObject(4711), 1, 2);
         final RouteSegment routeSegment3 = new RouteSegment(createRouteDataObject(4711), 1, 3);
-        final Set<RouteSegmentWrapper> routeSegments =
+        final Set<RouteSegmentWithEquality> routeSegments =
                 ImmutableSet
-                        .<RouteSegmentWrapper>builder()
-                        .add(new RouteSegmentWrapper(routeSegment1))
-                        .add(new RouteSegmentWrapper(routeSegment2))
-                        .add(new RouteSegmentWrapper(routeSegment3))
+                        .<RouteSegmentWithEquality>builder()
+                        .add(new RouteSegmentWithEquality(routeSegment1))
+                        .add(new RouteSegmentWithEquality(routeSegment2))
+                        .add(new RouteSegmentWithEquality(routeSegment3))
                         .build();
         final RouteSegments2GraphConverter routeSegments2GraphConverter = new RouteSegments2GraphConverter();
 

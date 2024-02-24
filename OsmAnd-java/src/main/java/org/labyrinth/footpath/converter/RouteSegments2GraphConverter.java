@@ -1,7 +1,7 @@
 package org.labyrinth.footpath.converter;
 
 import static net.osmand.router.BinaryRoutePlanner.RouteSegment;
-import static net.osmand.router.PostmanTourPlanner.RouteSegmentWrapper;
+import static net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
 
 import net.osmand.binary.RouteDataObject;
 import net.osmand.util.MapUtils;
@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 
 public class RouteSegments2GraphConverter {
 
-    public Graph routeSegments2Graph(final Set<RouteSegmentWrapper> routeSegments) {
+    public Graph routeSegments2Graph(final Set<RouteSegmentWithEquality> routeSegments) {
         final Set<Edge> edges = getEdges(routeSegments);
         return new Graph(getNodes(edges), edges);
     }
@@ -31,7 +31,7 @@ public class RouteSegments2GraphConverter {
                 .collect(Collectors.toSet());
     }
 
-    private Set<Edge> getEdges(final Set<RouteSegmentWrapper> routeSegments) {
+    private Set<Edge> getEdges(final Set<RouteSegmentWithEquality> routeSegments) {
         return routeSegments
                 .stream()
                 .map(routeSegmentWrapper -> routeSegmentWrapper.delegate)

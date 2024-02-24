@@ -5,7 +5,7 @@ import com.google.common.collect.Iterators;
 
 import net.osmand.binary.RouteDataObject;
 import net.osmand.router.BinaryRoutePlanner.RouteSegment;
-import net.osmand.router.PostmanTourPlanner.RouteSegmentWrapper;
+import net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
 import net.osmand.router.RoutingContext;
 
 import java.util.Collections;
@@ -23,16 +23,16 @@ public class ConnectedRouteSegmentsProvider implements IConnectedRouteSegmentsPr
     }
 
     @Override
-    public Set<RouteSegmentWrapper> getConnectedRouteSegments(final RouteSegmentWrapper routeSegment) {
+    public Set<RouteSegmentWithEquality> getConnectedRouteSegments(final RouteSegmentWithEquality routeSegment) {
         return ImmutableSet
-                .<RouteSegmentWrapper>builder()
+                .<RouteSegmentWithEquality>builder()
                 .add(routeSegment)
                 .addAll(_getConnectedRouteSegments(loadConnectedRouteSegment(routeSegment)))
                 .build();
     }
 
-    private RouteSegmentWrapper loadConnectedRouteSegment(final RouteSegmentWrapper segment) {
-        return new RouteSegmentWrapper(loadConnectedRouteSegment(segment.delegate));
+    private RouteSegmentWithEquality loadConnectedRouteSegment(final RouteSegmentWithEquality segment) {
+        return new RouteSegmentWithEquality(loadConnectedRouteSegment(segment.delegate));
     }
 
     private RouteSegment loadConnectedRouteSegment(final RouteSegment routeSegment) {
@@ -45,11 +45,11 @@ public class ConnectedRouteSegmentsProvider implements IConnectedRouteSegmentsPr
                 false);
     }
 
-    private static Set<RouteSegmentWrapper> _getConnectedRouteSegments(final RouteSegmentWrapper routeSegment) {
+    private static Set<RouteSegmentWithEquality> _getConnectedRouteSegments(final RouteSegmentWithEquality routeSegment) {
         final Iterable<RouteSegment> iterable = () -> getIterator(routeSegment.delegate);
         return StreamSupport
                 .stream(iterable.spliterator(), false)
-                .map(RouteSegmentWrapper::new)
+                .map(RouteSegmentWithEquality::new)
                 .collect(Collectors.toSet());
     }
 
