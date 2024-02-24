@@ -1,7 +1,12 @@
 package org.labyrinth.footpath.graph;
 
+import com.google.common.collect.Lists;
+
+import net.osmand.router.BinaryRoutePlanner.RouteSegment;
+
 import org.labyrinth.coordinate.Angle;
 
+import java.util.List;
 import java.util.Objects;
 
 import javax.measure.Quantity;
@@ -11,12 +16,14 @@ public class Edge {
 
     public final Node source;
     public final Node target;
+    public final List<RouteSegment> routeSegments;
     private final Quantity<Length> length;
     private final Angle bearing;
 
-    public Edge(final Node source, final Node target) {
+    public Edge(final Node source, final Node target, final List<RouteSegment> routeSegments) {
         this.source = source;
         this.target = target;
+        this.routeSegments = routeSegments;
         // FK-TODO: Nach Performancemessung vielleicht length und bearing nicht sofort berechnen, sondern in den getter-Methoden getLength() und getCompDir() cachen. Dann auch in toString() diese Getter-Methoden verwenden anstelle der entsprechenden Instanzvariablen.
         this.length = source.getDistanceTo(target);
         this.bearing = source.getBearing(target);
@@ -35,7 +42,7 @@ public class Edge {
     }
 
     public Edge reverse() {
-        return new Edge(target, source);
+        return new Edge(target, source, Lists.reverse(routeSegments));
     }
 
     private boolean isSource2Target(final Node source, final Node target) {

@@ -3,6 +3,7 @@ package org.labyrinth.footpath.graph;
 import org.labyrinth.common.ListUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,13 +18,15 @@ public class PathFactory {
                         new EdgePosition(
                                 new Edge(
                                         nodes.get(0),
-                                        nodes.get(1)),
+                                        nodes.get(1),
+                                        Collections.emptyList()),
                                 0),
                         nodes,
                         new EdgePosition(
                                 new Edge(
                                         nodes.get(nodes.size() - 2),
-                                        nodes.get(nodes.size() - 1)),
+                                        nodes.get(nodes.size() - 1),
+                                        Collections.emptyList()),
                                 1));
         return Optional.of(path);
     }

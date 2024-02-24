@@ -5,6 +5,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.labyrinth.common.MeasureUtils.toMetres;
 
+import net.osmand.router.BinaryRoutePlanner.RouteSegment;
+import net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
+
 import org.labyrinth.coordinate.Angle;
 import org.labyrinth.footpath.graph.Edge;
 import org.labyrinth.footpath.graph.Graph;
@@ -49,11 +52,15 @@ public class GraphUtils {
     }
 
     private static void assertActualEqualsExpected(final Edge actual, final Edge expected) {
-        assertThat(actual.source.id, is(expected.source.id));
-        assertThat(actual.target.id, is(expected.target.id));
+        assertThat(actual, is(expected));
+        assertThat(asRouteSegmentsWithEquality(actual.routeSegments), is(asRouteSegmentsWithEquality(expected.routeSegments)));
         assertThat(toMetres(actual.getLength()), is(closeTo(toMetres(expected.getLength()), 1)));
         // FK-FIXME: schlägt oft fehl, auch bei großem error-Wert.
         // assertThat(actual.getCompDir().toDegrees(), is(closeTo(expected.getCompDir().toDegrees(), 180)));
+    }
+
+    private static List<RouteSegmentWithEquality> asRouteSegmentsWithEquality(final List<RouteSegment> routeSegments) {
+        return routeSegments.stream().map(RouteSegmentWithEquality::new).collect(Collectors.toList());
     }
 
     private static void assertActualEqualsExpected(final Set<Node> actual, final Set<Node> expected) {

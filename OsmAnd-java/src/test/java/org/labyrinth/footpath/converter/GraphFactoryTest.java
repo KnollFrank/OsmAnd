@@ -17,6 +17,7 @@ import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
 import org.labyrinth.footpath.graph.RoadPosition;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 public class GraphFactoryTest {
@@ -75,10 +76,10 @@ public class GraphFactoryTest {
                                 .add(kreuzlingerWeg_11)
                                 .build(),
                         ImmutableSet.of(
-                                new Edge(kingersheimerStrasse_0, kingersheimerStrasse_1),
-                                new Edge(kingersheimerStrasse_1, kingersheimerStrasse_2),
-                                new Edge(kingersheimerStrasse_1, kreuzlingerWeg_12),
-                                new Edge(kreuzlingerWeg_12, kreuzlingerWeg_11)));
+                                new Edge(kingersheimerStrasse_0, kingersheimerStrasse_1, Arrays.asList(kingersheimerStrasse_0_1)),
+                                new Edge(kingersheimerStrasse_1, kingersheimerStrasse_2, Arrays.asList(kingersheimerStrasse_1_2)),
+                                new Edge(kingersheimerStrasse_1, kreuzlingerWeg_12, Arrays.asList(kingersheimerStrasse_0_1, kreuzlingerWeg_12_11)),
+                                new Edge(kreuzlingerWeg_12, kreuzlingerWeg_11, Arrays.asList(kreuzlingerWeg_12_11))));
         GraphUtils.assertActualEqualsExpected(graph, graphExpected);
     }
 
@@ -130,9 +131,9 @@ public class GraphFactoryTest {
                                 .add(kingersheimerStrasse_3)
                                 .build(),
                         ImmutableSet.of(
-                                new Edge(kingersheimerStrasse_0, kingersheimerStrasse_1),
-                                new Edge(kingersheimerStrasse_1, kingersheimerStrasse_2),
-                                new Edge(kingersheimerStrasse_2, kingersheimerStrasse_3)));
+                                new Edge(kingersheimerStrasse_0, kingersheimerStrasse_1, Arrays.asList(kingersheimerStrasse_0_1)),
+                                new Edge(kingersheimerStrasse_1, kingersheimerStrasse_2, Arrays.asList(kingersheimerStrasse_1_2)),
+                                new Edge(kingersheimerStrasse_2, kingersheimerStrasse_3, Arrays.asList(kingersheimerStrasse_2_3))));
         GraphUtils.assertActualEqualsExpected(graph, graphExpected);
     }
 

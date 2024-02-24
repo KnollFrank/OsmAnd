@@ -19,6 +19,7 @@ import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
 import org.labyrinth.footpath.graph.RoadPosition;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -82,8 +83,11 @@ public class GraphFactory {
         return routeSegments
                 .stream()
                 .filter(routeSegment -> !isSameRoad(routeSegment, start))
-                .map(routeSegmentFromOtherRoad -> getSourceNode(routeSegmentFromOtherRoad.delegate))
-                .map(sourceOfOtherRoad -> new Edge(targetOfStart, sourceOfOtherRoad))
+                .map(routeSegmentFromOtherRoad ->
+                        new Edge(
+                                targetOfStart,
+                                getSourceNode(routeSegmentFromOtherRoad.delegate),
+                                Arrays.asList(start.delegate, routeSegmentFromOtherRoad.delegate)))
                 .collect(Collectors.toSet());
     }
 
@@ -103,7 +107,7 @@ public class GraphFactory {
     }
 
     private static Edge asEdge(final RouteSegment routeSegment) {
-        return new Edge(getSourceNode(routeSegment), getTargetNode(routeSegment));
+        return new Edge(getSourceNode(routeSegment), getTargetNode(routeSegment), Arrays.asList(routeSegment));
     }
 
     private static Node getSourceNode(final RouteSegment routeSegment) {

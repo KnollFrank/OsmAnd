@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 
 import org.labyrinth.common.Utils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -31,7 +32,11 @@ public class Path {
         if (edges == null) {
             edges = Utils
                     .getConsecutivePairs(getNodes())
-                    .map(sourceTargetPair -> new Edge(sourceTargetPair.getFirst(), sourceTargetPair.getSecond()))
+                    .map(sourceTargetPair ->
+                            new Edge(
+                                    sourceTargetPair.getFirst(),
+                                    sourceTargetPair.getSecond(),
+                                    Collections.emptyList()))
                     .collect(Collectors.toList());
         }
         return edges;
