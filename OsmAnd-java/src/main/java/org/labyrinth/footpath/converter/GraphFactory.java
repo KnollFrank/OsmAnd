@@ -29,40 +29,31 @@ public class GraphFactory {
     }
 
     public Graph createGraph(final RouteSegmentWrapper start) {
-        final Set<RouteSegmentWrapper> routeSegmentsWithoutStart = getRouteSegmentsWithoutStart(start);
-        final Set<Edge> edges =
-                ImmutableSet
-                        .<Edge>builder()
-                        .add(asEdge(start.delegate))
-                        .addAll(asEdges(routeSegmentsWithoutStart))
-                        .addAll(getStart2OtherRoad(routeSegmentsWithoutStart, start))
-                        .build();
+        final Set<Edge> edges = getEdges(start);
         return new Graph(getNodes(edges), edges);
     }
 
-    private Set<RouteSegmentWrapper> getRouteSegmentsWithoutStart(final RouteSegmentWrapper start) {
-        return connectedRouteSegmentsProvider
-                // FK-TODO: ev. getConnectedRouteSegments() ohne start zurückliefern?
-                .getConnectedRouteSegments(start)
-                .stream()
-                .filter(routeSegmentWrapper -> !routeSegmentWrapper.equals(start))
-                .collect(Collectors.toSet());
+    private Set<Edge> getEdges(final RouteSegmentWrapper start) {
+        final Set<RouteSegmentWrapper> routeSegments = connectedRouteSegmentsProvider.getConnectedRouteSegments(start);
+        return ImmutableSet
+                .<Edge>builder()
+                .addAll(asEdges(routeSegments))
+                .addAll(getEdgesFromStart2OtherRoad(start, routeSegments))
+                .build();
     }
 
-    private static Set<Edge> getStart2OtherRoad(final Set<RouteSegmentWrapper> routeSegments,
-                                                final RouteSegmentWrapper start) {
-        final Node startTarget = getTargetNode(start.delegate);
+    private static Set<Edge> getEdgesFromStart2OtherRoad(final RouteSegmentWrapper start,
+                                                         final Set<RouteSegmentWrapper> routeSegments) {
+        final Node targetOfStart = getTargetNode(start.delegate);
         return routeSegments
                 .stream()
                 .filter(routeSegment -> !isSameRoad(routeSegment, start))
-                .map(routeSegmentFromOtherRoad ->
-                        new Edge(
-                                startTarget,
-                                getSourceNode(routeSegmentFromOtherRoad.delegate)))
+                .map(routeSegmentFromOtherRoad -> getSourceNode(routeSegmentFromOtherRoad.delegate))
+                .map(sourceOfOtherRoad -> new Edge(targetOfStart, sourceOfOtherRoad))
                 .collect(Collectors.toSet());
     }
 
-    private Set<Node> getNodes(final Set<Edge> edges) {
+    private static Set<Node> getNodes(final Set<Edge> edges) {
         return edges
                 .stream()
                 .flatMap(edge -> Stream.of(edge.source, edge.target))
