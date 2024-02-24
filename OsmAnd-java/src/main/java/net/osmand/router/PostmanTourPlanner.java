@@ -13,7 +13,9 @@ import net.osmand.util.MapUtils;
 
 import org.apache.commons.logging.Log;
 import org.labyrinth.footpath.converter.ConnectedRouteSegmentsProvider;
+import org.labyrinth.footpath.converter.GraphFactory;
 import org.labyrinth.footpath.converter.IConnectedRouteSegmentsProvider;
+import org.labyrinth.footpath.graph.Graph;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -264,9 +266,13 @@ public class PostmanTourPlanner {
     }
 
     private void createGraph(final RoutingContext ctx, final RouteSegmentPoint start) {
+        final ConnectedRouteSegmentsProvider connectedRouteSegmentsProvider = new ConnectedRouteSegmentsProvider(ctx);
+        final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
+        final Graph graph = graphFactory.createGraph(new RouteSegmentWrapper(start));
+
         final Set<RouteSegmentWrapper> routeSegments =
                 getAllRouteSegments(
-                        new ConnectedRouteSegmentsProvider(ctx),
+                        connectedRouteSegmentsProvider,
                         new RouteSegmentWrapper(start));
         System.out.println("FK-TEST: routeSegments " + "size: " + routeSegments.size());
         for (final RouteSegmentWrapper routeSegment : routeSegments) {
@@ -997,6 +1003,7 @@ public class PostmanTourPlanner {
         return nextCurrentSegment;
     }
 
+    // FK-TODO: rename to RouteSegmentWithEquality
     public static class RouteSegmentWrapper {
 
         public final RouteSegment delegate;
