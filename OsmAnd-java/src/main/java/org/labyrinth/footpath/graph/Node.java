@@ -10,7 +10,7 @@ import java.util.Set;
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 
-public class Node implements Comparable<Node> {
+public class Node {
 
     public final RoadPosition id;
     public final Geodetic position;
@@ -28,11 +28,6 @@ public class Node implements Comparable<Node> {
 
     public Quantity<Length> getDistanceTo(final Node other) {
         return position.getDistanceTo(other.position);
-    }
-
-    @Override
-    public int compareTo(final Node other) {
-        return this.id.compareTo(other.id);
     }
 
     @Override
