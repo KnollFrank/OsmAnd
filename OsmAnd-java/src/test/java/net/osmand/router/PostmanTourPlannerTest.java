@@ -8,7 +8,6 @@ import net.osmand.router.RoutingConfiguration.RoutingMemoryLimits;
 import org.apache.commons.compress.utils.Sets;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -28,7 +27,7 @@ public class PostmanTourPlannerTest {
     }
 
     @Test
-    @Ignore
+    // @Ignore
     public void testRouting() throws Exception {
         // BinaryRoutePlanner.TRACE_ROUTING = true;
         // BinaryRoutePlanner.DEBUG_BREAK_EACH_SEGMENT = true;

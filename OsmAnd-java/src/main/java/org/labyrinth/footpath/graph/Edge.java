@@ -21,6 +21,12 @@ public class Edge {
     private final Angle bearing;
 
     public Edge(final Node source, final Node target, final List<RouteSegment> routeSegments) {
+        if(source.equals(target)) {
+            throw new IllegalArgumentException(source + " = " + target);
+        }
+        if(routeSegments.isEmpty()) {
+            throw new IllegalArgumentException("routeSegments is empty");
+        }
         this.source = source;
         this.target = target;
         this.routeSegments = routeSegments;
