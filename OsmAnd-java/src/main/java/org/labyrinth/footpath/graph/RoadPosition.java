@@ -7,6 +7,10 @@ public class RoadPosition implements Comparable<RoadPosition> {
 
     public final long road;
     public final int position;
+    private static final Comparator<RoadPosition> comparator =
+            Comparator
+                    .<RoadPosition>comparingLong(roadPosition -> roadPosition.road)
+                    .thenComparingInt(roadPosition -> roadPosition.position);
 
     public RoadPosition(final long road, final int position) {
         this.road = road;
@@ -15,10 +19,7 @@ public class RoadPosition implements Comparable<RoadPosition> {
 
     @Override
     public int compareTo(final RoadPosition other) {
-        return Comparator
-                .<RoadPosition>comparingLong(roadPosition -> roadPosition.road)
-                .thenComparingInt(roadPosition -> roadPosition.position)
-                .compare(this, other);
+        return comparator.compare(this, other);
     }
 
     @Override
