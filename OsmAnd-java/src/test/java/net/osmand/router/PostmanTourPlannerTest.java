@@ -2,6 +2,7 @@ package net.osmand.router;
 
 import net.osmand.binary.BinaryMapIndexReader;
 import net.osmand.data.LatLon;
+import net.osmand.router.RouteResultPreparation.RouteCalcResult;
 import net.osmand.router.RoutingConfiguration.RoutingMemoryLimits;
 
 import org.apache.commons.compress.utils.Sets;
@@ -36,7 +37,7 @@ public class PostmanTourPlannerTest {
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Labyrinth.obf");
 
         // When
-        final RouteResultPreparation.RouteCalcResult routeCalcResult =
+        final RouteCalcResult routeCalcResult =
                 new RoutePlannerFrontEnd()
                         .searchRoute(
                                 routingContext,
@@ -57,7 +58,7 @@ public class PostmanTourPlannerTest {
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Hirschau.obf");
 
         // When
-        final RouteResultPreparation.RouteCalcResult routeCalcResult =
+        final RouteCalcResult routeCalcResult =
                 new RoutePlannerFrontEnd()
                         .searchRoute(
                                 routingContext,
