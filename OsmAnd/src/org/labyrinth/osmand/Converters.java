@@ -30,7 +30,6 @@ class Converters {
     private static Node asNode(final int id, final Location location) {
         return new Node(
                 new RoadPosition(-1, id),
-                GeodeticFactory.createGeodetic(location),
-                "");
+                GeodeticFactory.createGeodetic(location));
     }
 }
