@@ -1,12 +1,11 @@
 package org.labyrinth.footpath.converter;
 
-import static net.osmand.binary.BinaryMapRouteReaderAdapter.RouteRegion;
-import static net.osmand.router.BinaryRoutePlanner.RouteSegment;
-import static net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
-
 import com.google.common.collect.ImmutableSet;
 
+import net.osmand.binary.BinaryMapRouteReaderAdapter.RouteRegion;
 import net.osmand.binary.RouteDataObject;
+import net.osmand.router.BinaryRoutePlanner.RouteSegment;
+import net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
 import net.osmand.util.MapUtils;
 
 import org.junit.Test;
@@ -165,7 +164,7 @@ public class GraphFactoryTest {
         return new Angle(MapUtils.get31LongitudeX(road.getPoint31XTile(i)), Angle.Unit.DEGREES);
     }
 
-    private static RouteDataObject createRouteDataObject(final int id, final String name) {
+    static RouteDataObject createRouteDataObject(final int id, final String name) {
         final RouteDataObject routeDataObject = new RouteDataObject((RouteRegion) null);
         routeDataObject.id = id;
         routeDataObject.pointsX = new int[20];
