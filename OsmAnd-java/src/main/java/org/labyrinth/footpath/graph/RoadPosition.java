@@ -1,15 +1,25 @@
 package org.labyrinth.footpath.graph;
 
+import java.util.Comparator;
 import java.util.Objects;
 
-public class RoadPosition {
+public class RoadPosition implements Comparable<RoadPosition> {
 
     public final long road;
     public final int position;
+    private static final Comparator<RoadPosition> comparator =
+            Comparator
+                    .<RoadPosition>comparingLong(roadPosition -> roadPosition.road)
+                    .thenComparingInt(roadPosition -> roadPosition.position);
 
     public RoadPosition(final long road, final int position) {
         this.road = road;
         this.position = position;
+    }
+
+    @Override
+    public int compareTo(final RoadPosition other) {
+        return comparator.compare(this, other);
     }
 
     @Override
