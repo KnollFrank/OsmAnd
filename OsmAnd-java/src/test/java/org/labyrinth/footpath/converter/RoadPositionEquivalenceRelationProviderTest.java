@@ -10,6 +10,7 @@ import net.osmand.router.BinaryRoutePlanner.RouteSegment;
 import net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
 
 import org.junit.Test;
+import org.labyrinth.footpath.graph.EquivalentRoadPositions;
 import org.labyrinth.footpath.graph.RoadPosition;
 
 import java.util.Collections;
@@ -48,16 +49,17 @@ public class RoadPositionEquivalenceRelationProviderTest {
         final RoadPositionEquivalenceRelationProvider roadPositionEquivalenceRelationProvider = new RoadPositionEquivalenceRelationProvider(connectedRouteSegmentsProvider);
 
         // When
-        final Set<Set<RoadPosition>> equivalenceRelation = roadPositionEquivalenceRelationProvider.getRoadPositionEquivalenceRelation(new RouteSegmentWithEquality(kingersheimerStrasse_0_1));
+        final Set<EquivalentRoadPositions> equivalenceRelation = roadPositionEquivalenceRelationProvider.getRoadPositionEquivalenceRelation(new RouteSegmentWithEquality(kingersheimerStrasse_0_1));
 
         // Then
         assertThat(
                 equivalenceRelation,
                 is(
                         ImmutableSet.of(
-                                ImmutableSet.of(
-                                        getEndRoadPosition(kingersheimerStrasse_0_1),
-                                        getStartRoadPosition(kreuzlingerWeg_12_11)))));
+                                new EquivalentRoadPositions(
+                                        ImmutableSet.of(
+                                                getEndRoadPosition(kingersheimerStrasse_0_1),
+                                                getStartRoadPosition(kreuzlingerWeg_12_11))))));
     }
 
     private static RoadPosition getStartRoadPosition(final RouteSegment routeSegment) {
