@@ -8,8 +8,7 @@ public class Graph {
     public final Set<Node> nodes;
     public final Set<Edge> edges;
 
-    // FK-TODO: Parameter nodes entfernen und im Konstruktor aus edges selbst berechnen wie in RouteSegments2GraphConverter.getNodes()
-    public Graph(final Set<Node> nodes, final Set<Edge> edges) {
+    Graph(final Set<Node> nodes, final Set<Edge> edges) {
         this.nodes = nodes;
         this.edges = edges;
         addLocEdgesToNodes();
@@ -20,14 +19,6 @@ public class Graph {
             edge.source.locEdges.add(edge);
             edge.target.locEdges.add(edge);
         }
-    }
-
-    public Optional<Node> findNodeById(final RoadPosition id) {
-        return this
-                .nodes
-                .stream()
-                .filter(node -> node.id.equals(id))
-                .findFirst();
     }
 
     public Optional<Edge> findEdgeContainingNodes(final Node a, final Node b) {

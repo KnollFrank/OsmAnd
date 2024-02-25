@@ -51,7 +51,6 @@ public class PostmanTourPlannerTest {
     }
 
     @Test
-    // @Ignore
     public void testRoutingHirschau() throws Exception {
         // Given
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Hirschau.obf");
@@ -65,6 +64,28 @@ public class PostmanTourPlannerTest {
                                 new LatLon(48.501619, 8.9929844),
                                 // Hofweg:
                                 new LatLon(48.5017172, 8.9933938),
+                                Collections.emptyList());
+
+        // Then
+        Assert.assertEquals(
+                Sets.newHashSet(-1594L, -1593L),
+                getReachedSegments(routeCalcResult.getList()));
+    }
+
+    @Test
+    public void testRoutingTwoPoints() throws Exception {
+        // Given
+        final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/TwoPoints.obf");
+
+        // When
+        final RouteCalcResult routeCalcResult =
+                new RoutePlannerFrontEnd()
+                        .searchRoute(
+                                routingContext,
+                                // Kapellenweg:
+                                new LatLon(43.0257384, 9.4062576),
+                                // Hofweg:
+                                new LatLon(43.0258502, 9.4061449),
                                 Collections.emptyList());
 
         // Then

@@ -70,14 +70,7 @@ public class GraphFactoryTest {
         final Node kreuzlingerWeg_12 = getStartNode(kreuzlingerWeg_12_11, equivalenceRelation);
         final Node kreuzlingerWeg_11 = getEndNode(kreuzlingerWeg_12_11, equivalenceRelation);
         final Graph graphExpected =
-                new Graph(
-                        ImmutableSet
-                                .<Node>builder()
-                                .add(kingersheimerStrasse_0)
-                                .add(kingersheimerStrasse_1)
-                                .add(kingersheimerStrasse_2)
-                                .add(kreuzlingerWeg_11)
-                                .build(),
+                org.labyrinth.footpath.graph.GraphFactory.createGraph(
                         ImmutableSet.of(
                                 new Edge(kingersheimerStrasse_0, kingersheimerStrasse_1, Arrays.asList(kingersheimerStrasse_0_1)),
                                 new Edge(kingersheimerStrasse_1, kingersheimerStrasse_2, Arrays.asList(kingersheimerStrasse_1_2)),
@@ -125,14 +118,7 @@ public class GraphFactoryTest {
         final Node kingersheimerStrasse_2 = getEndNode(kingersheimerStrasse_1_2, equivalenceRelation);
         final Node kingersheimerStrasse_3 = getEndNode(kingersheimerStrasse_2_3, equivalenceRelation);
         final Graph graphExpected =
-                new Graph(
-                        ImmutableSet
-                                .<Node>builder()
-                                .add(kingersheimerStrasse_0)
-                                .add(kingersheimerStrasse_1)
-                                .add(kingersheimerStrasse_2)
-                                .add(kingersheimerStrasse_3)
-                                .build(),
+                org.labyrinth.footpath.graph.GraphFactory.createGraph(
                         ImmutableSet.of(
                                 new Edge(kingersheimerStrasse_0, kingersheimerStrasse_1, Arrays.asList(kingersheimerStrasse_0_1)),
                                 new Edge(kingersheimerStrasse_1, kingersheimerStrasse_2, Arrays.asList(kingersheimerStrasse_1_2)),

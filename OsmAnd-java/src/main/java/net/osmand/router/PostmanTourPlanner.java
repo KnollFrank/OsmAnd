@@ -1,7 +1,6 @@
 package net.osmand.router;
 
 import static net.osmand.router.BinaryRoutePlanner.FinalRouteSegment;
-import static net.osmand.router.BinaryRoutePlanner.MultiFinalRouteSegment;
 import static net.osmand.router.BinaryRoutePlanner.RouteSegment;
 import static net.osmand.router.BinaryRoutePlanner.RouteSegmentPoint;
 import static net.osmand.router.RoutePlannerFrontEnd.RouteCalculationMode;
@@ -12,6 +11,7 @@ import net.osmand.osm.MapRenderingTypes;
 import net.osmand.util.MapUtils;
 
 import org.apache.commons.logging.Log;
+import org.jgrapht.alg.util.Pair;
 import org.labyrinth.common.Utils;
 import org.labyrinth.footpath.converter.ConnectedRouteSegmentsProvider;
 import org.labyrinth.footpath.converter.GraphFactory;
@@ -26,13 +26,11 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
 
 public class PostmanTourPlanner {
 
@@ -90,14 +88,12 @@ public class PostmanTourPlanner {
      * Calculate route between start.segmentEnd and end.segmentStart (using A* algorithm)
      * return list of segments
      */
-    public FinalRouteSegment searchRouteInternal(
-            final RoutingContext ctx,
-            RouteSegmentPoint start,
-            RouteSegmentPoint end,
-            TLongObjectMap<RouteSegment> boundaries) throws InterruptedException {
+    public FinalRouteSegment searchRouteInternal(final RoutingContext ctx,
+                                                 final RouteSegmentPoint start) {
         // measure time
         ctx.memoryOverhead = 1000;
-        createGraph(ctx, start);
+        return createGraph(ctx, start);
+/*
         // Initializing priority queue to visit way segments
         PriorityQueue<RouteSegmentCost> graphDirectSegments = new PriorityQueue<RouteSegmentCost>(50, new SegmentsComparator()) {
 
@@ -269,35 +265,43 @@ public class PostmanTourPlanner {
             ctx.calculationProgress.oppositeQueueSize += graphReverseSegments.size();
         }
         return finalSegment;
+*/
     }
 
-    private void createGraph(final RoutingContext ctx, final RouteSegmentPoint start) {
+    private FinalRouteSegment createGraph(final RoutingContext ctx, final RouteSegmentPoint start) {
         final ConnectedRouteSegmentsProvider connectedRouteSegmentsProvider = new ConnectedRouteSegmentsProvider(ctx);
         final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
         final Graph graph = graphFactory.createGraph(new RouteSegmentWithEquality(start));
         final Node startOfPath = graph.nodes.stream().findFirst().get();
         final List<Node> shortestClosedPathStartingAtNode = ShortestClosedPathProvider.createShortestClosedPathStartingAtNode(graph, startOfPath);
-        final List<Optional<Edge>> collect =
+        final List<RouteSegment> routeSegments =
                 Utils
                         .getConsecutivePairs(shortestClosedPathStartingAtNode)
-                        .map(sourceTargetPair -> {
-                            final Optional<Edge> edgeSource2Target = graph.findEdgeContainingNodes(sourceTargetPair.getFirst(), sourceTargetPair.getSecond());
-                            if (edgeSource2Target.isEmpty()) {
-                                System.out.println("Problem: " + sourceTargetPair);
-                            }
-                            return edgeSource2Target;
-                        })
+                        .flatMap(sourceTargetPair -> getEdgeSource2Target(graph, sourceTargetPair).routeSegments.stream())
                         .collect(Collectors.toList());
+        Utils
+                .getConsecutivePairs(routeSegments)
+                .forEach(
+                        previous_actual_pair -> {
+                            final RouteSegment previous = previous_actual_pair.getFirst();
+                            final RouteSegment actual = previous_actual_pair.getSecond();
+                            actual.setParentRoute(previous);
+                        });
+        return createFinalRouteSegment(routeSegments.get(routeSegments.size() - 2));
+    }
 
-        final Set<RouteSegmentWithEquality> routeSegments =
-                getAllRouteSegments(
-                        connectedRouteSegmentsProvider,
-                        new RouteSegmentWithEquality(start));
-        System.out.println("FK-TEST: routeSegments " + "size: " + routeSegments.size());
-        for (final RouteSegmentWithEquality routeSegment : routeSegments) {
-            System.out.println(" " + routeSegment);
-        }
-        // createGraph(routeSegments);
+    private static FinalRouteSegment createFinalRouteSegment(final RouteSegment routeSegment) {
+        final FinalRouteSegment finalRouteSegment =
+                new FinalRouteSegment(
+                        routeSegment.getRoad(),
+                        routeSegment.getSegmentStart(),
+                        routeSegment.getSegmentEnd());
+        finalRouteSegment.setParentRoute(routeSegment.getParentRoute());
+        return finalRouteSegment;
+    }
+
+    private static Edge getEdgeSource2Target(final Graph graph, final Pair<Node, Node> sourceTargetPair) {
+        return graph.findEdgeContainingNodes(sourceTargetPair.getFirst(), sourceTargetPair.getSecond()).get();
     }
 
     private void createGraph(final Set<RouteSegmentWithEquality> routeSegments) {

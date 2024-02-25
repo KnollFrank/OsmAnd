@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class GraphFactory {
 
@@ -35,9 +34,10 @@ public class GraphFactory {
     }
 
     public Graph createGraph(final RouteSegmentWithEquality start) {
-        final Set<EquivalentRoadPositions> equivalenceRelation = new RoadPositionEquivalenceRelationProvider(connectedRouteSegmentsProvider).getRoadPositionEquivalenceRelation(start);
-        final Set<Edge> edges = getEdgesReachableFrom(start, equivalenceRelation);
-        return new Graph(getNodes(edges), edges);
+        return org.labyrinth.footpath.graph.GraphFactory.createGraph(
+                getEdgesReachableFrom(
+                        start,
+                        new RoadPositionEquivalenceRelationProvider(connectedRouteSegmentsProvider).getRoadPositionEquivalenceRelation(start)));
     }
 
     private Set<Edge> getEdgesReachableFrom(
@@ -91,13 +91,6 @@ public class GraphFactory {
                 getSourceNode(routeSegment, equivalenceRelation),
                 getTargetNode(routeSegment, equivalenceRelation),
                 Arrays.asList(routeSegment));
-    }
-
-    private static Set<Node> getNodes(final Set<Edge> edges) {
-        return edges
-                .stream()
-                .flatMap(edge -> Stream.of(edge.source, edge.target))
-                .collect(Collectors.toSet());
     }
 
     private static Node getSourceNode(final RouteSegment routeSegment, final Set<EquivalentRoadPositions> equivalenceRelation) {
