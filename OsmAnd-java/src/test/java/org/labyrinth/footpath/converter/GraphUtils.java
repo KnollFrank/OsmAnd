@@ -10,9 +10,9 @@ import net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
 
 import org.labyrinth.coordinate.Angle;
 import org.labyrinth.footpath.graph.Edge;
+import org.labyrinth.footpath.graph.EquivalentRoadPositions;
 import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
-import org.labyrinth.footpath.graph.RoadPosition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ public class GraphUtils {
         }
     }
 
-    private static Edge getEdge(final List<Edge> edges, final RoadPosition sourceId, final RoadPosition targetId) {
+    private static Edge getEdge(final List<Edge> edges, final EquivalentRoadPositions sourceId, final EquivalentRoadPositions targetId) {
         return edges
                 .stream()
                 .filter(edge -> isEdgeFromSourceToTarget(edge, sourceId, targetId))
@@ -47,7 +47,7 @@ public class GraphUtils {
                 .orElse(null);
     }
 
-    private static boolean isEdgeFromSourceToTarget(final Edge edge, final RoadPosition sourceId, final RoadPosition targetId) {
+    private static boolean isEdgeFromSourceToTarget(final Edge edge, final EquivalentRoadPositions sourceId, final EquivalentRoadPositions targetId) {
         return edge.source.id.equals(sourceId) && edge.target.id.equals(targetId);
     }
 

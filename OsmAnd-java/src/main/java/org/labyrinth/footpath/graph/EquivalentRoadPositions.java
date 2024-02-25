@@ -3,13 +3,22 @@ package org.labyrinth.footpath.graph;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Objects;
+import java.util.Set;
 
-public class EquivalentRoadPositions {
+public class EquivalentRoadPositions implements Comparable<EquivalentRoadPositions> {
 
     public final ImmutableSet<RoadPosition> roadPositions;
 
     public EquivalentRoadPositions(final ImmutableSet<RoadPosition> roadPositions) {
+        if (roadPositions.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
         this.roadPositions = roadPositions;
+    }
+
+    @Override
+    public int compareTo(final EquivalentRoadPositions equivalentRoadPositions) {
+        return getRepresentative(roadPositions).compareTo(getRepresentative(equivalentRoadPositions.roadPositions));
     }
 
     @Override
@@ -30,5 +39,9 @@ public class EquivalentRoadPositions {
         return "EquivalentRoadPositions{" +
                 "roadPositions=" + roadPositions +
                 '}';
+    }
+
+    private RoadPosition getRepresentative(final Set<RoadPosition> roadPositions) {
+        return roadPositions.stream().sorted().findFirst().get();
     }
 }

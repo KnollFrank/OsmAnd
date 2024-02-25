@@ -1,6 +1,7 @@
 package org.labyrinth.footpath.graph;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import org.labyrinth.common.Utils;
 
@@ -52,13 +53,13 @@ public class Path {
     public List<Node> getNodes() {
         return ImmutableList
                 .<Node>builder()
-                .add(createNode(src, new RoadPosition(-1, 0)))
+                .add(createNode(src, new EquivalentRoadPositions(ImmutableSet.of(new RoadPosition(-1, 0)))))
                 .addAll(intermediateNodes)
-                .add(createNode(dst, new RoadPosition(-1, 1)))
+                .add(createNode(dst, new EquivalentRoadPositions(ImmutableSet.of(new RoadPosition(-1, 1)))))
                 .build();
     }
 
-    private Node createNode(final EdgePosition edgePosition, final RoadPosition newid) {
+    private Node createNode(final EdgePosition edgePosition, final EquivalentRoadPositions newid) {
         return edgePosition
                 .getNode()
                 .orElseGet(() -> new Node(newid, edgePosition.getGeodetic()));

@@ -12,11 +12,11 @@ import javax.measure.quantity.Length;
 
 public class Node implements Comparable<Node> {
 
-    public final RoadPosition id;
+    public final EquivalentRoadPositions id;
     public final Geodetic position;
     public final Set<Edge> locEdges;
 
-    public Node(final RoadPosition id, final Geodetic position) {
+    public Node(final EquivalentRoadPositions id, final Geodetic position) {
         this.id = id;
         this.position = position;
         locEdges = new HashSet<>();

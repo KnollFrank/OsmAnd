@@ -12,15 +12,21 @@ import net.osmand.osm.MapRenderingTypes;
 import net.osmand.util.MapUtils;
 
 import org.apache.commons.logging.Log;
+import org.labyrinth.common.Utils;
 import org.labyrinth.footpath.converter.ConnectedRouteSegmentsProvider;
 import org.labyrinth.footpath.converter.GraphFactory;
 import org.labyrinth.footpath.converter.IConnectedRouteSegmentsProvider;
+import org.labyrinth.footpath.core.ShortestClosedPathProvider;
+import org.labyrinth.footpath.graph.Edge;
 import org.labyrinth.footpath.graph.Graph;
+import org.labyrinth.footpath.graph.Node;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -269,6 +275,19 @@ public class PostmanTourPlanner {
         final ConnectedRouteSegmentsProvider connectedRouteSegmentsProvider = new ConnectedRouteSegmentsProvider(ctx);
         final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
         final Graph graph = graphFactory.createGraph(new RouteSegmentWithEquality(start));
+        final Node startOfPath = graph.nodes.stream().findFirst().get();
+        final List<Node> shortestClosedPathStartingAtNode = ShortestClosedPathProvider.createShortestClosedPathStartingAtNode(graph, startOfPath);
+        final List<Optional<Edge>> collect =
+                Utils
+                        .getConsecutivePairs(shortestClosedPathStartingAtNode)
+                        .map(sourceTargetPair -> {
+                            final Optional<Edge> edgeSource2Target = graph.findEdgeContainingNodes(sourceTargetPair.getFirst(), sourceTargetPair.getSecond());
+                            if (edgeSource2Target.isEmpty()) {
+                                System.out.println("Problem: " + sourceTargetPair);
+                            }
+                            return edgeSource2Target;
+                        })
+                        .collect(Collectors.toList());
 
         final Set<RouteSegmentWithEquality> routeSegments =
                 getAllRouteSegments(

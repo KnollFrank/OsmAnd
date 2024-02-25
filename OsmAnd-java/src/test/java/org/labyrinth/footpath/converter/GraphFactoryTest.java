@@ -1,5 +1,7 @@
 package org.labyrinth.footpath.converter;
 
+import static org.labyrinth.footpath.converter.GraphFactory.getEquivalentRoadPositions;
+
 import com.google.common.collect.ImmutableSet;
 
 import net.osmand.binary.BinaryMapRouteReaderAdapter.RouteRegion;
@@ -12,12 +14,14 @@ import org.junit.Test;
 import org.labyrinth.coordinate.Angle;
 import org.labyrinth.coordinate.Geodetic;
 import org.labyrinth.footpath.graph.Edge;
+import org.labyrinth.footpath.graph.EquivalentRoadPositions;
 import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
 import org.labyrinth.footpath.graph.RoadPosition;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Set;
 
 public class GraphFactoryTest {
 
@@ -59,11 +63,12 @@ public class GraphFactoryTest {
         final Graph graph = graphFactory.createGraph(new RouteSegmentWithEquality(kingersheimerStrasse_0_1));
 
         // Then
-        final Node kingersheimerStrasse_0 = getStartNode(kingersheimerStrasse_0_1);
-        final Node kingersheimerStrasse_1 = getEndNode(kingersheimerStrasse_0_1);
-        final Node kingersheimerStrasse_2 = getEndNode(kingersheimerStrasse_1_2);
-        final Node kreuzlingerWeg_12 = getStartNode(kreuzlingerWeg_12_11);
-        final Node kreuzlingerWeg_11 = getEndNode(kreuzlingerWeg_12_11);
+        final Set<EquivalentRoadPositions> equivalenceRelation = new RoadPositionEquivalenceRelationProvider(connectedRouteSegmentsProvider).getRoadPositionEquivalenceRelation(new RouteSegmentWithEquality(kingersheimerStrasse_0_1));
+        final Node kingersheimerStrasse_0 = getStartNode(kingersheimerStrasse_0_1, equivalenceRelation);
+        final Node kingersheimerStrasse_1 = getEndNode(kingersheimerStrasse_0_1, equivalenceRelation);
+        final Node kingersheimerStrasse_2 = getEndNode(kingersheimerStrasse_1_2, equivalenceRelation);
+        final Node kreuzlingerWeg_12 = getStartNode(kreuzlingerWeg_12_11, equivalenceRelation);
+        final Node kreuzlingerWeg_11 = getEndNode(kreuzlingerWeg_12_11, equivalenceRelation);
         final Graph graphExpected =
                 new Graph(
                         ImmutableSet
@@ -71,13 +76,11 @@ public class GraphFactoryTest {
                                 .add(kingersheimerStrasse_0)
                                 .add(kingersheimerStrasse_1)
                                 .add(kingersheimerStrasse_2)
-                                .add(kreuzlingerWeg_12)
                                 .add(kreuzlingerWeg_11)
                                 .build(),
                         ImmutableSet.of(
                                 new Edge(kingersheimerStrasse_0, kingersheimerStrasse_1, Arrays.asList(kingersheimerStrasse_0_1)),
                                 new Edge(kingersheimerStrasse_1, kingersheimerStrasse_2, Arrays.asList(kingersheimerStrasse_1_2)),
-                                new Edge(kingersheimerStrasse_1, kreuzlingerWeg_12, Arrays.asList(kingersheimerStrasse_0_1, kreuzlingerWeg_12_11)),
                                 new Edge(kreuzlingerWeg_12, kreuzlingerWeg_11, Arrays.asList(kreuzlingerWeg_12_11))));
         GraphUtils.assertActualEqualsExpected(graph, graphExpected);
     }
@@ -116,10 +119,11 @@ public class GraphFactoryTest {
         final Graph graph = graphFactory.createGraph(new RouteSegmentWithEquality(kingersheimerStrasse_0_1));
 
         // Then
-        final Node kingersheimerStrasse_0 = getStartNode(kingersheimerStrasse_0_1);
-        final Node kingersheimerStrasse_1 = getEndNode(kingersheimerStrasse_0_1);
-        final Node kingersheimerStrasse_2 = getEndNode(kingersheimerStrasse_1_2);
-        final Node kingersheimerStrasse_3 = getEndNode(kingersheimerStrasse_2_3);
+        final Set<EquivalentRoadPositions> equivalenceRelation = new RoadPositionEquivalenceRelationProvider(connectedRouteSegmentsProvider).getRoadPositionEquivalenceRelation(new RouteSegmentWithEquality(kingersheimerStrasse_0_1));
+        final Node kingersheimerStrasse_0 = getStartNode(kingersheimerStrasse_0_1, equivalenceRelation);
+        final Node kingersheimerStrasse_1 = getEndNode(kingersheimerStrasse_0_1, equivalenceRelation);
+        final Node kingersheimerStrasse_2 = getEndNode(kingersheimerStrasse_1_2, equivalenceRelation);
+        final Node kingersheimerStrasse_3 = getEndNode(kingersheimerStrasse_2_3, equivalenceRelation);
         final Graph graphExpected =
                 new Graph(
                         ImmutableSet
@@ -136,15 +140,15 @@ public class GraphFactoryTest {
         GraphUtils.assertActualEqualsExpected(graph, graphExpected);
     }
 
-    private static Node getStartNode(final RouteSegment routeSegment) {
+    private static Node getStartNode(final RouteSegment routeSegment, final Set<EquivalentRoadPositions> equivalenceRelation) {
         return new Node(
-                new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentStart()),
+                getEquivalentRoadPositions(new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentStart()), equivalenceRelation),
                 getGeodetic(routeSegment, routeSegment.getSegmentStart()));
     }
 
-    private static Node getEndNode(final RouteSegment routeSegment) {
+    private static Node getEndNode(final RouteSegment routeSegment, final Set<EquivalentRoadPositions> equivalenceRelation) {
         return new Node(
-                new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentEnd()),
+                getEquivalentRoadPositions(new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentEnd()), equivalenceRelation),
                 getGeodetic(routeSegment, routeSegment.getSegmentEnd()));
     }
 

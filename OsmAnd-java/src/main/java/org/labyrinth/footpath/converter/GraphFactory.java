@@ -2,7 +2,6 @@ package org.labyrinth.footpath.converter;
 
 import static net.osmand.router.BinaryRoutePlanner.RouteSegment;
 import static net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
-import static net.osmand.router.PostmanTourPlanner.isSameRoad;
 import static org.labyrinth.common.SetUtils.union;
 
 import com.google.common.collect.ImmutableSet;
@@ -15,6 +14,7 @@ import org.labyrinth.common.ListUtils;
 import org.labyrinth.coordinate.Angle;
 import org.labyrinth.coordinate.Geodetic;
 import org.labyrinth.footpath.graph.Edge;
+import org.labyrinth.footpath.graph.EquivalentRoadPositions;
 import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
 import org.labyrinth.footpath.graph.RoadPosition;
@@ -35,16 +35,19 @@ public class GraphFactory {
     }
 
     public Graph createGraph(final RouteSegmentWithEquality start) {
-        final Set<Edge> edges = getEdgesReachableFrom(start);
+        final Set<EquivalentRoadPositions> equivalenceRelation = new RoadPositionEquivalenceRelationProvider(connectedRouteSegmentsProvider).getRoadPositionEquivalenceRelation(start);
+        final Set<Edge> edges = getEdgesReachableFrom(start, equivalenceRelation);
         return new Graph(getNodes(edges), edges);
     }
 
-    private Set<Edge> getEdgesReachableFrom(final RouteSegmentWithEquality start) {
+    private Set<Edge> getEdgesReachableFrom(
+            final RouteSegmentWithEquality start,
+            final Set<EquivalentRoadPositions> equivalenceRelation) {
         Set<RouteSegmentWithEquality> routeSegments = Collections.singleton(start);
         Set<Edge> edges;
         boolean newRouteSegmentsFound;
         do {
-            final Pair<Set<Edge>, Set<RouteSegmentWithEquality>> newEdgesAndNewRouteSegments = getEdgesAndRouteSegments(routeSegments);
+            final Pair<Set<Edge>, Set<RouteSegmentWithEquality>> newEdgesAndNewRouteSegments = getEdgesAndRouteSegments(routeSegments, equivalenceRelation);
             final Set<RouteSegmentWithEquality> newRouteSegments = newEdgesAndNewRouteSegments.getSecond();
             edges = newEdgesAndNewRouteSegments.getFirst();
             newRouteSegmentsFound = !newRouteSegments.equals(routeSegments);
@@ -53,42 +56,41 @@ public class GraphFactory {
         return edges;
     }
 
-    private Pair<Set<Edge>, Set<RouteSegmentWithEquality>> getEdgesAndRouteSegments(final Set<RouteSegmentWithEquality> routeSegments) {
+    private Pair<Set<Edge>, Set<RouteSegmentWithEquality>> getEdgesAndRouteSegments(
+            final Set<RouteSegmentWithEquality> routeSegments,
+            final Set<EquivalentRoadPositions> equivalenceRelation) {
         final List<Pair<Set<Edge>, Set<RouteSegmentWithEquality>>> edgesAndRouteSegmentsList =
                 routeSegments
                         .stream()
-                        .map(this::getEdgesAndRouteSegments)
+                        .map(routeSegment -> getEdgesAndRouteSegments(routeSegment, equivalenceRelation))
                         .collect(Collectors.toList());
         return Pair.of(
                 getEdges(edgesAndRouteSegmentsList),
                 getRouteSegments(edgesAndRouteSegmentsList));
     }
 
-    private Pair<Set<Edge>, Set<RouteSegmentWithEquality>> getEdgesAndRouteSegments(final RouteSegmentWithEquality start) {
+    private Pair<Set<Edge>, Set<RouteSegmentWithEquality>> getEdgesAndRouteSegments(
+            final RouteSegmentWithEquality start,
+            final Set<EquivalentRoadPositions> equivalenceRelation) {
         final Set<RouteSegmentWithEquality> routeSegments = connectedRouteSegmentsProvider.getConnectedRouteSegments(start);
-        return Pair.of(getEdges(start, routeSegments), routeSegments);
+        return Pair.of(asEdges(routeSegments, equivalenceRelation), routeSegments);
     }
 
-    private static Set<Edge> getEdges(final RouteSegmentWithEquality start, final Set<RouteSegmentWithEquality> routeSegments) {
-        return ImmutableSet
-                .<Edge>builder()
-                .addAll(asEdges(routeSegments))
-                .addAll(getEdgesFromStartToOtherRoad(start, routeSegments))
-                .build();
-    }
-
-    private static Set<Edge> getEdgesFromStartToOtherRoad(final RouteSegmentWithEquality start,
-                                                          final Set<RouteSegmentWithEquality> routeSegments) {
-        final Node targetOfStart = getTargetNode(start.delegate);
+    private static Set<Edge> asEdges(
+            final Set<RouteSegmentWithEquality> routeSegments,
+            final Set<EquivalentRoadPositions> equivalenceRelation) {
         return routeSegments
                 .stream()
-                .filter(routeSegment -> !isSameRoad(routeSegment, start))
-                .map(routeSegmentFromOtherRoad ->
-                        new Edge(
-                                targetOfStart,
-                                getSourceNode(routeSegmentFromOtherRoad.delegate),
-                                Arrays.asList(start.delegate, routeSegmentFromOtherRoad.delegate)))
+                .map(routeSegmentWrapper -> routeSegmentWrapper.delegate)
+                .map(routeSegment -> asEdge(routeSegment, equivalenceRelation))
                 .collect(Collectors.toSet());
+    }
+
+    private static Edge asEdge(final RouteSegment routeSegment, final Set<EquivalentRoadPositions> equivalenceRelation) {
+        return new Edge(
+                getSourceNode(routeSegment, equivalenceRelation),
+                getTargetNode(routeSegment, equivalenceRelation),
+                Arrays.asList(routeSegment));
     }
 
     private static Set<Node> getNodes(final Set<Edge> edges) {
@@ -98,28 +100,21 @@ public class GraphFactory {
                 .collect(Collectors.toSet());
     }
 
-    private static Set<Edge> asEdges(final Set<RouteSegmentWithEquality> routeSegments) {
-        return routeSegments
-                .stream()
-                .map(routeSegmentWrapper -> routeSegmentWrapper.delegate)
-                .map(GraphFactory::asEdge)
-                .collect(Collectors.toSet());
+    private static Node getSourceNode(final RouteSegment routeSegment, final Set<EquivalentRoadPositions> equivalenceRelation) {
+        return getNode(routeSegment, routeSegment.getSegmentStart(), equivalenceRelation);
     }
 
-    private static Edge asEdge(final RouteSegment routeSegment) {
-        return new Edge(getSourceNode(routeSegment), getTargetNode(routeSegment), Arrays.asList(routeSegment));
+    private static Node getTargetNode(final RouteSegment routeSegment, final Set<EquivalentRoadPositions> equivalenceRelation) {
+        return getNode(routeSegment, routeSegment.getSegmentEnd(), equivalenceRelation);
     }
 
-    private static Node getSourceNode(final RouteSegment routeSegment) {
+    private static Node getNode(
+            final RouteSegment routeSegment,
+            final short position,
+            final Set<EquivalentRoadPositions> equivalenceRelation) {
         return new Node(
-                new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentStart()),
-                getGeodetic(routeSegment, routeSegment.getSegmentStart()));
-    }
-
-    private static Node getTargetNode(final RouteSegment routeSegment) {
-        return new Node(
-                new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentEnd()),
-                getGeodetic(routeSegment, routeSegment.getSegmentEnd()));
+                getEquivalentRoadPositions(new RoadPosition(routeSegment.getRoad().id, position), equivalenceRelation),
+                getGeodetic(routeSegment, position));
     }
 
     private static Geodetic getGeodetic(final RouteSegment routeSegment, final short i) {
@@ -144,5 +139,13 @@ public class GraphFactory {
 
     private static Set<RouteSegmentWithEquality> getRouteSegments(final List<Pair<Set<Edge>, Set<RouteSegmentWithEquality>>> edgesAndRouteSegmentsList) {
         return union(ListUtils.getSeconds(edgesAndRouteSegmentsList));
+    }
+
+    static EquivalentRoadPositions getEquivalentRoadPositions(final RoadPosition roadPosition, final Set<EquivalentRoadPositions> equivalenceRelation) {
+        return equivalenceRelation
+                .stream()
+                .filter(equivalentRoadPositions -> equivalentRoadPositions.roadPositions.contains(roadPosition))
+                .findFirst()
+                .orElseGet(() -> new EquivalentRoadPositions(ImmutableSet.of(roadPosition)));
     }
 }
