@@ -71,7 +71,7 @@ public class GraphFactory {
         private Set<Edge> asEdges(final Set<RouteSegmentWithEquality> routeSegments) {
             return routeSegments
                     .stream()
-                    .map(routeSegmentWrapper -> routeSegmentWrapper.delegate)
+                    .map(routeSegment -> routeSegment.delegate)
                     .map(this::asEdge)
                     .collect(Collectors.toSet());
         }
