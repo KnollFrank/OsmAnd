@@ -49,76 +49,76 @@ public class GraphFactory {
     private Set<EquivalentRoadPositions> getRoadPositionEquivalenceRelation(final RouteSegmentWithEquality start) {
         return new RoadPositionEquivalenceRelationProvider(connectedRouteSegmentsProvider).getRoadPositionEquivalenceRelation(start);
     }
-}
 
-class EdgesVisitor implements IConnectedRouteSegmentsVisitor<Set<Edge>> {
+    static class EdgesVisitor implements IConnectedRouteSegmentsVisitor<Set<Edge>> {
 
-    private final Set<EquivalentRoadPositions> equivalenceRelation;
+        private final Set<EquivalentRoadPositions> equivalenceRelation;
 
-    public EdgesVisitor(final Set<EquivalentRoadPositions> equivalenceRelation) {
-        this.equivalenceRelation = equivalenceRelation;
-    }
+        public EdgesVisitor(final Set<EquivalentRoadPositions> equivalenceRelation) {
+            this.equivalenceRelation = equivalenceRelation;
+        }
 
-    @Override
-    public Set<Edge> processConnectedRouteSegments(final RouteSegmentWithEquality source, final Set<RouteSegmentWithEquality> destinations) {
-        return asEdges(destinations);
-    }
+        @Override
+        public Set<Edge> processConnectedRouteSegments(final RouteSegmentWithEquality source, final Set<RouteSegmentWithEquality> destinations) {
+            return asEdges(destinations);
+        }
 
-    @Override
-    public Set<Edge> combine(final List<Set<Edge>> sets) {
-        return union(sets);
-    }
+        @Override
+        public Set<Edge> combine(final List<Set<Edge>> sets) {
+            return union(sets);
+        }
 
-    private Set<Edge> asEdges(final Set<RouteSegmentWithEquality> routeSegments) {
-        return routeSegments
-                .stream()
-                .map(routeSegmentWrapper -> routeSegmentWrapper.delegate)
-                .map(this::asEdge)
-                .collect(Collectors.toSet());
-    }
+        private Set<Edge> asEdges(final Set<RouteSegmentWithEquality> routeSegments) {
+            return routeSegments
+                    .stream()
+                    .map(routeSegmentWrapper -> routeSegmentWrapper.delegate)
+                    .map(this::asEdge)
+                    .collect(Collectors.toSet());
+        }
 
-    private Edge asEdge(final RouteSegment routeSegment) {
-        return new Edge(
-                getSourceNode(routeSegment),
-                getTargetNode(routeSegment),
-                Arrays.asList(routeSegment));
-    }
+        private Edge asEdge(final RouteSegment routeSegment) {
+            return new Edge(
+                    getSourceNode(routeSegment),
+                    getTargetNode(routeSegment),
+                    Arrays.asList(routeSegment));
+        }
 
-    private Node getSourceNode(final RouteSegment routeSegment) {
-        return getNode(routeSegment, routeSegment.getSegmentStart());
-    }
+        private Node getSourceNode(final RouteSegment routeSegment) {
+            return getNode(routeSegment, routeSegment.getSegmentStart());
+        }
 
-    private Node getTargetNode(final RouteSegment routeSegment) {
-        return getNode(routeSegment, routeSegment.getSegmentEnd());
-    }
+        private Node getTargetNode(final RouteSegment routeSegment) {
+            return getNode(routeSegment, routeSegment.getSegmentEnd());
+        }
 
-    private Node getNode(final RouteSegment routeSegment, final short position) {
-        return new Node(
-                getEquivalentRoadPositions(new RoadPosition(routeSegment.getRoad().id, position), equivalenceRelation),
-                getGeodetic(routeSegment, position));
-    }
+        private Node getNode(final RouteSegment routeSegment, final short position) {
+            return new Node(
+                    getEquivalentRoadPositions(new RoadPosition(routeSegment.getRoad().id, position), equivalenceRelation),
+                    getGeodetic(routeSegment, position));
+        }
 
-    private static Geodetic getGeodetic(final RouteSegment routeSegment, final short i) {
-        return getGeodetic(routeSegment.getRoad(), i);
-    }
+        private static Geodetic getGeodetic(final RouteSegment routeSegment, final short i) {
+            return getGeodetic(routeSegment.getRoad(), i);
+        }
 
-    private static Geodetic getGeodetic(final RouteDataObject road, final short i) {
-        return new Geodetic(getLatitude(road, i), getLongitude(road, i));
-    }
+        private static Geodetic getGeodetic(final RouteDataObject road, final short i) {
+            return new Geodetic(getLatitude(road, i), getLongitude(road, i));
+        }
 
-    private static Angle getLatitude(final RouteDataObject road, final short i) {
-        return new Angle(MapUtils.get31LatitudeY(road.getPoint31YTile(i)), Angle.Unit.DEGREES);
-    }
+        private static Angle getLatitude(final RouteDataObject road, final short i) {
+            return new Angle(MapUtils.get31LatitudeY(road.getPoint31YTile(i)), Angle.Unit.DEGREES);
+        }
 
-    private static Angle getLongitude(final RouteDataObject road, final short i) {
-        return new Angle(MapUtils.get31LongitudeX(road.getPoint31XTile(i)), Angle.Unit.DEGREES);
-    }
+        private static Angle getLongitude(final RouteDataObject road, final short i) {
+            return new Angle(MapUtils.get31LongitudeX(road.getPoint31XTile(i)), Angle.Unit.DEGREES);
+        }
 
-    static EquivalentRoadPositions getEquivalentRoadPositions(final RoadPosition roadPosition, final Set<EquivalentRoadPositions> equivalenceRelation) {
-        return equivalenceRelation
-                .stream()
-                .filter(equivalentRoadPositions -> equivalentRoadPositions.roadPositions.contains(roadPosition))
-                .findFirst()
-                .orElseGet(() -> new EquivalentRoadPositions(ImmutableSet.of(roadPosition)));
+        static EquivalentRoadPositions getEquivalentRoadPositions(final RoadPosition roadPosition, final Set<EquivalentRoadPositions> equivalenceRelation) {
+            return equivalenceRelation
+                    .stream()
+                    .filter(equivalentRoadPositions -> equivalentRoadPositions.roadPositions.contains(roadPosition))
+                    .findFirst()
+                    .orElseGet(() -> new EquivalentRoadPositions(ImmutableSet.of(roadPosition)));
+        }
     }
 }

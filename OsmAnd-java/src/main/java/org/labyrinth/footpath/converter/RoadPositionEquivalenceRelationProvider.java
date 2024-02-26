@@ -29,36 +29,36 @@ class RoadPositionEquivalenceRelationProvider {
     public final Set<EquivalentRoadPositions> getRoadPositionEquivalenceRelation(final RouteSegmentWithEquality start) {
         return connectedRouteSegmentsProcessor.processConnectedRouteSegments(start);
     }
-}
 
-class RoadPositionEquivalenceRelationVisitor implements IConnectedRouteSegmentsVisitor<Set<EquivalentRoadPositions>> {
+    private static class RoadPositionEquivalenceRelationVisitor implements IConnectedRouteSegmentsVisitor<Set<EquivalentRoadPositions>> {
 
-    @Override
-    public Set<EquivalentRoadPositions> processConnectedRouteSegments(
-            final RouteSegmentWithEquality source,
-            final Set<RouteSegmentWithEquality> destinations) {
-        final RoadPosition endOfSource = getEndRoadPosition(source.delegate);
-        return destinations
-                .stream()
-                .filter(routeSegment -> !isSameRoad(routeSegment, source))
-                .map(routeSegmentFromOtherRoad ->
-                        new EquivalentRoadPositions(
-                                ImmutableSet.of(
-                                        endOfSource,
-                                        getStartRoadPosition(routeSegmentFromOtherRoad.delegate))))
-                .collect(Collectors.toSet());
-    }
+        @Override
+        public Set<EquivalentRoadPositions> processConnectedRouteSegments(
+                final RouteSegmentWithEquality source,
+                final Set<RouteSegmentWithEquality> destinations) {
+            final RoadPosition endOfSource = getEndRoadPosition(source.delegate);
+            return destinations
+                    .stream()
+                    .filter(routeSegment -> !isSameRoad(routeSegment, source))
+                    .map(routeSegmentFromOtherRoad ->
+                            new EquivalentRoadPositions(
+                                    ImmutableSet.of(
+                                            endOfSource,
+                                            getStartRoadPosition(routeSegmentFromOtherRoad.delegate))))
+                    .collect(Collectors.toSet());
+        }
 
-    @Override
-    public Set<EquivalentRoadPositions> combine(final List<Set<EquivalentRoadPositions>> equivalenceRelations) {
-        return union(equivalenceRelations);
-    }
+        @Override
+        public Set<EquivalentRoadPositions> combine(final List<Set<EquivalentRoadPositions>> equivalenceRelations) {
+            return union(equivalenceRelations);
+        }
 
-    private static RoadPosition getStartRoadPosition(final RouteSegment routeSegment) {
-        return new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentStart());
-    }
+        private static RoadPosition getStartRoadPosition(final RouteSegment routeSegment) {
+            return new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentStart());
+        }
 
-    private static RoadPosition getEndRoadPosition(final RouteSegment routeSegment) {
-        return new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentEnd());
+        private static RoadPosition getEndRoadPosition(final RouteSegment routeSegment) {
+            return new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentEnd());
+        }
     }
 }
