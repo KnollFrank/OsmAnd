@@ -28,4 +28,12 @@ public class Graph {
                 .filter(edge -> edge.containsNodes(a, b))
                 .findFirst();
     }
+
+    public Optional<Edge> findEdgeFromSource2Target(final Node source, final Node target) {
+        return source
+                .locEdges
+                .stream()
+                .filter(edge -> edge.isSource2Target(source, target))
+                .findFirst();
+    }
 }

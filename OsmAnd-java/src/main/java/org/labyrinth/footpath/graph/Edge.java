@@ -51,7 +51,7 @@ public class Edge {
         return new Edge(target, source, Lists.reverse(routeSegments));
     }
 
-    private boolean isSource2Target(final Node source, final Node target) {
+    public boolean isSource2Target(final Node source, final Node target) {
         return this.source.equals(source) && this.target.equals(target);
     }
 

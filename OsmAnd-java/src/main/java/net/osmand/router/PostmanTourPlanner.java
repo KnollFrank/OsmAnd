@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -277,7 +278,8 @@ public class PostmanTourPlanner {
         final List<RouteSegment> routeSegments =
                 Utils
                         .getConsecutivePairs(shortestClosedPathStartingAtNode)
-                        .flatMap(sourceTargetPair -> getEdgeSource2Target(graph, sourceTargetPair).routeSegments.stream())
+                        .map(sourceTargetPair -> getEdgeFromSource2Target(graph, sourceTargetPair))
+                        .flatMap(edge -> edge.routeSegments.stream())
                         .collect(Collectors.toList());
         Utils
                 .getConsecutivePairs(routeSegments)
@@ -290,6 +292,15 @@ public class PostmanTourPlanner {
         return createFinalRouteSegment(routeSegments.get(routeSegments.size() - 2));
     }
 
+    private static Edge getEdgeFromSource2Target(final Graph graph,
+                                                 final Pair<Node, Node> sourceTargetPair) {
+        return graph
+                .findEdgeFromSource2Target(
+                        sourceTargetPair.getFirst(),
+                        sourceTargetPair.getSecond())
+                .orElseThrow(() -> new NoSuchElementException(sourceTargetPair + ""));
+    }
+
     private static FinalRouteSegment createFinalRouteSegment(final RouteSegment routeSegment) {
         final FinalRouteSegment finalRouteSegment =
                 new FinalRouteSegment(
@@ -298,10 +309,6 @@ public class PostmanTourPlanner {
                         routeSegment.getSegmentEnd());
         finalRouteSegment.setParentRoute(routeSegment.getParentRoute());
         return finalRouteSegment;
-    }
-
-    private static Edge getEdgeSource2Target(final Graph graph, final Pair<Node, Node> sourceTargetPair) {
-        return graph.findEdgeContainingNodes(sourceTargetPair.getFirst(), sourceTargetPair.getSecond()).get();
     }
 
     private void createGraph(final Set<RouteSegmentWithEquality> routeSegments) {
