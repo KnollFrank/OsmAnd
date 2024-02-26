@@ -39,12 +39,12 @@ class RoadPositionEquivalenceRelationProvider {
             final RoadPosition endOfSource = getEndRoadPosition(source.delegate);
             return destinations
                     .stream()
-                    .filter(routeSegment -> !isSameRoad(routeSegment, source))
-                    .map(routeSegmentFromOtherRoad ->
+                    .filter(destination -> !isSameRoad(destination, source))
+                    .map(destinationFromOtherRoad ->
                             new EquivalentRoadPositions(
                                     ImmutableSet.of(
                                             endOfSource,
-                                            getStartRoadPosition(routeSegmentFromOtherRoad.delegate))))
+                                            getStartRoadPosition(destinationFromOtherRoad.delegate))))
                     .collect(Collectors.toSet());
         }
 
