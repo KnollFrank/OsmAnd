@@ -17,12 +17,19 @@ public class GraphFactory {
     }
 
     public Graph createGraph(final RouteSegmentWithEquality start) {
-        final ConnectedRouteSegmentsProcessor<Set<Edge>> connectedRouteSegmentsProcessor =
-                new ConnectedRouteSegmentsProcessor<>(
-                        connectedRouteSegmentsProvider,
-                        new EdgesVisitor(getRoadPositionEquivalenceRelation(start)));
-        final Set<Edge> edges = connectedRouteSegmentsProcessor.processConnectedRouteSegments(start);
-        return org.labyrinth.footpath.graph.GraphFactory.createGraph(edges);
+        return org.labyrinth.footpath.graph.GraphFactory.createGraph(getEdges(start));
+    }
+
+    private Set<Edge> getEdges(final RouteSegmentWithEquality start) {
+        return this
+                .createConnectedRouteSegmentsProcessor(start)
+                .processConnectedRouteSegments(start);
+    }
+
+    private ConnectedRouteSegmentsProcessor<Set<Edge>> createConnectedRouteSegmentsProcessor(final RouteSegmentWithEquality start) {
+        return new ConnectedRouteSegmentsProcessor<>(
+                connectedRouteSegmentsProvider,
+                new EdgesVisitor(getRoadPositionEquivalenceRelation(start)));
     }
 
     private Set<EquivalentRoadPositions> getRoadPositionEquivalenceRelation(final RouteSegmentWithEquality start) {
