@@ -1,7 +1,5 @@
 package net.osmand.plus.views.mapwidgets.configure.dialogs;
 
-import static net.osmand.plus.views.mapwidgets.configure.dialogs.Map3DModeBottomSheet.Map3DModeUpdateListener;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -28,12 +26,10 @@ import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.base.BaseOsmAndFragment;
 import net.osmand.plus.helpers.AndroidUiHelper;
 import net.osmand.plus.profiles.SelectCopyAppModeBottomSheet.CopyAppModePrefsListener;
-import net.osmand.plus.quickaction.QuickActionRegistry.QuickActionUpdatesListener;
+import net.osmand.plus.quickaction.MapButtonsHelper.QuickActionUpdatesListener;
 import net.osmand.plus.routepreparationmenu.cards.BaseCard;
 import net.osmand.plus.settings.backend.ApplicationMode;
 import net.osmand.plus.settings.bottomsheets.ConfirmationBottomSheet.ConfirmationDialogListener;
-import net.osmand.plus.settings.enums.CompassVisibility;
-import net.osmand.plus.settings.enums.Map3DModeVisibility;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.ColorUtilities;
 import net.osmand.plus.views.layers.MapInfoLayer;
@@ -41,7 +37,6 @@ import net.osmand.plus.views.mapwidgets.MapWidgetInfo;
 import net.osmand.plus.views.mapwidgets.MapWidgetRegistry;
 import net.osmand.plus.views.mapwidgets.MapWidgetRegistry.WidgetsRegistryListener;
 import net.osmand.plus.views.mapwidgets.configure.WidgetsSettingsHelper;
-import net.osmand.plus.views.mapwidgets.configure.dialogs.CompassVisibilityBottomSheet.CompassVisibilityUpdateListener;
 import net.osmand.plus.views.mapwidgets.configure.dialogs.cards.ConfigureActionsCard;
 import net.osmand.plus.views.mapwidgets.configure.dialogs.cards.ConfigureButtonsCard;
 import net.osmand.plus.views.mapwidgets.configure.dialogs.cards.ConfigureOtherCard;
@@ -54,8 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConfigureScreenFragment extends BaseOsmAndFragment implements QuickActionUpdatesListener,
-		WidgetsRegistryListener, ConfirmationDialogListener, CopyAppModePrefsListener,
-		CompassVisibilityUpdateListener, Map3DModeUpdateListener {
+		WidgetsRegistryListener, ConfirmationDialogListener, CopyAppModePrefsListener {
 
 	public static final String TAG = ConfigureScreenFragment.class.getSimpleName();
 
@@ -120,21 +114,33 @@ public class ConfigureScreenFragment extends BaseOsmAndFragment implements Quick
 	public void onResume() {
 		super.onResume();
 		updateCard(widgetsCard);
-		settings.POSITION_PLACEMENT_ON_MAP.addListener(getDisplayPositionListener());
+		updateCard(buttonsCard);
+
 		settings.SHOW_DISTANCE_RULER.addListener(getDistanceByTapListener());
+		settings.POSITION_PLACEMENT_ON_MAP.addListener(getDisplayPositionListener());
+
+		MapActivity mapActivity = getMapActivity();
+		if (mapActivity != null) {
+			mapActivity.disableDrawer();
+		}
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		settings.POSITION_PLACEMENT_ON_MAP.removeListener(getDisplayPositionListener());
 		settings.SHOW_DISTANCE_RULER.removeListener(getDistanceByTapListener());
+		settings.POSITION_PLACEMENT_ON_MAP.removeListener(getDisplayPositionListener());
+
+		MapActivity mapActivity = getMapActivity();
+		if (mapActivity != null) {
+			mapActivity.enableDrawer();
+		}
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-		app.getQuickActionRegistry().addUpdatesListener(this);
+		app.getMapButtonsHelper().addUpdatesListener(this);
 		widgetRegistry.addWidgetsRegistryListener(this);
 		mapActivity.disableDrawer();
 	}
@@ -142,7 +148,7 @@ public class ConfigureScreenFragment extends BaseOsmAndFragment implements Quick
 	@Override
 	public void onStop() {
 		super.onStop();
-		app.getQuickActionRegistry().removeUpdatesListener(this);
+		app.getMapButtonsHelper().removeUpdatesListener(this);
 		widgetRegistry.removeWidgetsRegistryListener(this);
 		mapActivity.enableDrawer();
 	}
@@ -293,11 +299,6 @@ public class ConfigureScreenFragment extends BaseOsmAndFragment implements Quick
 	}
 
 	@Override
-	public void onCompassVisibilityUpdated(@NonNull CompassVisibility visibility) {
-		updateCard(buttonsCard);
-	}
-
-	@Override
 	public void onWidgetRegistered(@NonNull MapWidgetInfo widgetInfo) {
 		updateCard(widgetsCard);
 	}
@@ -337,11 +338,6 @@ public class ConfigureScreenFragment extends BaseOsmAndFragment implements Quick
 			distanceByTapListener = change -> app.runInUIThread(() -> updateCard(otherCard));
 		}
 		return distanceByTapListener;
-	}
-
-	@Override
-	public void onMap3DModeUpdated(@NonNull Map3DModeVisibility visibility) {
-		updateCard(buttonsCard);
 	}
 
 	@NonNull

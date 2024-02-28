@@ -2497,7 +2497,7 @@
     <string name="shared_string_more_without_dots">Altro</string>
     <string name="empty_state_osm_edits">Crea o modifica oggetti OSM</string>
     <string name="empty_state_osm_edits_descr">Crea o modifica PDI OSM, apri o commenta note OSM, e invia tracce GPX registrate.</string>
-    <string name="shared_string_deleted">Eliminato</string>
+    <string name="shared_string_deleted">Cancellato</string>
     <string name="shared_string_edited">Modificato</string>
     <string name="shared_string_added">Aggiunto</string>
     <string name="marker_activated">Marcatore %s attivato.</string>
@@ -3058,7 +3058,7 @@
     <string name="rendering_attr_tracktype_grade5_name">Morbido</string>
     <string name="routeInfo_tracktype_name">Rigidità della superficie</string>
     <string name="shared_string_file_is_saved">%s è salvato</string>
-    <string name="shared_string_open_track">Apri traccia</string>
+    <string name="shared_string_open_track">Apri la traccia</string>
     <string name="shared_string_track_is_saved">Traccia %s salvata</string>
     <string name="turn_on_profile_desc">Per favore attiva almeno un profilo dell\'app da utilizzare con questa impostazione.</string>
     <string name="app_mode_campervan">Camper (RV)</string>
@@ -3872,7 +3872,7 @@
     <string name="plan_route_split_before">Spezza</string>
     <string name="announcement_time_arrive">Arrivo a destinazione</string>
     <string name="shared_string_turn">Svolta</string>
-    <string name="start_recording">Avvia registrazione</string>
+    <string name="start_recording">Inizia registrazione</string>
     <string name="show_track_on_map">Mostra il percorso sulla mappa</string>
     <string name="routing_engine_vehicle_type_wheelchair">Sedia a rotelle</string>
     <string name="routing_engine_vehicle_type_hiking">Escursionismo</string>
@@ -4182,7 +4182,7 @@
 \n • OsmAnd Live spostato in \"Scarica mappe &gt; Aggiornamenti\"
 \n
 \n</string>
-    <string name="duration_moment_ago">poco fa</string>
+    <string name="duration_moment_ago">un attimo fa</string>
     <string name="logout_from_osmand_cloud">Disconnettiti da OsmAnd Cloud</string>
     <string name="logout_from_osmand_cloud_decsr">Disconnettersi\?
 \nDovrai ricollegarti nuovamente per fare il backup o ripristinare i tuoi dati.</string>
@@ -4530,7 +4530,7 @@
     <string name="location_source_descr">Come preimpostazione, OsmAnd installato da Google Play usa %1$s per determinare la posizione.
 \n
 \nSe tu ottieni posizioni non accurate, oppure usi un dispositivo senza %2$s, prova a passare a \"%3$s\"</string>
-    <string name="location_source">Origine posizione</string>
+    <string name="location_source">Origine della posizione</string>
     <string name="apply_to_existing">Applica agli esistenti</string>
     <string name="osm_carto_render_descr">Simile allo stile cartografico di OpenStreetMap sul sito principale OSM</string>
     <string name="simulation_real_mode_title">Simulazione realistica</string>
@@ -4874,7 +4874,7 @@
     <string name="precipitation_widget_desc">Mostra le precipitazioni del centro attuale della mappa.</string>
     <string name="temperature_widget_desc">Mostra la temperatura del centro attuale della mappa.</string>
     <string name="weather_pressure_hpa">hPa</string>
-    <string name="weather_pressure_inhg">inHg</string>
+    <string name="weather_pressure_inhg">mmHg</string>
     <string name="weather_pressure_mmhg">mmHg</string>
     <string name="location_simulation_speedup">Accelerazione della simulazione</string>
     <string name="map_widget_sunset_desc">Mostra l\'ora del prossimo tramonto o il tempo che manca al prossimo tramonto.</string>
@@ -5143,7 +5143,7 @@
     <string name="external_device_characteristic_distance">Distanza</string>
     <string name="save_track_external_sensors_data">Dati</string>
     <string name="delete_folder_question">Eliminare la cartella\?</string>
-    <string name="delete_folder">Eliminare la cartella</string>
+    <string name="delete_folder">Elimina la cartella</string>
     <string name="map_widget_rssi">RSSI</string>
     <string name="tracks_empty_folder_description">Questa cartella non ha ancora alcuna traccia.</string>
     <string name="external_device_characteristic_speed">Velocità</string>
@@ -5335,7 +5335,7 @@
     <string name="local_indexes_category_terrain">Mappe del terreno (3D)</string>
     <string name="contact_us">Contattaci</string>
     <string name="help_article_map_legend_nautical_map_name">Stile mappa nautica</string>
-    <string name="help_article_navigation_guidance_name">Norma</string>
+    <string name="help_article_navigation_guidance_name">Guida alla navigazione</string>
     <string name="help_article_navigation_routing_horse_routing_name">Itinerario a cavallo</string>
     <string name="help_article_navigation_routing_pedestrian_routing_name">Percorso a piedi</string>
     <string name="help_article_navigation_routing_ski_routing_name">Percorsi sciistici</string>
@@ -5486,7 +5486,7 @@
     <string name="searching_matching_tracks">Cerca tutte le tracce corrispondenti</string>
     <string name="cloud_trash_clear_confirmation">Eliminare definitivamente tutti gli elementi nel cestino?</string>
     <string name="with_waypoints">Con punti intermedi</string>
-    <string name="restore_from_trash">Recupera dal cestino</string>
+    <string name="restore_from_trash">Ripristina dal cestino</string>
     <string name="delete_all_items">Elimina tutti gli elementi</string>
     <string name="trash_is_empty_banner_desc">I file rimossi da OsmAnd Cloud saranno disponibili qui per altri %1$s giorni.</string>
     <plurals name="tracks">
@@ -5504,7 +5504,7 @@
     <string name="trash_alert_card_desc">Gli elementi nel cestino verranno eliminati dopo %1$s giorni.</string>
     <string name="trash_is_empty">Il cestino è vuoto</string>
     <string name="shared_string_trash">Cestino</string>
-    <string name="shared_string_delete_item">Cancella elemento</string>
+    <string name="shared_string_delete_item">Cancella l\'oggetto</string>
     <string name="help_article_personal_storage_name">Archiviazione</string>
     <string name="key_event_action_zoom_in">Ingrandisci</string>
     <string name="enable_to_use_external_input_device">Abilita l\'uso del dispositivo di input esterno con OsmAnd</string>
@@ -5606,4 +5606,18 @@
     <string name="shared_string_additional">Ulteriori</string>
     <string name="shared_string_keywords">Parole chiave</string>
     <string name="sorted_sufolders_toast">Le sottocartelle in “%1$s” sono ordinate per: “%2$s”</string>
+    <string name="add_button">Aggiungi pulsante</string>
+    <string name="custom_buttons">Pulsanti personalizzati</string>
+    <string name="default_buttons">Pulsanti predefiniti</string>
+    <string name="any_connected">Qualsiasi connesso</string>
+    <string name="any_connected_with_device">Qualsiasi connesso: %s</string>
+    <string name="custom_map_button_name_present">Tale pulsante è già presente</string>
+    <string name="special_routing_cpp">Tipo di percorso speciale</string>
+    <string name="target_elevation">Elevazione del bersaglio</string>
+    <string name="shared_string_limit">Limite</string>
+    <string name="when_exceeded">Quando superato</string>
+    <string name="shared_string_speedometer">Tachimetro</string>
+    <string name="help_article_setup_a_route_name">Imposta un percorso</string>
+    <string name="speed_limit_warning">Avviso limite di velocità</string>
+    <string name="speedometer_description">Mostra la velocità attuale come riportata dal GPS</string>
 </resources>

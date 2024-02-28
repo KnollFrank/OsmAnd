@@ -61,9 +61,11 @@ public class ListStringPreference extends StringPreference {
 
 	public boolean removeValueForProfile(ApplicationMode appMode, String res) {
 		String vl = getModeValue(appMode);
-		String r = res + delimiter;
 		if (vl != null) {
-			if (vl.startsWith(r)) {
+			String r = res + delimiter;
+			if (vl.equals(res)) {
+				vl = "";
+			} else if (vl.startsWith(r)) {
 				vl = vl.substring(r.length());
 			} else {
 				int it = vl.indexOf(delimiter + r);
@@ -89,7 +91,7 @@ public class ListStringPreference extends StringPreference {
 			if (listAsString.contains(delimiter)) {
 				return Arrays.asList(listAsString.split(delimiter));
 			} else {
-				return new ArrayList<String>(Collections.singleton(listAsString));
+				return new ArrayList<>(Collections.singleton(listAsString));
 			}
 		}
 		return null;

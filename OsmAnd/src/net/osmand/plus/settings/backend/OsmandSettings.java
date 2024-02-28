@@ -13,8 +13,11 @@ import static net.osmand.plus.plugins.rastermaps.OsmandRasterMapsPlugin.NO_POLYG
 import static net.osmand.plus.routing.TransportRoutingHelper.PUBLIC_TRANSPORT_KEY;
 import static net.osmand.plus.settings.enums.LocationSource.ANDROID_API;
 import static net.osmand.plus.settings.enums.LocationSource.GOOGLE_PLAY_SERVICES;
+import static net.osmand.plus.settings.enums.WidgetSize.MEDIUM;
 import static net.osmand.plus.views.mapwidgets.WidgetsPanel.PAGE_SEPARATOR;
 import static net.osmand.plus.views.mapwidgets.WidgetsPanel.WIDGET_SEPARATOR;
+import static net.osmand.plus.views.mapwidgets.configure.buttons.QuickActionButtonState.DEFAULT_BUTTON_ID;
+import static net.osmand.plus.settings.enums.SpeedLimitWarningState.WHEN_EXCEEDED;
 import static net.osmand.render.RenderingRuleStorageProperties.A_APP_MODE;
 import static net.osmand.render.RenderingRuleStorageProperties.A_BASE_APP_MODE;
 
@@ -79,7 +82,6 @@ import net.osmand.plus.settings.backend.preferences.BooleanStringPreference;
 import net.osmand.plus.settings.backend.preferences.CommonPreference;
 import net.osmand.plus.settings.backend.preferences.ContextMenuItemsPreference;
 import net.osmand.plus.settings.backend.preferences.EnumStringPreference;
-import net.osmand.plus.settings.backend.preferences.FabMarginPreference;
 import net.osmand.plus.settings.backend.preferences.FloatPreference;
 import net.osmand.plus.settings.backend.preferences.IntPreference;
 import net.osmand.plus.settings.backend.preferences.ListStringPreference;
@@ -110,6 +112,7 @@ import net.osmand.plus.utils.FileUtils;
 import net.osmand.plus.views.layers.RadiusRulerControlLayer.RadiusRulerMode;
 import net.osmand.plus.views.mapwidgets.WidgetType;
 import net.osmand.plus.views.mapwidgets.WidgetsPanel;
+import net.osmand.plus.settings.enums.SpeedLimitWarningState;
 import net.osmand.plus.wikipedia.WikiArticleShowImages;
 import net.osmand.render.RenderingRulesStorage;
 import net.osmand.util.Algorithms;
@@ -852,15 +855,6 @@ public class OsmandSettings {
 
 	public final CommonPreference<Boolean> ENABLE_3D_MAPS = registerBooleanPreference("enable_3d_maps", true).makeProfile().makeShared().cache();
 
-	public final CommonPreference<CompassVisibility> COMPASS_VISIBILITY = new EnumStringPreference<CompassVisibility>(this, "compass_visibility", CompassVisibility.VISIBLE_IF_MAP_ROTATED, CompassVisibility.values()) {
-
-		@Override
-		public CompassVisibility getModeValue(ApplicationMode mode) {
-			CompassVisibility customizationValue = CompassVisibility.getFromCustomization(ctx, mode);
-			return isSetForMode(mode) || customizationValue == null ? super.getModeValue(mode) : customizationValue;
-		}
-	}.makeProfile().cache();
-
 	public final CommonPreference<Integer> SIMULATE_POSITION_SPEED = new IntPreference(this, "simulate_position_movement_speed", 1).makeGlobal().makeShared();
 
 	public final CommonPreference<DistanceByTapTextSize> DISTANCE_BY_TAP_TEXT_SIZE = new EnumStringPreference<>(this, "distance_by_tap_text_size", DistanceByTapTextSize.NORMAL, DistanceByTapTextSize.values()).makeProfile();
@@ -869,6 +863,9 @@ public class OsmandSettings {
 	public final OsmandPreference<Boolean> SHOW_COMPASS_ON_RADIUS_RULER = new BooleanPreference(this, "show_compass_ruler", true).makeProfile();
 
 	public final OsmandPreference<Boolean> SHOW_DISTANCE_RULER = new BooleanPreference(this, "show_distance_ruler", false).makeProfile();
+	public final OsmandPreference<Boolean> SHOW_SPEEDOMETER = new BooleanPreference(this, "show_speedometer", false).makeProfile();
+	public final CommonPreference<SpeedLimitWarningState> SHOW_SPEED_LIMIT_WARNING = new EnumStringPreference<>(this, "show_speed_limit_warning", WHEN_EXCEEDED, SpeedLimitWarningState.values()).makeProfile();
+	public final OsmandPreference<WidgetSize> SPEEDOMETER_SIZE = new EnumStringPreference<>(this, "speedometer_size", MEDIUM, WidgetSize.values()).makeProfile();
 
 	public final CommonPreference<Boolean> SHOW_LINES_TO_FIRST_MARKERS = new BooleanPreference(this, "show_lines_to_first_markers", false).makeProfile();
 	public final CommonPreference<Boolean> SHOW_ARROWS_TO_FIRST_MARKERS = new BooleanPreference(this, "show_arrows_to_first_markers", false).makeProfile();
@@ -2785,26 +2782,9 @@ public class OsmandSettings {
 		return impassableRoadsStorage.movePoint(latLonEx, latLonNew);
 	}
 
-	/**
-	 * quick actions prefs
-	 */
-
-	public final CommonPreference<Boolean> QUICK_ACTION = new BooleanPreference(this, "quick_action_state", false).makeProfile();
-
-	public final CommonPreference<String> QUICK_ACTION_LIST = new StringPreference(this, "quick_action_list", "").makeGlobal().storeLastModifiedTime();
-
 	public final CommonPreference<Boolean> IS_QUICK_ACTION_TUTORIAL_SHOWN = new BooleanPreference(this, "quick_action_tutorial", false).makeGlobal().makeShared();
-	public final FabMarginPreference QUICK_ACTION_FAB_MARGIN = new FabMarginPreference(this, "quick_fab_margin");
+	public final ListStringPreference QUICK_ACTION_BUTTONS = (ListStringPreference) new ListStringPreference(this, "quick_action_buttons", DEFAULT_BUTTON_ID + ";", ";").makeProfile();
 
-	/**
-	 * map 3d mode
-	 */
-
-	public final CommonPreference<Map3DModeVisibility> MAP_3D_MODE_VISIBILITY = new EnumStringPreference<>(this, "map_3d_mode_visibility", Map3DModeVisibility.VISIBLE, Map3DModeVisibility.values()).makeProfile().cache();
-
-	public final FabMarginPreference MAP_3D_MODE_FAB_MARGIN = new FabMarginPreference(this, "map_3d_mode_margin");
-
-	public final CommonPreference<Float> MAP_3D_MODE_ELEVATION_ANGLE = new FloatPreference(this, "map_3d_mode_elevation_angle", 90).makeProfile();
 
 	/**
 	 * the location of a parked car
@@ -3272,16 +3252,6 @@ public class OsmandSettings {
 			res.add(toks.nextToken());
 		}
 		return res;
-	}
-
-	public void setQuickActions(HashMap<String, Boolean> quickActions, ApplicationMode mode) {
-		if (!QUICK_ACTION.isSetForMode(mode)) {
-			Boolean actionState = quickActions.get(mode.getStringKey());
-			if (actionState == null) {
-				actionState = QUICK_ACTION.getDefaultValue();
-			}
-			setPreference(QUICK_ACTION.getId(), actionState, mode);
-		}
 	}
 
 	public final OsmandPreference<Boolean> FAVORITES_FREE_ACCOUNT_CARD_DISMISSED =
