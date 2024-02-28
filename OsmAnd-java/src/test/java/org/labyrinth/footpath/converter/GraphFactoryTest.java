@@ -1,6 +1,6 @@
 package org.labyrinth.footpath.converter;
 
-import static org.labyrinth.footpath.converter.GraphFactory.EdgesVisitor.getEquivalentRoadPositions;
+import static org.labyrinth.footpath.converter.GraphFactory.getEquivalentRoadPositions;
 
 import com.google.common.collect.ImmutableSet;
 

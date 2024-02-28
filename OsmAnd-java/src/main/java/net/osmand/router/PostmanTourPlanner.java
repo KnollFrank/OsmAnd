@@ -5,6 +5,7 @@ import static net.osmand.router.BinaryRoutePlanner.RouteSegment;
 import static net.osmand.router.BinaryRoutePlanner.RouteSegmentPoint;
 
 import org.jgrapht.alg.util.Pair;
+import org.labyrinth.common.ListUtils;
 import org.labyrinth.common.Utils;
 import org.labyrinth.footpath.converter.ConnectedRouteSegmentsProvider;
 import org.labyrinth.footpath.converter.GraphFactory;
@@ -23,18 +24,21 @@ public class PostmanTourPlanner {
     public FinalRouteSegment searchRoute(final RoutingContext ctx,
                                          final RouteSegmentPoint start) {
         ctx.memoryOverhead = 1000;
-        final ConnectedRouteSegmentsProvider connectedRouteSegmentsProvider = new ConnectedRouteSegmentsProvider(ctx);
-        final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
+        final GraphFactory graphFactory = new GraphFactory(new ConnectedRouteSegmentsProvider(ctx));
         final Graph graph = graphFactory.createGraph(new RouteSegmentWithEquality(start));
         final Node startOfPath = graph.nodes.stream().findFirst().get();
         final List<Node> shortestClosedPath = ShortestClosedPathProvider.createShortestClosedPathStartingAtNode(graph, startOfPath);
-        final List<RouteSegment> routeSegments =
-                Utils
-                        .getConsecutivePairs(shortestClosedPath)
-                        .map(sourceTargetPair -> getEdgeFromSource2Target(graph, sourceTargetPair))
-                        .flatMap(edge -> edge.routeSegments.stream())
-                        .map(PostmanTourPlanner::copy)
-                        .collect(Collectors.toList());
+        final List<RouteSegment> routeSegments = getRouteSegments(graph, shortestClosedPath);
+        final RouteSegment routeSegment = connectRouteSegmentsReturnStartOfChain(routeSegments);
+        return createFinalRouteSegment(routeSegment);
+    }
+
+    private static RouteSegment connectRouteSegmentsReturnStartOfChain(final List<RouteSegment> routeSegments) {
+        connectRouteSegments(routeSegments);
+        return ListUtils.getEnd(routeSegments).get();
+    }
+
+    private static void connectRouteSegments(final List<RouteSegment> routeSegments) {
         Utils
                 .getConsecutivePairs(routeSegments)
                 .forEach(
@@ -42,11 +46,20 @@ public class PostmanTourPlanner {
                             final RouteSegment previous = previous_actual_pair.getFirst();
                             final RouteSegment actual = previous_actual_pair.getSecond();
                             if (actual.getParentRoute() != null) {
+                                // FK-TODO: remove:
                                 System.out.println("oh, je");
                             }
                             actual.setParentRoute(previous);
                         });
-        return createFinalRouteSegment(routeSegments.get(routeSegments.size() - 1));
+    }
+
+    private static List<RouteSegment> getRouteSegments(final Graph graph, final List<Node> shortestClosedPath) {
+        return Utils
+                .getConsecutivePairs(shortestClosedPath)
+                .map(sourceTargetPair -> getEdgeFromSource2Target(graph, sourceTargetPair))
+                .flatMap(edge -> edge.routeSegments.stream())
+                .map(PostmanTourPlanner::copy)
+                .collect(Collectors.toList());
     }
 
     private static RouteSegment copy(final RouteSegment routeSegment) {
@@ -74,7 +87,6 @@ public class PostmanTourPlanner {
         finalRouteSegment.setParentRoute(routeSegment.getParentRoute());
         return finalRouteSegment;
     }
-
 
     public static class RouteSegmentWithEquality {
 

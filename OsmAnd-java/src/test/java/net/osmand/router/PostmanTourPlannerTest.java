@@ -81,17 +81,18 @@ public class PostmanTourPlannerTest {
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/TwoPoints.obf");
 
         // When
+        final LatLon start = new LatLon(43.0257384, 9.4062576);
         final RouteCalcResult routeCalcResult =
                 new RoutePlannerFrontEnd()
                         .searchRoute(
                                 routingContext,
-                                // Kapellenweg:
-                                new LatLon(43.0257384, 9.4062576),
-                                // Hofweg:
+                                start,
                                 new LatLon(43.0258502, 9.4061449),
                                 Collections.emptyList());
 
         // Then
+        final List<RouteSegmentResult> routeSegmentResults = routeCalcResult.getList();
+        Assert.assertEquals(getStartOfRoute(routeSegmentResults), start);
         Assert.assertEquals(
                 Arrays.asList(
                         new RouteSegmentResultWithEquality(-1348, "kurzer Weg", 1, 0),
@@ -99,7 +100,11 @@ public class PostmanTourPlannerTest {
                         new RouteSegmentResultWithEquality(-1347, "langer Weg", 2, 0),
                         new RouteSegmentResultWithEquality(-1347, "langer Weg", 0, 1),
                         new RouteSegmentResultWithEquality(-1348, "kurzer Weg", 0, 1)),
-                getRouteSegmentResultWithEqualities(routeCalcResult.getList()));
+                getRouteSegmentResultWithEqualities(routeSegmentResults));
+    }
+
+    private static LatLon getStartOfRoute(final List<RouteSegmentResult> routeSegmentResults) {
+        return routeSegmentResults.get(0).getStartPoint();
     }
 
     private static BinaryMapIndexReader createBinaryMapIndexReader(final String fileName) throws IOException {

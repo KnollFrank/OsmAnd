@@ -26,16 +26,16 @@ class RoadPositionEquivalenceRelationProvider {
                         new RoadPositionEquivalenceRelationVisitor());
     }
 
+    public final Set<EquivalentRoadPositions> getRoadPositionEquivalenceRelation(final RouteSegmentWithEquality start) {
+        return connectedRouteSegmentsProcessor.processConnectedRouteSegments(start);
+    }
+
     private static boolean isSameRoad(final RouteSegmentWithEquality routeSegment1, final RouteSegmentWithEquality routeSegment2) {
         return isSameRoad(routeSegment1.delegate.getRoad(), routeSegment2.delegate.getRoad());
     }
 
     private static boolean isSameRoad(final RouteDataObject road1, final RouteDataObject road2) {
         return road1.id == road2.id;
-    }
-
-    public final Set<EquivalentRoadPositions> getRoadPositionEquivalenceRelation(final RouteSegmentWithEquality start) {
-        return connectedRouteSegmentsProcessor.processConnectedRouteSegments(start);
     }
 
     private static class RoadPositionEquivalenceRelationVisitor implements IConnectedRouteSegmentsVisitor<Set<EquivalentRoadPositions>> {

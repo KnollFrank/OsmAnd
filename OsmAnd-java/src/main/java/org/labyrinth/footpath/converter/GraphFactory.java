@@ -61,7 +61,15 @@ public class GraphFactory {
         return new RoadPositionEquivalenceRelationProvider(connectedRouteSegmentsProvider).getRoadPositionEquivalenceRelation(start);
     }
 
-    static class EdgesVisitor implements IConnectedRouteSegmentsVisitor<Set<Edge>> {
+    static EquivalentRoadPositions getEquivalentRoadPositions(final RoadPosition roadPosition, final Set<EquivalentRoadPositions> equivalenceRelation) {
+        return equivalenceRelation
+                .stream()
+                .filter(equivalentRoadPositions -> equivalentRoadPositions.roadPositions.contains(roadPosition))
+                .findFirst()
+                .orElseGet(() -> new EquivalentRoadPositions(ImmutableSet.of(roadPosition)));
+    }
+
+    private static class EdgesVisitor implements IConnectedRouteSegmentsVisitor<Set<Edge>> {
 
         private final Set<EquivalentRoadPositions> equivalenceRelation;
 
@@ -122,14 +130,6 @@ public class GraphFactory {
 
         private static Angle getLongitude(final RouteDataObject road, final short i) {
             return new Angle(MapUtils.get31LongitudeX(road.getPoint31XTile(i)), Angle.Unit.DEGREES);
-        }
-
-        static EquivalentRoadPositions getEquivalentRoadPositions(final RoadPosition roadPosition, final Set<EquivalentRoadPositions> equivalenceRelation) {
-            return equivalenceRelation
-                    .stream()
-                    .filter(equivalentRoadPositions -> equivalentRoadPositions.roadPositions.contains(roadPosition))
-                    .findFirst()
-                    .orElseGet(() -> new EquivalentRoadPositions(ImmutableSet.of(roadPosition)));
         }
     }
 }
