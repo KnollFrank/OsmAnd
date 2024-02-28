@@ -987,7 +987,7 @@ public class RoutePlannerFrontEnd {
 				makeStartEndPointsPrecise(res, start, end, new ArrayList<LatLon>());
 				return res;
 			}
-			ctx.calculationProgress.hhIteration(null);
+			ctx.calculationProgress.hhIteration(HHIteration.HH_NOT_STARTED);
 		} catch (SQLException e) {
 			throw new IOException(e.getMessage(), e);
 		} catch (IOException | RuntimeException e) {
@@ -1209,7 +1209,11 @@ public class RoutePlannerFrontEnd {
 		}
 		addPrecalculatedToResult(recalculationEnd, result);
 		ctx.routingTime += ctx.calculationProgress.routingCalculatedTime;
-		return new RouteResultPreparation().prepareResult(ctx, result);
+		if (hhConfig != null) {
+			return new RouteCalcResult(result); // HH: avoid double call prepareResult() (already done in C++)
+		} else {
+			return new RouteResultPreparation().prepareResult(ctx, result);
+		}
 	}
 
 	private void addPrecalculatedToResult(RouteSegment recalculationEnd, List<RouteSegmentResult> result) {
