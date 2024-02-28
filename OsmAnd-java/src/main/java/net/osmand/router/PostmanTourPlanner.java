@@ -4,8 +4,6 @@ import static net.osmand.router.BinaryRoutePlanner.FinalRouteSegment;
 import static net.osmand.router.BinaryRoutePlanner.RouteSegment;
 import static net.osmand.router.BinaryRoutePlanner.RouteSegmentPoint;
 
-import net.osmand.binary.RouteDataObject;
-
 import org.jgrapht.alg.util.Pair;
 import org.labyrinth.common.Utils;
 import org.labyrinth.footpath.converter.ConnectedRouteSegmentsProvider;
@@ -22,12 +20,8 @@ import java.util.stream.Collectors;
 
 public class PostmanTourPlanner {
 
-    /**
-     * Calculate route between start.segmentEnd and end.segmentStart (using A* algorithm)
-     * return list of segments
-     */
-    public FinalRouteSegment searchRouteInternal(final RoutingContext ctx,
-                                                 final RouteSegmentPoint start) {
+    public FinalRouteSegment searchRoute(final RoutingContext ctx,
+                                         final RouteSegmentPoint start) {
         ctx.memoryOverhead = 1000;
         final ConnectedRouteSegmentsProvider connectedRouteSegmentsProvider = new ConnectedRouteSegmentsProvider(ctx);
         final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
@@ -39,7 +33,7 @@ public class PostmanTourPlanner {
                         .getConsecutivePairs(shortestClosedPath)
                         .map(sourceTargetPair -> getEdgeFromSource2Target(graph, sourceTargetPair))
                         .flatMap(edge -> edge.routeSegments.stream())
-                        .map(this::copy)
+                        .map(PostmanTourPlanner::copy)
                         .collect(Collectors.toList());
         Utils
                 .getConsecutivePairs(routeSegments)
@@ -55,14 +49,7 @@ public class PostmanTourPlanner {
         return createFinalRouteSegment(routeSegments.get(routeSegments.size() - 1));
     }
 
-    private List<RouteSegment> copy(final List<RouteSegment> routeSegments) {
-        return routeSegments
-                .stream()
-                .map(this::copy)
-                .collect(Collectors.toList());
-    }
-
-    private RouteSegment copy(final RouteSegment routeSegment) {
+    private static RouteSegment copy(final RouteSegment routeSegment) {
         return new RouteSegment(
                 routeSegment.getRoad(),
                 routeSegment.getSegmentStart(),
@@ -75,7 +62,7 @@ public class PostmanTourPlanner {
                 .findEdgeFromSource2Target(
                         sourceTargetPair.getFirst(),
                         sourceTargetPair.getSecond())
-                .orElseThrow(() -> new NoSuchElementException(sourceTargetPair + ""));
+                .orElseThrow(() -> new NoSuchElementException(String.valueOf(sourceTargetPair)));
     }
 
     private static FinalRouteSegment createFinalRouteSegment(final RouteSegment routeSegment) {
@@ -118,13 +105,5 @@ public class PostmanTourPlanner {
                     "delegate=" + delegate +
                     '}';
         }
-    }
-
-    public static boolean isSameRoad(final RouteSegmentWithEquality routeSegment1, final RouteSegmentWithEquality routeSegment2) {
-        return isSameRoad(routeSegment1.delegate.getRoad(), routeSegment2.delegate.getRoad());
-    }
-
-    private static boolean isSameRoad(final RouteDataObject road1, final RouteDataObject road2) {
-        return road1.id == road2.id;
     }
 }

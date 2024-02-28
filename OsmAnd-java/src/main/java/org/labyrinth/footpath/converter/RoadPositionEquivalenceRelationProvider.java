@@ -1,10 +1,10 @@
 package org.labyrinth.footpath.converter;
 
-import static net.osmand.router.PostmanTourPlanner.isSameRoad;
 import static org.labyrinth.common.SetUtils.union;
 
 import com.google.common.collect.ImmutableSet;
 
+import net.osmand.binary.RouteDataObject;
 import net.osmand.router.BinaryRoutePlanner.RouteSegment;
 import net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
 
@@ -24,6 +24,14 @@ class RoadPositionEquivalenceRelationProvider {
                 new ConnectedRouteSegmentsProcessor<>(
                         connectedRouteSegmentsProvider,
                         new RoadPositionEquivalenceRelationVisitor());
+    }
+
+    private static boolean isSameRoad(final RouteSegmentWithEquality routeSegment1, final RouteSegmentWithEquality routeSegment2) {
+        return isSameRoad(routeSegment1.delegate.getRoad(), routeSegment2.delegate.getRoad());
+    }
+
+    private static boolean isSameRoad(final RouteDataObject road1, final RouteDataObject road2) {
+        return road1.id == road2.id;
     }
 
     public final Set<EquivalentRoadPositions> getRoadPositionEquivalenceRelation(final RouteSegmentWithEquality start) {

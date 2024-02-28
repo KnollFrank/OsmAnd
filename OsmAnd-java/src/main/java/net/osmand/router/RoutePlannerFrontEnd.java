@@ -1120,7 +1120,7 @@ public class RoutePlannerFrontEnd {
 			refreshProgressDistance(ctx);
 			// Split into 2 methods to let GC work in between
 			// FK-TODO: reactivate ctx.finalRouteSegment = new BinaryRoutePlanner().searchRouteInternal(ctx, start, recalculationEnd != null ? recalculationEnd : end, null);
-			ctx.finalRouteSegment = new PostmanTourPlanner().searchRouteInternal(ctx, start);
+			ctx.finalRouteSegment = new PostmanTourPlanner().searchRoute(ctx, start);
 			RouteResultPreparation rrp = new RouteResultPreparation();
 			// 4. Route is found : collect all segments and prepare result
 			List<RouteSegmentResult> result  = rrp.convertFinalSegmentToResults(ctx, ctx.finalRouteSegment);
