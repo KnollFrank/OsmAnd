@@ -5,7 +5,6 @@ import net.osmand.data.LatLon;
 import net.osmand.router.RouteResultPreparation.RouteCalcResult;
 import net.osmand.router.RoutingConfiguration.RoutingMemoryLimits;
 
-import org.apache.commons.compress.utils.Sets;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,10 +12,10 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class PostmanTourPlannerTest {
 
@@ -27,11 +26,7 @@ public class PostmanTourPlannerTest {
     }
 
     @Test
-    // @Ignore
-    public void testRouting() throws Exception {
-        // BinaryRoutePlanner.TRACE_ROUTING = true;
-        // BinaryRoutePlanner.DEBUG_BREAK_EACH_SEGMENT = true;
-        // BinaryRoutePlanner.DEBUG_PRECISE_DIST_MEASUREMENT = true;
+    public void testRoutingLabyrinth() throws Exception {
         // Given
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Labyrinth.obf");
 
@@ -46,8 +41,12 @@ public class PostmanTourPlannerTest {
 
         // Then
         Assert.assertEquals(
-                Sets.newHashSet(-1594L, -1593L),
-                getReachedSegments(routeCalcResult.getList()));
+                Arrays.asList(
+                        new RouteSegmentResultWithEquality(-101967, null, 2, 1),
+                        new RouteSegmentResultWithEquality(-101963, null, 4, 2),
+                        new RouteSegmentResultWithEquality(-101963, null, 2, 4),
+                        new RouteSegmentResultWithEquality(-101967, null, 1, 2)),
+                getRouteSegmentResultWithEqualities(routeCalcResult.getList()));
     }
 
     @Test
@@ -68,8 +67,12 @@ public class PostmanTourPlannerTest {
 
         // Then
         Assert.assertEquals(
-                Sets.newHashSet(-1594L, -1593L),
-                getReachedSegments(routeCalcResult.getList()));
+                Arrays.asList(
+                        new RouteSegmentResultWithEquality(67280568007L, "Burgstraße", 9, 10),
+                        new RouteSegmentResultWithEquality(12544617881L, null, 7, 0),
+                        new RouteSegmentResultWithEquality(12544617881L, null, 0, 7),
+                        new RouteSegmentResultWithEquality(67280568007L, "Burgstraße", 11, 10)),
+                getRouteSegmentResultWithEqualities(routeCalcResult.getList()));
     }
 
     @Test
@@ -90,8 +93,13 @@ public class PostmanTourPlannerTest {
 
         // Then
         Assert.assertEquals(
-                Sets.newHashSet(-1594L, -1593L),
-                getReachedSegments(routeCalcResult.getList()));
+                Arrays.asList(
+                        new RouteSegmentResultWithEquality(-1348, "kurzer Weg", 1, 0),
+                        new RouteSegmentResultWithEquality(-1347, "langer Weg", 1, 2),
+                        new RouteSegmentResultWithEquality(-1347, "langer Weg", 2, 0),
+                        new RouteSegmentResultWithEquality(-1347, "langer Weg", 0, 1),
+                        new RouteSegmentResultWithEquality(-1348, "kurzer Weg", 0, 1)),
+                getRouteSegmentResultWithEqualities(routeCalcResult.getList()));
     }
 
     private static BinaryMapIndexReader createBinaryMapIndexReader(final String fileName) throws IOException {
@@ -122,25 +130,23 @@ public class PostmanTourPlannerTest {
         return ctx;
     }
 
-    private static Set<Long> getReachedSegments(final List<RouteSegmentResult> routeSegments) {
-        final Set<Long> reachedSegments = new TreeSet<>();
-        int prevSegment = -1;
-        for (int i = 0; i <= routeSegments.size(); i++) {
-            if (i == routeSegments.size() || routeSegments.get(i).getTurnType() != null) {
-                if (prevSegment >= 0) {
-                    final RouteSegmentResult routeSegmentResult = routeSegments.get(prevSegment);
-                    System.out.println("segmentId: " + getSegmentId(routeSegmentResult) + " description: " + routeSegmentResult.getDescription(false));
-                }
-                prevSegment = i;
-            }
-            if (i < routeSegments.size()) {
-                reachedSegments.add(getSegmentId(routeSegments.get(i)));
-            }
+    private static void print(final List<RouteSegmentResult> routeSegmentResults) {
+        for (int i = 0; i < routeSegmentResults.size(); i++) {
+            final RouteSegmentResult routeSegmentResult = routeSegmentResults.get(i);
+            System.out.println(i + ": " + routeSegmentResult);
+            System.out.println("   description: " + routeSegmentResult.getDescription(true));
         }
-        return reachedSegments;
     }
 
-    private static long getSegmentId(RouteSegmentResult routeSegmentResult) {
-        return routeSegmentResult.getObject().getId() >> RouteResultPreparation.SHIFT_ID;
+    private static List<RouteSegmentResultWithEquality> getRouteSegmentResultWithEqualities(final List<RouteSegmentResult> routeSegmentResults) {
+        return routeSegmentResults
+                .stream()
+                .map(routeSegmentResult ->
+                        new RouteSegmentResultWithEquality(
+                                routeSegmentResult.getObject().id,
+                                routeSegmentResult.getObject().getName(),
+                                routeSegmentResult.getStartPointIndex(),
+                                routeSegmentResult.getEndPointIndex()))
+                .collect(Collectors.toList());
     }
 }
