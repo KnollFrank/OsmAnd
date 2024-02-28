@@ -274,22 +274,40 @@ public class PostmanTourPlanner {
         final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
         final Graph graph = graphFactory.createGraph(new RouteSegmentWithEquality(start));
         final Node startOfPath = graph.nodes.stream().findFirst().get();
-        final List<Node> shortestClosedPathStartingAtNode = ShortestClosedPathProvider.createShortestClosedPathStartingAtNode(graph, startOfPath);
-        final List<RouteSegment> routeSegments =
+        final List<Node> shortestClosedPath = ShortestClosedPathProvider.createShortestClosedPathStartingAtNode(graph, startOfPath);
+        List<RouteSegment> routeSegments =
                 Utils
-                        .getConsecutivePairs(shortestClosedPathStartingAtNode)
+                        .getConsecutivePairs(shortestClosedPath)
                         .map(sourceTargetPair -> getEdgeFromSource2Target(graph, sourceTargetPair))
                         .flatMap(edge -> edge.routeSegments.stream())
                         .collect(Collectors.toList());
+        routeSegments = copy(routeSegments);
         Utils
                 .getConsecutivePairs(routeSegments)
                 .forEach(
                         previous_actual_pair -> {
                             final RouteSegment previous = previous_actual_pair.getFirst();
                             final RouteSegment actual = previous_actual_pair.getSecond();
+                            if (actual.getParentRoute() != null) {
+                                System.out.println("oh, je");
+                            }
                             actual.setParentRoute(previous);
                         });
-        return createFinalRouteSegment(routeSegments.get(routeSegments.size() - 2));
+        return createFinalRouteSegment(routeSegments.get(routeSegments.size() - 1));
+    }
+
+    private List<RouteSegment> copy(final List<RouteSegment> routeSegments) {
+        return routeSegments
+                .stream()
+                .map(this::copy)
+                .collect(Collectors.toList());
+    }
+
+    private RouteSegment copy(final RouteSegment routeSegment) {
+        return new RouteSegment(
+                routeSegment.getRoad(),
+                routeSegment.getSegmentStart(),
+                routeSegment.getSegmentEnd());
     }
 
     private static Edge getEdgeFromSource2Target(final Graph graph,

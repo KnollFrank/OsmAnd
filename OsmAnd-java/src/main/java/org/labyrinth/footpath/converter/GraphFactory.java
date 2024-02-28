@@ -31,7 +31,18 @@ public class GraphFactory {
     }
 
     public Graph createGraph(final RouteSegmentWithEquality start) {
-        return org.labyrinth.footpath.graph.GraphFactory.createGraph(getEdges(start));
+        return org.labyrinth.footpath.graph.GraphFactory.createGraph(addReversedEdges(getEdges(start)));
+    }
+
+    private Set<Edge> addReversedEdges(final Set<Edge> edges) {
+        return union(edges, reverse(edges));
+    }
+
+    private static Set<Edge> reverse(final Set<Edge> edges) {
+        return edges
+                .stream()
+                .map(Edge::reverse)
+                .collect(Collectors.toSet());
     }
 
     private Set<Edge> getEdges(final RouteSegmentWithEquality start) {

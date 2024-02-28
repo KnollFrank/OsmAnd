@@ -1,9 +1,8 @@
 package org.labyrinth.footpath.graph;
 
-import com.google.common.collect.Lists;
-
 import net.osmand.router.BinaryRoutePlanner.RouteSegment;
 
+import org.labyrinth.common.ListUtils;
 import org.labyrinth.coordinate.Angle;
 
 import java.util.List;
@@ -21,10 +20,10 @@ public class Edge {
     private final Angle bearing;
 
     public Edge(final Node source, final Node target, final List<RouteSegment> routeSegments) {
-        if(source.equals(target)) {
+        if (source.equals(target)) {
             throw new IllegalArgumentException(source + " = " + target);
         }
-        if(routeSegments.isEmpty()) {
+        if (routeSegments.isEmpty()) {
             throw new IllegalArgumentException("routeSegments is empty");
         }
         this.source = source;
@@ -48,7 +47,7 @@ public class Edge {
     }
 
     public Edge reverse() {
-        return new Edge(target, source, Lists.reverse(routeSegments));
+        return new Edge(target, source, reverse(routeSegments));
     }
 
     public boolean isSource2Target(final Node source, final Node target) {
@@ -75,5 +74,18 @@ public class Edge {
         ret += "\n    Length: " + length;
         ret += "\n    Bearing: " + bearing;
         return ret;
+    }
+
+    private static List<RouteSegment> reverse(final List<RouteSegment> routeSegments) {
+        return routeSegments
+                .stream()
+                .map(Edge::reverse)
+                .collect(ListUtils.toReversedList());
+    }
+
+    private static RouteSegment reverse(final RouteSegment routeSegment) {
+        final short segmentStart = routeSegment.getSegmentEnd();
+        final short segmentEnd = routeSegment.getSegmentStart();
+        return new RouteSegment(routeSegment.getRoad(), segmentStart, segmentEnd);
     }
 }

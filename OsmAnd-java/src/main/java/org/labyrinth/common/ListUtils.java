@@ -1,9 +1,12 @@
 package org.labyrinth.common;
 
+import com.google.common.collect.Lists;
+
 import org.jgrapht.alg.util.Pair;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class ListUtils {
@@ -36,5 +39,11 @@ public class ListUtils {
                 .stream()
                 .map(Pair::getSecond)
                 .collect(Collectors.toList());
+    }
+
+    public static <T> Collector<T, ?, List<T>> toReversedList() {
+        return Collectors.collectingAndThen(
+                Collectors.toList(),
+                Lists::reverse);
     }
 }
