@@ -11,6 +11,7 @@ import org.labyrinth.footpath.converter.ConnectedRouteSegmentsProvider;
 import org.labyrinth.footpath.converter.GraphFactory;
 import org.labyrinth.footpath.core.ShortestClosedPathProvider;
 import org.labyrinth.footpath.graph.Edge;
+import org.labyrinth.footpath.graph.Edges;
 import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
 
@@ -24,9 +25,11 @@ public class PostmanTourPlanner {
     public FinalRouteSegment searchRoute(final RoutingContext ctx,
                                          final RouteSegmentPoint start) {
         ctx.memoryOverhead = 1000;
+        // FK-TODO: refactor
         final GraphFactory graphFactory = new GraphFactory(new ConnectedRouteSegmentsProvider(ctx));
         final Graph graph = graphFactory.createGraph(new RouteSegmentWithEquality(start));
-        final Node startOfPath = graph.nodes.stream().findFirst().get();
+        final Edge startEdge = Edges.getEdgeContainingRouteSegment(graph.edges, new RouteSegmentWithEquality(start));
+        final Node startOfPath = startEdge.source; // FK-TODO: oder auch startEdge.target?
         final List<Node> shortestClosedPath = ShortestClosedPathProvider.createShortestClosedPathStartingAtNode(graph, startOfPath);
         final List<RouteSegment> routeSegments = getRouteSegments(graph, shortestClosedPath);
         final RouteSegment routeSegment = connectRouteSegmentsReturnStartOfChain(routeSegments);

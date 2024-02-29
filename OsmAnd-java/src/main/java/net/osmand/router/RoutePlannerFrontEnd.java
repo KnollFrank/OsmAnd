@@ -1258,7 +1258,8 @@ public class RoutePlannerFrontEnd {
 			pringGC(ctx, true);
 			RouteCalcResult res = searchRouteInternalPrepare(ctx, points.get(0), points.get(1), routeDirection);
 			pringGC(ctx, false);
-			makeStartEndPointsPrecise(res, points.get(0).getPreciseLatLon(), points.get(1).getPreciseLatLon(), null);
+			// FK-FIXME: makeStartEndPointsPrecise() wieder aktivieren für non-PostmanTour-Fälle:
+			// makeStartEndPointsPrecise(res, points.get(0).getPreciseLatLon(), points.get(1).getPreciseLatLon(), null);
 			return res;
 		}
 
