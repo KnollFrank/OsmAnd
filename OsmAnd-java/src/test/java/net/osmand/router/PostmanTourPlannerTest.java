@@ -111,21 +111,17 @@ public class PostmanTourPlannerTest {
                 getRouteSegmentResultWithEqualities(routeSegmentResults));
     }
 
-    private static LatLon getStartOfRoute(
-            final List<RouteSegmentResult> routeSegmentResults) {
+    private static LatLon getStartOfRoute(final List<RouteSegmentResult> routeSegmentResults) {
         return routeSegmentResults.get(0).getStartPoint();
     }
 
-    private static BinaryMapIndexReader createBinaryMapIndexReader(
-            final String fileName) throws
-            IOException {
+    private static BinaryMapIndexReader createBinaryMapIndexReader(final String fileName) throws IOException {
         return new BinaryMapIndexReader(
                 new RandomAccessFile(fileName, "r"),
                 new File(fileName));
     }
 
-    private static RoutingContext createRoutingContext(final String obfFileName) throws
-            IOException {
+    private static RoutingContext createRoutingContext(final String obfFileName) throws IOException {
         final RoutingContext ctx =
                 new RoutePlannerFrontEnd()
                         .buildRoutingContext(
