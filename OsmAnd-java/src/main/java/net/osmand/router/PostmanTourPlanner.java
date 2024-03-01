@@ -6,7 +6,10 @@ import static net.osmand.router.BinaryRoutePlanner.RouteSegmentPoint;
 
 import org.jgrapht.alg.util.Pair;
 import org.labyrinth.common.ListUtils;
+import org.labyrinth.common.MeasureUtils;
 import org.labyrinth.common.Utils;
+import org.labyrinth.coordinate.Geodetic;
+import org.labyrinth.coordinate.GeodeticFactory;
 import org.labyrinth.footpath.converter.ConnectedRouteSegmentsProvider;
 import org.labyrinth.footpath.converter.GraphFactory;
 import org.labyrinth.footpath.core.ShortestClosedPathProvider;
@@ -26,14 +29,39 @@ public class PostmanTourPlanner {
                                          final RouteSegmentPoint start) {
         ctx.memoryOverhead = 1000;
         // FK-TODO: refactor
-        final GraphFactory graphFactory = new GraphFactory(new ConnectedRouteSegmentsProvider(ctx));
-        final Graph graph = graphFactory.createGraph(new RouteSegmentWithEquality(start));
-        final Edge startEdge = Edges.getEdgeContainingRouteSegment(graph.edges, new RouteSegmentWithEquality(start));
-        final Node startOfPath = startEdge.source; // FK-TODO: oder auch startEdge.target?
-        final List<Node> shortestClosedPath = ShortestClosedPathProvider.createShortestClosedPathStartingAtNode(graph, startOfPath);
+        final Graph graph = getGraph(ctx, start);
+        final Node startOfPath = getNode(start, graph);
+        final List<Node> shortestClosedPath =
+                ShortestClosedPathProvider.createShortestClosedPathStartingAtNode(
+                        graph,
+                        startOfPath);
         final List<RouteSegment> routeSegments = getRouteSegments(graph, shortestClosedPath);
         final RouteSegment routeSegment = connectRouteSegmentsReturnStartOfChain(routeSegments);
         return createFinalRouteSegment(routeSegment);
+    }
+
+    private static Graph getGraph(final RoutingContext ctx, final RouteSegmentPoint start) {
+        final GraphFactory graphFactory = new GraphFactory(new ConnectedRouteSegmentsProvider(ctx));
+        return graphFactory.createGraph(new RouteSegmentWithEquality(start));
+    }
+
+    private static Node getNode(final RouteSegmentPoint start, final Graph graph) {
+        final Edge startEdge = Edges.getEdgeContainingRouteSegment(graph.edges, new RouteSegmentWithEquality(start));
+        return getNode(start, startEdge);
+    }
+
+    private static Node getNode(final RouteSegmentPoint needle, final Edge haystack) {
+        return getNode(GeodeticFactory.createGeodetic(needle.getPreciseLatLon()), haystack);
+    }
+
+    private static Node getNode(final Geodetic needle, final Edge haystack) {
+        return matchesSourceNode(needle, haystack) ? haystack.source : haystack.target;
+    }
+
+    private static boolean matchesSourceNode(final Geodetic geodetic, final Edge edge) {
+        return MeasureUtils.isLessOrEqual(
+                geodetic.getDistanceTo(edge.source.position),
+                geodetic.getDistanceTo(edge.target.position));
     }
 
     private static RouteSegment connectRouteSegmentsReturnStartOfChain(final List<RouteSegment> routeSegments) {

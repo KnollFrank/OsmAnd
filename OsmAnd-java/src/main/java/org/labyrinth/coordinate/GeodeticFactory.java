@@ -1,6 +1,7 @@
 package org.labyrinth.coordinate;
 
 import net.osmand.Location;
+import net.osmand.data.LatLon;
 
 public class GeodeticFactory {
 
@@ -8,5 +9,11 @@ public class GeodeticFactory {
         return new Geodetic(
                 new Angle(location.getLatitude(), Angle.Unit.DEGREES),
                 new Angle(location.getLongitude(), Angle.Unit.DEGREES));
+    }
+
+    public static Geodetic createGeodetic(final LatLon latLon) {
+        return new Geodetic(
+                new Angle(latLon.getLatitude(), Angle.Unit.DEGREES),
+                new Angle(latLon.getLongitude(), Angle.Unit.DEGREES));
     }
 }

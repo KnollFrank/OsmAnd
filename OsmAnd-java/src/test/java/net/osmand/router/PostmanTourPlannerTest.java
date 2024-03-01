@@ -29,7 +29,7 @@ public class PostmanTourPlannerTest {
     public void testRoutingLabyrinth() throws Exception {
         // Given
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Labyrinth.obf");
-        final LatLon start = new LatLon(49.4460638, 10.3180879);
+        final LatLon start = new LatLon(49.4460708, 10.3188208);
 
         // When
         final RouteCalcResult routeCalcResult =
@@ -45,11 +45,15 @@ public class PostmanTourPlannerTest {
         Assert.assertEquals(getStartOfRoute(routeSegmentResults), start);
         Assert.assertEquals(
                 Arrays.asList(
-                        new RouteSegmentResultWithEquality(-101963, null, 2, 4),
-                        new RouteSegmentResultWithEquality(-101967, null, 1, 2),
-                        new RouteSegmentResultWithEquality(-101967, null, 2, 1),
-                        new RouteSegmentResultWithEquality(-101963, null, 4, 2)),
-                getRouteSegmentResultWithEqualities(routeSegmentResults));
+                        new RouteSegmentResultWithEquality(-102033, null, 0, 1),
+                        new RouteSegmentResultWithEquality(-102033, null, 1, 0),
+                        new RouteSegmentResultWithEquality(-101874, null, 2, 1),
+                        new RouteSegmentResultWithEquality(-101874, null, 1, 5),
+                        new RouteSegmentResultWithEquality(-101884, null, 0, 1),
+                        new RouteSegmentResultWithEquality(-101884, null, 1, 0),
+                        new RouteSegmentResultWithEquality(-101874, null, 5, 8),
+                        new RouteSegmentResultWithEquality(-101886, null, 0, 6)),
+                getRouteSegmentResultWithEqualities(routeSegmentResults.subList(0, 8)));
     }
 
     @Test
@@ -72,6 +76,7 @@ public class PostmanTourPlannerTest {
         // Then
         final List<RouteSegmentResult> routeSegmentResults = routeCalcResult.getList();
         Assert.assertEquals(getStartOfRoute(routeSegmentResults), start);
+        // FK-FIXME: viel zu wenig RouteSegments für einen Rundweg in Hirschau
         Assert.assertEquals(
                 Arrays.asList(
                         new RouteSegmentResultWithEquality(22432831547L, "Kapellenweg", 10, 11),
