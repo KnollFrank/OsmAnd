@@ -28,12 +28,19 @@ public class PostmanTourPlanner {
     public FinalRouteSegment searchRoute(final RoutingContext ctx,
                                          final RouteSegmentPoint start) {
         ctx.memoryOverhead = 1000;
-        final Graph graph = getGraph(ctx, start);
+        final Pair<Graph, Node> graphAndStartNode = getGraphAndStartNode(ctx, start);
+        final Graph graph = graphAndStartNode.getFirst();
+        final Node startNode = graphAndStartNode.getSecond();
         final List<Node> shortestClosedPath =
                 ShortestClosedPathProvider.createShortestClosedPathStartingAtNode(
                         graph,
-                        getNode(start, graph));
-        return getFinalRouteSegment(shortestClosedPath, graph);
+                        startNode);
+        return path2StartOfConnectedRouteSegments(shortestClosedPath, graph);
+    }
+
+    private static Pair<Graph, Node> getGraphAndStartNode(final RoutingContext ctx, final RouteSegmentPoint start) {
+        final Graph graph = getGraph(ctx, start);
+        return Pair.of(graph, getNode(start, graph));
     }
 
     private static Graph getGraph(final RoutingContext ctx, final RouteSegmentPoint start) {
@@ -61,10 +68,11 @@ public class PostmanTourPlanner {
                 geodetic.getDistanceTo(edge.target.position));
     }
 
-    private static FinalRouteSegment getFinalRouteSegment(final List<Node> shortestClosedPath, final Graph graph) {
-        final List<RouteSegment> routeSegments = getRouteSegments(shortestClosedPath, graph);
-        final RouteSegment routeSegment = connectRouteSegmentsReturnStartOfChain(routeSegments);
-        return createFinalRouteSegment(routeSegment);
+    private static FinalRouteSegment path2StartOfConnectedRouteSegments(final List<Node> path,
+                                                                        final Graph graph) {
+        return routeSegment2FinalRouteSegment(
+                connectRouteSegmentsReturnStartOfChain(
+                        path2RouteSegments(path, graph)));
     }
 
     private static RouteSegment connectRouteSegmentsReturnStartOfChain(final List<RouteSegment> routeSegments) {
@@ -87,9 +95,9 @@ public class PostmanTourPlanner {
                         });
     }
 
-    private static List<RouteSegment> getRouteSegments(final List<Node> shortestClosedPath, final Graph graph) {
+    private static List<RouteSegment> path2RouteSegments(final List<Node> path, final Graph graph) {
         return Utils
-                .getConsecutivePairs(shortestClosedPath)
+                .getConsecutivePairs(path)
                 .map(sourceTargetPair -> getEdgeFromSource2Target(graph, sourceTargetPair))
                 .flatMap(edge -> edge.routeSegments.stream())
                 .map(PostmanTourPlanner::copy)
@@ -112,7 +120,7 @@ public class PostmanTourPlanner {
                 .orElseThrow(() -> new NoSuchElementException(String.valueOf(sourceTargetPair)));
     }
 
-    private static FinalRouteSegment createFinalRouteSegment(final RouteSegment routeSegment) {
+    private static FinalRouteSegment routeSegment2FinalRouteSegment(final RouteSegment routeSegment) {
         final FinalRouteSegment finalRouteSegment =
                 new FinalRouteSegment(
                         routeSegment.getRoad(),
