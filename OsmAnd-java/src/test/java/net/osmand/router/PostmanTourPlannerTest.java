@@ -87,11 +87,10 @@ public class PostmanTourPlannerTest {
                 getRouteSegmentResultWithEqualities(routeSegmentResults));
     }
 
-    // FK-TODO: TwoPoints.osm umbenennen in T_junction.osm und in JOSM zu einem T-Buchstaben ähnlicher malen.
     @Test
-    public void testRoutingTwoPoints() throws Exception {
+    public void testRoutingT_junction() throws Exception {
         // Given
-        final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/TwoPoints.obf");
+        final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/T_junction.obf");
         final LatLon start = new LatLon(43.0257384, 9.4062576);
 
         // When
