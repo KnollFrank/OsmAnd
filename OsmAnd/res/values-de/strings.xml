@@ -5621,7 +5621,7 @@
     <string name="shared_string_additional">Zusätzlich</string>
     <string name="shared_string_activity">Aktivität</string>
     <string name="sort_subfolders">Unterordner sortieren</string>
-    <string name="sorted_sufolders_toast">Unterordner in „%1$s“ werden sortiert nach: „%2$s“</string>
+    <string name="sorted_sufolders_toast">Unterordner in „%1$s“ sind sortiert nach: „%2$s“</string>
     <string name="special_routing_cpp">Spezieller Navigationstyp</string>
     <string name="add_button">Schaltfläche hinzufügen</string>
     <string name="custom_buttons">Benutzerdefinierte Schaltflächen</string>
@@ -5633,4 +5633,10 @@
     <string name="speedometer_description">Zeigt Ihre aktuelle Geschwindigkeit an, wie sie über GPS gemeldet wird</string>
     <string name="shared_string_speedometer">Geschwindigkeitsmesser</string>
     <string name="help_article_setup_a_route_name">Route einrichten</string>
+    <string name="rendering_value_access_name">Nach Zugangsart</string>
+    <string name="rendering_value_managerName_name">Nach Name der Verwaltung</string>
+    <string name="rendering_attr_padusHideBoundaries_name">Grenzen von öffentlichem Land ausblenden</string>
+    <string name="rendering_attr_padusHideBoundaries_description">Grenzen von öffentlichem Land ausblenden, aber Gebiete belassen</string>
+    <string name="rendering_attr_padusDisplayMode_description">Nach Zugangsart oder Name der Verwaltung</string>
+    <string name="rendering_attr_padusDisplayMode_name">Anzeigemodus für öffentliche Flächen</string>
 </resources>
