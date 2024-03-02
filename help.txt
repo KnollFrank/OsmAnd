@@ -1,5 +1,6 @@
 frankknoll@frankknoll-XPS-13-9370:~/AndroidStudioProjects/OsmAnd/android/OsmAnd
 ../gradlew assembleNightlyFreeOpenglArm64Debug
+../gradlew assembleNightlyFreeOpenglArm64Debug --refresh-dependencies
 ../gradlew assembleNightlyFreeLegacyFatDebug
 
 RouteDataObject
