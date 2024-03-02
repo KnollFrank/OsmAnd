@@ -12,6 +12,7 @@ import net.osmand.util.MapUtils;
 import org.labyrinth.coordinate.Angle;
 import org.labyrinth.coordinate.Geodetic;
 import org.labyrinth.footpath.graph.Edge;
+import org.labyrinth.footpath.graph.Edges;
 import org.labyrinth.footpath.graph.EquivalentRoadPositions;
 import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
@@ -35,14 +36,7 @@ public class GraphFactory {
     }
 
     private Set<Edge> addReversedEdges(final Set<Edge> edges) {
-        return union(edges, reverse(edges));
-    }
-
-    private static Set<Edge> reverse(final Set<Edge> edges) {
-        return edges
-                .stream()
-                .map(Edge::reverse)
-                .collect(Collectors.toSet());
+        return union(edges, Edges.reverse(edges));
     }
 
     private Set<Edge> getEdges(final RouteSegmentWithEquality start) {

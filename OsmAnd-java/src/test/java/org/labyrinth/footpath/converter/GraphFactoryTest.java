@@ -1,5 +1,6 @@
 package org.labyrinth.footpath.converter;
 
+import static org.labyrinth.common.SetUtils.union;
 import static org.labyrinth.footpath.converter.GraphFactory.getEquivalentRoadPositions;
 
 import com.google.common.collect.ImmutableSet;
@@ -14,6 +15,7 @@ import org.junit.Test;
 import org.labyrinth.coordinate.Angle;
 import org.labyrinth.coordinate.Geodetic;
 import org.labyrinth.footpath.graph.Edge;
+import org.labyrinth.footpath.graph.Edges;
 import org.labyrinth.footpath.graph.EquivalentRoadPositions;
 import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
@@ -69,12 +71,14 @@ public class GraphFactoryTest {
         final Node kingersheimerStrasse_2 = getEndNode(kingersheimerStrasse_1_2, equivalenceRelation);
         final Node kreuzlingerWeg_12 = getStartNode(kreuzlingerWeg_12_11, equivalenceRelation);
         final Node kreuzlingerWeg_11 = getEndNode(kreuzlingerWeg_12_11, equivalenceRelation);
+        final Set<Edge> edges =
+                ImmutableSet.of(
+                        new Edge(kingersheimerStrasse_0, kingersheimerStrasse_1, Arrays.asList(kingersheimerStrasse_0_1)),
+                        new Edge(kingersheimerStrasse_1, kingersheimerStrasse_2, Arrays.asList(kingersheimerStrasse_1_2)),
+                        new Edge(kreuzlingerWeg_12, kreuzlingerWeg_11, Arrays.asList(kreuzlingerWeg_12_11)));
         final Graph graphExpected =
                 org.labyrinth.footpath.graph.GraphFactory.createGraph(
-                        ImmutableSet.of(
-                                new Edge(kingersheimerStrasse_0, kingersheimerStrasse_1, Arrays.asList(kingersheimerStrasse_0_1)),
-                                new Edge(kingersheimerStrasse_1, kingersheimerStrasse_2, Arrays.asList(kingersheimerStrasse_1_2)),
-                                new Edge(kreuzlingerWeg_12, kreuzlingerWeg_11, Arrays.asList(kreuzlingerWeg_12_11))));
+                        union(edges, Edges.reverse(edges)));
         GraphUtils.assertActualEqualsExpected(graph, graphExpected);
     }
 
@@ -117,12 +121,14 @@ public class GraphFactoryTest {
         final Node kingersheimerStrasse_1 = getEndNode(kingersheimerStrasse_0_1, equivalenceRelation);
         final Node kingersheimerStrasse_2 = getEndNode(kingersheimerStrasse_1_2, equivalenceRelation);
         final Node kingersheimerStrasse_3 = getEndNode(kingersheimerStrasse_2_3, equivalenceRelation);
+        final Set<Edge> edges =
+                ImmutableSet.of(
+                        new Edge(kingersheimerStrasse_0, kingersheimerStrasse_1, Arrays.asList(kingersheimerStrasse_0_1)),
+                        new Edge(kingersheimerStrasse_1, kingersheimerStrasse_2, Arrays.asList(kingersheimerStrasse_1_2)),
+                        new Edge(kingersheimerStrasse_2, kingersheimerStrasse_3, Arrays.asList(kingersheimerStrasse_2_3)));
         final Graph graphExpected =
                 org.labyrinth.footpath.graph.GraphFactory.createGraph(
-                        ImmutableSet.of(
-                                new Edge(kingersheimerStrasse_0, kingersheimerStrasse_1, Arrays.asList(kingersheimerStrasse_0_1)),
-                                new Edge(kingersheimerStrasse_1, kingersheimerStrasse_2, Arrays.asList(kingersheimerStrasse_1_2)),
-                                new Edge(kingersheimerStrasse_2, kingersheimerStrasse_3, Arrays.asList(kingersheimerStrasse_2_3))));
+                        union(edges, Edges.reverse(edges)));
         GraphUtils.assertActualEqualsExpected(graph, graphExpected);
     }
 
