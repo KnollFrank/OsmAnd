@@ -1,9 +1,12 @@
 package org.labyrinth.osmand;
 
+import com.google.common.collect.ImmutableSet;
+
 import net.osmand.Location;
 
 import org.labyrinth.coordinate.GeodeticFactory;
 import org.labyrinth.coordinate.LocationExtension;
+import org.labyrinth.footpath.graph.EquivalentRoadPositions;
 import org.labyrinth.footpath.graph.Node;
 import org.labyrinth.footpath.graph.PathPosition;
 import org.labyrinth.footpath.graph.RoadPosition;
@@ -29,7 +32,7 @@ class Converters {
 
     private static Node asNode(final int id, final Location location) {
         return new Node(
-                new RoadPosition(-1, id),
+                new EquivalentRoadPositions(ImmutableSet.of(new RoadPosition(-1, id))),
                 GeodeticFactory.createGeodetic(location));
     }
 }
