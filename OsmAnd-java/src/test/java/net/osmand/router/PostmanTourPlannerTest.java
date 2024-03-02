@@ -60,6 +60,7 @@ public class PostmanTourPlannerTest {
     public void testRoutingHirschau() throws Exception {
         // Given
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Hirschau.obf");
+        // Kapellenweg:
         final LatLon start = new LatLon(48.501619, 8.9929844);
 
         // When
@@ -67,7 +68,6 @@ public class PostmanTourPlannerTest {
                 new RoutePlannerFrontEnd()
                         .searchRoute(
                                 routingContext,
-                                // Kapellenweg:
                                 start,
                                 // Hofweg:
                                 new LatLon(48.5017172, 8.9933938),

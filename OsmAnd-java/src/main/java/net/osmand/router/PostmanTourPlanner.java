@@ -87,10 +87,6 @@ public class PostmanTourPlanner {
                         previous_actual_pair -> {
                             final RouteSegment previous = previous_actual_pair.getFirst();
                             final RouteSegment actual = previous_actual_pair.getSecond();
-                            if (actual.getParentRoute() != null) {
-                                // FK-TODO: remove:
-                                System.out.println("oh, je");
-                            }
                             actual.setParentRoute(previous);
                         });
     }
