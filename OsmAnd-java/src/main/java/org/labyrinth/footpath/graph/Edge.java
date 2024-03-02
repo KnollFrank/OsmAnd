@@ -16,8 +16,8 @@ public class Edge {
     public final Node source;
     public final Node target;
     public final List<RouteSegment> routeSegments;
-    private final Quantity<Length> length;
-    private final Angle bearing;
+    private Quantity<Length> length;
+    private Angle bearing;
 
     public Edge(final Node source, final Node target, final List<RouteSegment> routeSegments) {
         if (source.equals(target)) {
@@ -29,16 +29,19 @@ public class Edge {
         this.source = source;
         this.target = target;
         this.routeSegments = routeSegments;
-        // FK-TODO: Nach Performancemessung vielleicht length und bearing nicht sofort berechnen, sondern in den getter-Methoden getLength() und getCompDir() cachen. Dann auch in toString() diese Getter-Methoden verwenden anstelle der entsprechenden Instanzvariablen.
-        this.length = source.getDistanceTo(target);
-        this.bearing = source.getBearing(target);
     }
 
     public Angle getDirection() {
+        if (bearing == null) {
+            bearing = source.getBearing(target);
+        }
         return bearing;
     }
 
     public Quantity<Length> getLength() {
+        if (length == null) {
+            length = source.getDistanceTo(target);
+        }
         return length;
     }
 
@@ -71,8 +74,8 @@ public class Edge {
     @Override
     public String toString() {
         String ret = "\nEdge(" + source.id + " to " + target.id + "): ";
-        ret += "\n    Length: " + length;
-        ret += "\n    Bearing: " + bearing;
+        ret += "\n    Length: " + getLength();
+        ret += "\n    Bearing: " + getDirection();
         return ret;
     }
 
