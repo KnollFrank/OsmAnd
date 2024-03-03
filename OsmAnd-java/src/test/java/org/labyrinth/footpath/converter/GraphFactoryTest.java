@@ -9,11 +9,8 @@ import net.osmand.binary.BinaryMapRouteReaderAdapter.RouteRegion;
 import net.osmand.binary.RouteDataObject;
 import net.osmand.router.BinaryRoutePlanner.RouteSegment;
 import net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
-import net.osmand.util.MapUtils;
 
 import org.junit.Test;
-import org.labyrinth.coordinate.Angle;
-import org.labyrinth.coordinate.Geodetic;
 import org.labyrinth.footpath.graph.Edge;
 import org.labyrinth.footpath.graph.Edges;
 import org.labyrinth.footpath.graph.EquivalentRoadPositions;
@@ -135,29 +132,13 @@ public class GraphFactoryTest {
     private static Node getStartNode(final RouteSegment routeSegment, final Set<EquivalentRoadPositions> equivalenceRelation) {
         return new Node(
                 getEquivalentRoadPositions(new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentStart()), equivalenceRelation),
-                getGeodetic(routeSegment, routeSegment.getSegmentStart()));
+                RouteSegment2Geodetic.getGeodetic(routeSegment, routeSegment.getSegmentStart()));
     }
 
     private static Node getEndNode(final RouteSegment routeSegment, final Set<EquivalentRoadPositions> equivalenceRelation) {
         return new Node(
                 getEquivalentRoadPositions(new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentEnd()), equivalenceRelation),
-                getGeodetic(routeSegment, routeSegment.getSegmentEnd()));
-    }
-
-    private static Geodetic getGeodetic(final RouteSegment routeSegment, final short i) {
-        return getGeodetic(routeSegment.getRoad(), i);
-    }
-
-    private static Geodetic getGeodetic(final RouteDataObject road, final short i) {
-        return new Geodetic(getLatitude(road, i), getLongitude(road, i));
-    }
-
-    private static Angle getLatitude(final RouteDataObject road, final short i) {
-        return new Angle(MapUtils.get31LatitudeY(road.getPoint31YTile(i)), Angle.Unit.DEGREES);
-    }
-
-    private static Angle getLongitude(final RouteDataObject road, final short i) {
-        return new Angle(MapUtils.get31LongitudeX(road.getPoint31XTile(i)), Angle.Unit.DEGREES);
+                RouteSegment2Geodetic.getGeodetic(routeSegment, routeSegment.getSegmentEnd()));
     }
 
     static RouteDataObject createRouteDataObject(final int id, final String name) {

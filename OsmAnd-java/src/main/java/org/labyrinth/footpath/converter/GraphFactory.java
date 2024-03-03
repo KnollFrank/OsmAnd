@@ -5,12 +5,8 @@ import static org.labyrinth.common.SetUtils.union;
 
 import com.google.common.collect.ImmutableSet;
 
-import net.osmand.binary.RouteDataObject;
 import net.osmand.router.BinaryRoutePlanner.RouteSegment;
-import net.osmand.util.MapUtils;
 
-import org.labyrinth.coordinate.Angle;
-import org.labyrinth.coordinate.Geodetic;
 import org.labyrinth.footpath.graph.Edge;
 import org.labyrinth.footpath.graph.Edges;
 import org.labyrinth.footpath.graph.EquivalentRoadPositions;
@@ -107,23 +103,7 @@ public class GraphFactory {
         private Node getNode(final RouteSegment routeSegment, final short position) {
             return new Node(
                     getEquivalentRoadPositions(new RoadPosition(routeSegment.getRoad().id, position), equivalenceRelation),
-                    getGeodetic(routeSegment, position));
-        }
-
-        private static Geodetic getGeodetic(final RouteSegment routeSegment, final short i) {
-            return getGeodetic(routeSegment.getRoad(), i);
-        }
-
-        private static Geodetic getGeodetic(final RouteDataObject road, final short i) {
-            return new Geodetic(getLatitude(road, i), getLongitude(road, i));
-        }
-
-        private static Angle getLatitude(final RouteDataObject road, final short i) {
-            return new Angle(MapUtils.get31LatitudeY(road.getPoint31YTile(i)), Angle.Unit.DEGREES);
-        }
-
-        private static Angle getLongitude(final RouteDataObject road, final short i) {
-            return new Angle(MapUtils.get31LongitudeX(road.getPoint31XTile(i)), Angle.Unit.DEGREES);
+                    RouteSegment2Geodetic.getGeodetic(routeSegment, position));
         }
     }
 }

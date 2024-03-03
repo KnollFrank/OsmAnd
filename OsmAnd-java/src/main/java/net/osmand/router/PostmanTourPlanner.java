@@ -3,6 +3,9 @@ package net.osmand.router;
 import static net.osmand.router.BinaryRoutePlanner.FinalRouteSegment;
 import static net.osmand.router.BinaryRoutePlanner.RouteSegment;
 import static net.osmand.router.BinaryRoutePlanner.RouteSegmentPoint;
+import static tec.units.ri.quantity.Quantities.getQuantity;
+import static tec.units.ri.unit.MetricPrefix.KILO;
+import static tec.units.ri.unit.Units.METRE;
 
 import org.jgrapht.alg.util.Pair;
 import org.labyrinth.common.ListUtils;
@@ -10,8 +13,11 @@ import org.labyrinth.common.MeasureUtils;
 import org.labyrinth.common.Utils;
 import org.labyrinth.coordinate.Geodetic;
 import org.labyrinth.coordinate.GeodeticFactory;
+import org.labyrinth.footpath.converter.Circle;
 import org.labyrinth.footpath.converter.ConnectedRouteSegmentsProvider;
+import org.labyrinth.footpath.converter.ConnectedRouteSegmentsWithinAreaProvider;
 import org.labyrinth.footpath.converter.GraphFactory;
+import org.labyrinth.footpath.converter.RouteSegmentWithinCirclePredicate;
 import org.labyrinth.footpath.core.ShortestClosedPathProvider;
 import org.labyrinth.footpath.graph.Edge;
 import org.labyrinth.footpath.graph.Edges;
@@ -25,8 +31,7 @@ import java.util.stream.Collectors;
 
 public class PostmanTourPlanner {
 
-    public FinalRouteSegment searchRoute(final RoutingContext ctx,
-                                         final RouteSegmentPoint start) {
+    public FinalRouteSegment searchRoute(final RoutingContext ctx, final RouteSegmentPoint start) {
         ctx.memoryOverhead = 1000;
         final Pair<Graph, Node> graphAndStartNode = getGraphAndStartNode(ctx, start);
         final Graph graph = graphAndStartNode.getFirst();
@@ -44,8 +49,17 @@ public class PostmanTourPlanner {
     }
 
     private static Graph getGraph(final RoutingContext ctx, final RouteSegmentPoint start) {
-        final GraphFactory graphFactory = new GraphFactory(new ConnectedRouteSegmentsProvider(ctx));
-        return graphFactory.createGraph(new RouteSegmentWithEquality(start));
+        return createGraphFactory(ctx, start).createGraph(new RouteSegmentWithEquality(start));
+    }
+
+    private static GraphFactory createGraphFactory(final RoutingContext ctx, final RouteSegmentPoint start) {
+        return new GraphFactory(
+                new ConnectedRouteSegmentsWithinAreaProvider(
+                        new ConnectedRouteSegmentsProvider(ctx),
+                        new RouteSegmentWithinCirclePredicate(
+                                new Circle(
+                                        GeodeticFactory.createGeodetic(start.getPreciseLatLon()),
+                                        getQuantity(5.0, KILO(METRE))))));
     }
 
     private static Node getNode(final RouteSegmentPoint routeSegmentPoint, final Graph graph) {
