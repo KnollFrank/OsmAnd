@@ -50,7 +50,9 @@ class ConnectedRouteSegmentsProcessor<T> {
 
     private Pair<T, Set<RouteSegmentWithEquality>> getTAndRouteSegments(final RouteSegmentWithEquality start) {
         final Set<RouteSegmentWithEquality> routeSegments = connectedRouteSegmentsProvider.getConnectedRouteSegments(start);
-        return Pair.of(connectedRouteSegmentsVisitor.processConnectedRouteSegments(start, routeSegments), routeSegments);
+        return Pair.of(
+                connectedRouteSegmentsVisitor.processConnectedRouteSegments(start, routeSegments),
+                routeSegments);
     }
 
     private T getT(final List<Pair<T, Set<RouteSegmentWithEquality>>> tAndRouteSegmentsList) {
