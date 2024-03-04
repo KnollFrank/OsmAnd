@@ -23,9 +23,6 @@ public class Edge {
         if (source.equals(target)) {
             throw new IllegalArgumentException(source + " = " + target);
         }
-        if (routeSegments.isEmpty()) {
-            throw new IllegalArgumentException("routeSegments is empty");
-        }
         this.source = source;
         this.target = target;
         this.routeSegments = routeSegments;
