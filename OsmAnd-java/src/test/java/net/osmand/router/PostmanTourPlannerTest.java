@@ -119,12 +119,6 @@ public class PostmanTourPlannerTest {
         return routeSegmentResults.get(0).getStartPoint();
     }
 
-    private static BinaryMapIndexReader createBinaryMapIndexReader(final String fileName) throws IOException {
-        return new BinaryMapIndexReader(
-                new RandomAccessFile(fileName, "r"),
-                new File(fileName));
-    }
-
     private static RoutingContext createRoutingContext(final String obfFileName) throws IOException {
         final RoutingContext ctx =
                 new RoutePlannerFrontEnd()
@@ -145,6 +139,12 @@ public class PostmanTourPlannerTest {
                                 RoutePlannerFrontEnd.RouteCalculationMode.NORMAL);
         ctx.leftSideNavigation = false;
         return ctx;
+    }
+
+    private static BinaryMapIndexReader createBinaryMapIndexReader(final String fileName) throws IOException {
+        return new BinaryMapIndexReader(
+                new RandomAccessFile(fileName, "r"),
+                new File(fileName));
     }
 
     private static void print(final List<RouteSegmentResult> routeSegmentResults) {
