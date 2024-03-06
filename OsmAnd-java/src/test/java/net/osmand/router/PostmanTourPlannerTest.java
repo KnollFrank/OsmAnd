@@ -1,5 +1,9 @@
 package net.osmand.router;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
+
 import net.osmand.binary.BinaryMapIndexReader;
 import net.osmand.data.LatLon;
 import net.osmand.router.RouteResultPreparation.RouteCalcResult;
@@ -61,7 +65,7 @@ public class PostmanTourPlannerTest {
         // Given
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Hirschau.obf");
         // Kapellenweg:
-        final LatLon start = new LatLon(48.501619, 8.9929844);
+        final LatLon start = new LatLon(48.5017172, 8.9933938);
 
         // When
         final RouteCalcResult routeCalcResult =
@@ -75,16 +79,22 @@ public class PostmanTourPlannerTest {
 
         // Then
         final List<RouteSegmentResult> routeSegmentResults = routeCalcResult.getList();
-        Assert.assertEquals(getStartOfRoute(routeSegmentResults), start);
-        // FK-FIXME: viel zu wenig RouteSegments für einen Rundweg in Hirschau
-        Assert.assertEquals(
-                Arrays.asList(
-                        new RouteSegmentResultWithEquality(22432831547L, "Kapellenweg", 10, 11),
-                        new RouteSegmentResultWithEquality(73829969825L, null, 1, 0),
-                        new RouteSegmentResultWithEquality(73829969825L, null, 0, 1),
-                        new RouteSegmentResultWithEquality(22432831547L, "Kapellenweg", 11, 15),
-                        new RouteSegmentResultWithEquality(22432831547L, "Kapellenweg", 15, 10)),
-                getRouteSegmentResultWithEqualities(routeSegmentResults));
+        assertThat(getStartOfRoute(routeSegmentResults), is(start));
+        assertThat(
+                getRouteSegmentResultWithEqualities(routeSegmentResults),
+                hasItems(
+                        new RouteSegmentResultWithEquality(305275763L, "Hofweg", 6, 7),
+                        new RouteSegmentResultWithEquality(66633789123L, "Hofweg", 0, 2),
+                        new RouteSegmentResultWithEquality(12544617511L, "Kingersheimer Straße", 6, 7),
+                        new RouteSegmentResultWithEquality(67343327585L, "Kirchplatz", 0, 5),
+                        new RouteSegmentResultWithEquality(43742393661L, null, 1, 0),
+                        new RouteSegmentResultWithEquality(43742393661L, null, 0, 1),
+                        new RouteSegmentResultWithEquality(67343327585L, "Kirchplatz", 5, 7),
+                        new RouteSegmentResultWithEquality(305273305L, "Kirchplatz", 0, 8),
+                        new RouteSegmentResultWithEquality(58331930311L, null, 0, 1),
+                        new RouteSegmentResultWithEquality(58331930311L, null, 1, 0),
+                        new RouteSegmentResultWithEquality(305273305L, "Kirchplatz", 8, 10),
+                        new RouteSegmentResultWithEquality(70755014031L, null, 1, 0)));
     }
 
     @Test

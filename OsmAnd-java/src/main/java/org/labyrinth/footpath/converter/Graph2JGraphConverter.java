@@ -11,7 +11,7 @@ import org.labyrinth.footpath.graph.Node;
 
 public class Graph2JGraphConverter {
 
-    public org.jgrapht.Graph<Node, DefaultWeightedEdge> convert(final Graph graph) {
+    public static org.jgrapht.Graph<Node, DefaultWeightedEdge> convert(final Graph graph) {
         final org.jgrapht.Graph<Node, DefaultWeightedEdge> jgraph = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
         for (final Edge edge : graph.edges) {
             Graphs.addEdgeWithVertices(
