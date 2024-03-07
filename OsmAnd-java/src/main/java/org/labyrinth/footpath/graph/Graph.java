@@ -39,6 +39,14 @@ public class Graph {
     }
 
     @Override
+    public String toString() {
+        return "Graph{" +
+                "nodes=" + nodes +
+                ", edges=" + edges +
+                '}';
+    }
+
+    @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
