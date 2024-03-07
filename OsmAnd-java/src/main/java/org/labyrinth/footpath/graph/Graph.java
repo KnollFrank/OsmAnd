@@ -1,5 +1,6 @@
 package org.labyrinth.footpath.graph;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -35,5 +36,18 @@ public class Graph {
                 .stream()
                 .filter(edge -> edge.isSource2Target(source, target))
                 .findFirst();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final Graph graph = (Graph) o;
+        return Objects.equals(nodes, graph.nodes) && Objects.equals(edges, graph.edges);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nodes, edges);
     }
 }
