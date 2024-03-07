@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.closeTo;
 import static org.labyrinth.common.MeasureUtils.toMetres;
 
 import net.osmand.router.BinaryRoutePlanner.RouteSegment;
-import net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
+import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import org.labyrinth.coordinate.Angle;
 import org.labyrinth.footpath.graph.Edge;

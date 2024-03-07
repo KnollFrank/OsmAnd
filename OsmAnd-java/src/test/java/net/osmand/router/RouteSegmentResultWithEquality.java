@@ -2,17 +2,17 @@ package net.osmand.router;
 
 import java.util.Objects;
 
-class RouteSegmentResultWithEquality {
+public class RouteSegmentResultWithEquality {
 
     private final long road;
     private final String roadName;
     private final int startPointIndex;
     private final int endPointIndex;
 
-    RouteSegmentResultWithEquality(final long road,
-                                   final String roadName,
-                                   final int startPointIndex,
-                                   final int endPointIndex) {
+    public RouteSegmentResultWithEquality(final long road,
+                                          final String roadName,
+                                          final int startPointIndex,
+                                          final int endPointIndex) {
         this.road = road;
         this.roadName = roadName;
         this.startPointIndex = startPointIndex;

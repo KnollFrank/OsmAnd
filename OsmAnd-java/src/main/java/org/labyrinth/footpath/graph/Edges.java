@@ -4,7 +4,7 @@ import static org.labyrinth.common.MeasureUtils.sum;
 
 import com.google.common.collect.MoreCollectors;
 
-import net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
+import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import java.util.List;
 import java.util.Set;

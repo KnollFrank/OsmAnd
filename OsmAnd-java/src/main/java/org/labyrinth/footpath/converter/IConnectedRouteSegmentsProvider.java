@@ -1,6 +1,6 @@
 package org.labyrinth.footpath.converter;
 
-import net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
+import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import java.util.Set;
 

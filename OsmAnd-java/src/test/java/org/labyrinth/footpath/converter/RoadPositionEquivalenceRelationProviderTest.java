@@ -7,7 +7,7 @@ import static org.labyrinth.footpath.converter.GraphFactoryTest.createRouteDataO
 import com.google.common.collect.ImmutableSet;
 
 import net.osmand.router.BinaryRoutePlanner.RouteSegment;
-import net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
+import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import org.junit.Test;
 import org.labyrinth.footpath.graph.EquivalentRoadPositions;

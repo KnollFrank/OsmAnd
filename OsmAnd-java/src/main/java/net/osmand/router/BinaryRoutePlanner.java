@@ -1,15 +1,7 @@
 package net.osmand.router;
 
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
-
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.PriorityQueue;
+import static net.osmand.router.RoutePlannerFrontEnd.GpxPoint;
+import static net.osmand.router.RoutePlannerFrontEnd.RouteCalculationMode;
 
 import net.osmand.PlatformUtil;
 import net.osmand.binary.RouteDataObject;
@@ -19,7 +11,16 @@ import net.osmand.util.MapUtils;
 
 import org.apache.commons.logging.Log;
 
-import static net.osmand.router.RoutePlannerFrontEnd.*;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.PriorityQueue;
+
+import gnu.trove.map.TLongObjectMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
 
 public class BinaryRoutePlanner {
 
@@ -1212,7 +1213,7 @@ public class BinaryRoutePlanner {
 		
 	}
 
-	static class FinalRouteSegment extends RouteSegment {
+	public static class FinalRouteSegment extends RouteSegment {
 
 		boolean reverseWaySearch;
 		RouteSegment opposite;

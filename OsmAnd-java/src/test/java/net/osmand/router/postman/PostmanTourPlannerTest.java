@@ -1,4 +1,4 @@
-package net.osmand.router;
+package net.osmand.router.postman;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
@@ -6,8 +6,14 @@ import static org.hamcrest.Matchers.is;
 
 import net.osmand.binary.BinaryMapIndexReader;
 import net.osmand.data.LatLon;
+import net.osmand.router.RoutePlannerFrontEnd;
+import net.osmand.router.RouteResultPreparation;
 import net.osmand.router.RouteResultPreparation.RouteCalcResult;
+import net.osmand.router.RouteSegmentResult;
+import net.osmand.router.RouteSegmentResultWithEquality;
+import net.osmand.router.RoutingConfiguration;
 import net.osmand.router.RoutingConfiguration.RoutingMemoryLimits;
+import net.osmand.router.RoutingContext;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -26,7 +32,7 @@ public class PostmanTourPlannerTest {
     @BeforeClass
     public static void setUp() {
         RouteResultPreparation.PRINT_TO_CONSOLE_ROUTE_INFORMATION_TO_TEST = true;
-        BinaryRoutePlanner.TRACE_ROUTING = true;
+        // BinaryRoutePlanner.TRACE_ROUTING = true;
     }
 
     @Test
@@ -129,7 +135,7 @@ public class PostmanTourPlannerTest {
         return routeSegmentResults.get(0).getStartPoint();
     }
 
-    private static RoutingContext createRoutingContext(final String obfFileName) throws IOException {
+    static RoutingContext createRoutingContext(final String obfFileName) throws IOException {
         final RoutingContext ctx =
                 new RoutePlannerFrontEnd()
                         .buildRoutingContext(

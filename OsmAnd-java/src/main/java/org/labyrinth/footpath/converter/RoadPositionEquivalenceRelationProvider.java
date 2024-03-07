@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableSet;
 
 import net.osmand.binary.RouteDataObject;
 import net.osmand.router.BinaryRoutePlanner.RouteSegment;
-import net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
+import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import org.labyrinth.footpath.graph.EquivalentRoadPositions;
 import org.labyrinth.footpath.graph.RoadPosition;

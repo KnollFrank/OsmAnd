@@ -5,8 +5,8 @@ import com.google.common.collect.Iterators;
 
 import net.osmand.binary.RouteDataObject;
 import net.osmand.router.BinaryRoutePlanner.RouteSegment;
-import net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
 import net.osmand.router.RoutingContext;
+import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -38,11 +38,20 @@ public class ConnectedRouteSegmentsProvider implements IConnectedRouteSegmentsPr
     private RouteSegment loadConnectedRouteSegment(final RouteSegment routeSegment) {
         final RouteDataObject road = routeSegment.getRoad();
         final short segmentEnd = routeSegment.getSegmentEnd();
-        return routingContext.loadRouteSegment(
-                road.getPoint31XTile(segmentEnd),
-                road.getPoint31YTile(segmentEnd),
-                0,
-                false);
+        final RouteSegment routeSegmentEnd =
+                routingContext.loadRouteSegment(
+                        road.getPoint31XTile(segmentEnd),
+                        road.getPoint31YTile(segmentEnd),
+                        0,
+                        false);
+        final short segmentStart = routeSegment.getSegmentStart();
+        final RouteSegment routeSegmentStart =
+                routingContext.loadRouteSegment(
+                        road.getPoint31XTile(segmentStart),
+                        road.getPoint31YTile(segmentStart),
+                        0,
+                        false);
+        return routeSegmentEnd;
     }
 
     private static Set<RouteSegmentWithEquality> _getConnectedRouteSegments(final RouteSegmentWithEquality routeSegment) {

@@ -1,11 +1,11 @@
 package org.labyrinth.footpath.converter;
 
-import static net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
 import static org.labyrinth.common.SetUtils.union;
 
 import com.google.common.collect.ImmutableSet;
 
 import net.osmand.router.BinaryRoutePlanner.RouteSegment;
+import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import org.labyrinth.footpath.graph.Edge;
 import org.labyrinth.footpath.graph.Edges;

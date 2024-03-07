@@ -2,7 +2,7 @@ package org.labyrinth.footpath.converter;
 
 import static org.labyrinth.common.SetUtils.union;
 
-import net.osmand.router.PostmanTourPlanner.RouteSegmentWithEquality;
+import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import org.jgrapht.alg.util.Pair;
 import org.labyrinth.common.ListUtils;
