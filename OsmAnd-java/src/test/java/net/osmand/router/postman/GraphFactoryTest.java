@@ -37,7 +37,7 @@ public class GraphFactoryTest {
     }
 
     @Test
-    public void testRoutingT_junction() throws Exception {
+    public void test_getGraphAndStartNode_T_junction() throws Exception {
         // Given
         final LatLon start = new LatLon(43.0257384, 9.4062576);
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/T_junction.obf");
@@ -57,41 +57,54 @@ public class GraphFactoryTest {
         final Graph graph = graphAndStartNode.getFirst();
         final Node startNode = graphAndStartNode.getSecond();
         assertThat(getTallestConnectedSet(graph).contains(startNode), is(true));
-        // assertThat("number of connected sets: " + connectedSets.size() + "", connectivityInspector.isConnected(), is(true));
-        final Node node0 =
-                new Node(
-                        new EquivalentRoadPositions(
-                                ImmutableSet.of(
-                                        new RoadPosition(-1348, 1))),
-                        GeodeticFactory.createGeodetic(new LatLon(43.025719777334494, 9.405868649482727)));
-        final Node node1 =
-                new Node(
-                        new EquivalentRoadPositions(
-                                ImmutableSet.of(
-                                        new RoadPosition(-1347, 1),
-                                        new RoadPosition(-1348, 0))),
-                        GeodeticFactory.createGeodetic(new LatLon(43.02591193760422, 9.406225383281708)));
-        final Node node2 =
-                new Node(
-                        new EquivalentRoadPositions(
-                                ImmutableSet.of(
-                                        new RoadPosition(-1347, 0))),
-                        GeodeticFactory.createGeodetic(new LatLon(43.02573938555285, 9.406254887580872)));
-        final Node node3 =
-                new Node(
-                        new EquivalentRoadPositions(
-                                ImmutableSet.of(
-                                        new RoadPosition(-1347, 2))),
-                        GeodeticFactory.createGeodetic(new LatLon(43.02598056612619, 9.406008124351501)));
-        final Edge edge0 = new Edge(node0, node1, null);
-        final Edge edge1 = new Edge(node2, node1, null);
-        final Edge edge2 = new Edge(node3, node1, null);
-        final Edge edge3 = new Edge(node1, node0, null);
-        final Edge edge4 = new Edge(node1, node2, null);
-        final Edge edge5 = new Edge(node1, node3, null);
-        final Graph graph1 = org.labyrinth.footpath.graph.GraphFactory.createGraph(
-                ImmutableSet.of(edge0, edge1, edge2, edge3, edge4, edge5));
-        assertThat(graph, is(graph1));
+        assertThat(startNode, is(node2()));
+        // node3---node1---node2
+        //           |
+        //           |
+        //         node0
+        final Graph graphExpected =
+                org.labyrinth.footpath.graph.GraphFactory.createGraph(
+                        ImmutableSet.of(
+                                new Edge(node0(), node1(), null),
+                                new Edge(node2(), node1(), null),
+                                new Edge(node3(), node1(), null),
+                                new Edge(node1(), node0(), null),
+                                new Edge(node1(), node2(), null),
+                                new Edge(node1(), node3(), null)));
+        assertThat(graph, is(graphExpected));
+    }
+
+    private static Node node0() {
+        return new Node(
+                new EquivalentRoadPositions(
+                        ImmutableSet.of(
+                                new RoadPosition(-1348, 1))),
+                GeodeticFactory.createGeodetic(new LatLon(43.025719777334494, 9.405868649482727)));
+    }
+
+    private static Node node1() {
+        return new Node(
+                new EquivalentRoadPositions(
+                        ImmutableSet.of(
+                                new RoadPosition(-1347, 1),
+                                new RoadPosition(-1348, 0))),
+                GeodeticFactory.createGeodetic(new LatLon(43.02591193760422, 9.406225383281708)));
+    }
+
+    private static Node node2() {
+        return new Node(
+                new EquivalentRoadPositions(
+                        ImmutableSet.of(
+                                new RoadPosition(-1347, 0))),
+                GeodeticFactory.createGeodetic(new LatLon(43.02573938555285, 9.406254887580872)));
+    }
+
+    private static Node node3() {
+        return new Node(
+                new EquivalentRoadPositions(
+                        ImmutableSet.of(
+                                new RoadPosition(-1347, 2))),
+                GeodeticFactory.createGeodetic(new LatLon(43.02598056612619, 9.406008124351501)));
     }
 
     private static Set<Node> getTallestConnectedSet(final Graph graph) {
