@@ -37,15 +37,25 @@ public class RoadPositionEquivalenceRelationProviderTest {
                         12,
                         11);
         final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider =
-                routeSegment ->
-                        routeSegment.equals(new RouteSegmentWithEquality(kingersheimerStrasse_0_1)) ?
+                new IConnectedRouteSegmentsProvider() {
+
+                    @Override
+                    public Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtEndOf(final RouteSegmentWithEquality routeSegment) {
+                        return routeSegment.equals(new RouteSegmentWithEquality(kingersheimerStrasse_0_1)) ?
                                 ImmutableSet
                                         .<RouteSegmentWithEquality>builder()
-                                        .add(new RouteSegmentWithEquality(kingersheimerStrasse_0_1))
                                         .add(new RouteSegmentWithEquality(kingersheimerStrasse_1_2))
                                         .add(new RouteSegmentWithEquality(kreuzlingerWeg_12_11))
                                         .build() :
-                                Collections.singleton(routeSegment);
+                                Collections.emptySet();
+                    }
+
+                    @Override
+                    public Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtStartOf(final RouteSegmentWithEquality routeSegment) {
+                        return Collections.singleton(routeSegment);
+                    }
+                };
+
         final RoadPositionEquivalenceRelationProvider roadPositionEquivalenceRelationProvider = new RoadPositionEquivalenceRelationProvider(connectedRouteSegmentsProvider);
 
         // When

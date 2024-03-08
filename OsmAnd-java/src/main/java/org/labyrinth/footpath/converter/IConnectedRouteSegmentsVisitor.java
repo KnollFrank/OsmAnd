@@ -7,8 +7,9 @@ import java.util.Set;
 
 interface IConnectedRouteSegmentsVisitor<T> {
 
-    T processConnectedRouteSegments(final RouteSegmentWithEquality source,
-                                    final Set<RouteSegmentWithEquality> destinations);
+    T processConnectedRouteSegments(final RouteSegmentWithEquality start,
+                                    final Set<RouteSegmentWithEquality> routeSegmentsStartingAtEndOfStart,
+                                    final Set<RouteSegmentWithEquality> routeSegmentsStartingAtStartOfStart);
 
     T combine(final List<T> ts);
 }

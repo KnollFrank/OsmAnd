@@ -42,17 +42,18 @@ class RoadPositionEquivalenceRelationProvider {
 
         @Override
         public Set<EquivalentRoadPositions> processConnectedRouteSegments(
-                final RouteSegmentWithEquality source,
-                final Set<RouteSegmentWithEquality> destinations) {
-            final RoadPosition endOfSource = getEndRoadPosition(source.delegate);
-            return destinations
+                final RouteSegmentWithEquality start,
+                final Set<RouteSegmentWithEquality> routeSegmentsStartingAtEndOfStart,
+                final Set<RouteSegmentWithEquality> routeSegmentsStartingAtStartOfStart) {
+            final RoadPosition endOfStart = getEndRoadPosition(start.delegate);
+            return routeSegmentsStartingAtEndOfStart
                     .stream()
-                    .filter(destination -> !isSameRoad(destination, source))
-                    .map(destinationFromOtherRoad ->
+                    .filter(routeSegmentStartingAtEndOfStart -> !isSameRoad(routeSegmentStartingAtEndOfStart, start))
+                    .map(routeSegmentFromOtherRoadStartingAtEndOfStart ->
                             new EquivalentRoadPositions(
                                     ImmutableSet.of(
-                                            endOfSource,
-                                            getStartRoadPosition(destinationFromOtherRoad.delegate))))
+                                            endOfStart,
+                                            getStartRoadPosition(routeSegmentFromOtherRoadStartingAtEndOfStart.delegate))))
                     .collect(Collectors.toSet());
         }
 

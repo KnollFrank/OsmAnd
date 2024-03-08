@@ -18,8 +18,13 @@ public class ConnectedRouteSegmentsWithinAreaProvider implements IConnectedRoute
     }
 
     @Override
-    public Set<RouteSegmentWithEquality> getConnectedRouteSegments(final RouteSegmentWithEquality routeSegment) {
-        return getRouteSegmentsWithinArea(delegate.getConnectedRouteSegments(routeSegment));
+    public Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtEndOf(final RouteSegmentWithEquality routeSegment) {
+        return getRouteSegmentsWithinArea(delegate.getRouteSegmentsStartingAtEndOf(routeSegment));
+    }
+
+    @Override
+    public Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtStartOf(final RouteSegmentWithEquality routeSegment) {
+        return getRouteSegmentsWithinArea(delegate.getRouteSegmentsStartingAtStartOf(routeSegment));
     }
 
     private Set<RouteSegmentWithEquality> getRouteSegmentsWithinArea(final Set<RouteSegmentWithEquality> routeSegments) {

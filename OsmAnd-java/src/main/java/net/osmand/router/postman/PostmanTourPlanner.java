@@ -3,13 +3,13 @@ package net.osmand.router.postman;
 import static net.osmand.router.BinaryRoutePlanner.FinalRouteSegment;
 import static net.osmand.router.BinaryRoutePlanner.RouteSegment;
 import static net.osmand.router.BinaryRoutePlanner.RouteSegmentPoint;
+import static org.labyrinth.footpath.core.ShortestClosedPathProvider.createShortestClosedPathStartingAtNode;
 
 import net.osmand.router.RoutingContext;
 
 import org.jgrapht.alg.util.Pair;
 import org.labyrinth.common.ListUtils;
 import org.labyrinth.common.Utils;
-import org.labyrinth.footpath.core.ShortestClosedPathProvider;
 import org.labyrinth.footpath.graph.Edge;
 import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
@@ -25,10 +25,7 @@ public class PostmanTourPlanner {
         final Pair<Graph, Node> graphAndStartNode = GraphFactory.getGraphAndStartNode(ctx, start);
         final Graph graph = graphAndStartNode.getFirst();
         final Node startNode = graphAndStartNode.getSecond();
-        final List<Node> shortestClosedPath =
-                ShortestClosedPathProvider.createShortestClosedPathStartingAtNode(
-                        graph,
-                        startNode);
+        final List<Node> shortestClosedPath = createShortestClosedPathStartingAtNode(graph, startNode);
         return path2StartOfConnectedRouteSegments(shortestClosedPath, graph);
     }
 

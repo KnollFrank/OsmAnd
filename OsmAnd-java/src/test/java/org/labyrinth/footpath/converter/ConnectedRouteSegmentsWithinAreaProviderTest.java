@@ -2,6 +2,7 @@ package org.labyrinth.footpath.converter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.labyrinth.common.SetUtils.union;
 import static org.labyrinth.footpath.converter.GraphFactoryTest.createRouteDataObject;
 
 import com.google.common.collect.ImmutableSet;
@@ -39,10 +40,20 @@ public class ConnectedRouteSegmentsWithinAreaProviderTest {
                                 11));
         final IConnectedRouteSegmentsProvider connectedRouteSegmentsWithinAreaProvider =
                 new ConnectedRouteSegmentsWithinAreaProvider(
-                        routeSegment ->
-                                routeSegment.equals(withinArea1) ?
-                                        ImmutableSet.of(withinArea1, withinArea2, outsideArea) :
-                                        Collections.singleton(routeSegment),
+                        new IConnectedRouteSegmentsProvider() {
+
+                            @Override
+                            public Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtEndOf(final RouteSegmentWithEquality routeSegment) {
+                                return routeSegment.equals(withinArea1) ?
+                                        ImmutableSet.of(withinArea2, outsideArea) :
+                                        Collections.emptySet();
+                            }
+
+                            @Override
+                            public Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtStartOf(final RouteSegmentWithEquality routeSegment) {
+                                return Collections.singleton(routeSegment);
+                            }
+                        },
                         routeSegment ->
                                 ImmutableSet
                                         .of(withinArea1, withinArea2)
@@ -50,8 +61,9 @@ public class ConnectedRouteSegmentsWithinAreaProviderTest {
 
         // When
         final Set<RouteSegmentWithEquality> connectedRouteSegments =
-                connectedRouteSegmentsWithinAreaProvider.getConnectedRouteSegments(
-                        withinArea1);
+                union(
+                        connectedRouteSegmentsWithinAreaProvider.getRouteSegmentsStartingAtEndOf(withinArea1),
+                        connectedRouteSegmentsWithinAreaProvider.getRouteSegmentsStartingAtStartOf(withinArea1));
 
         // Then
         assertThat(connectedRouteSegments, is(ImmutableSet.of(withinArea1, withinArea2)));

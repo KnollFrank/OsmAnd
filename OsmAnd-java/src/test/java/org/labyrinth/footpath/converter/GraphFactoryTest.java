@@ -47,15 +47,24 @@ public class GraphFactoryTest {
                         12,
                         11);
         final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider =
-                routeSegment ->
-                        routeSegment.equals(new RouteSegmentWithEquality(kingersheimerStrasse_0_1)) ?
+                new IConnectedRouteSegmentsProvider() {
+
+                    @Override
+                    public Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtEndOf(final RouteSegmentWithEquality routeSegment) {
+                        return routeSegment.equals(new RouteSegmentWithEquality(kingersheimerStrasse_0_1)) ?
                                 ImmutableSet
                                         .<RouteSegmentWithEquality>builder()
-                                        .add(new RouteSegmentWithEquality(kingersheimerStrasse_0_1))
                                         .add(new RouteSegmentWithEquality(kingersheimerStrasse_1_2))
                                         .add(new RouteSegmentWithEquality(kreuzlingerWeg_12_11))
                                         .build() :
-                                Collections.singleton(routeSegment);
+                                Collections.emptySet();
+                    }
+
+                    @Override
+                    public Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtStartOf(final RouteSegmentWithEquality routeSegment) {
+                        return Collections.singleton(routeSegment);
+                    }
+                };
         final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
 
         // When
@@ -98,14 +107,23 @@ public class GraphFactoryTest {
                         2,
                         3);
         final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider =
-                routeSegment -> {
-                    if (routeSegment.equals(new RouteSegmentWithEquality(kingersheimerStrasse_0_1))) {
-                        return ImmutableSet.of(routeSegment, new RouteSegmentWithEquality(kingersheimerStrasse_1_2));
+                new IConnectedRouteSegmentsProvider() {
+
+                    @Override
+                    public Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtEndOf(final RouteSegmentWithEquality routeSegment) {
+                        if (routeSegment.equals(new RouteSegmentWithEquality(kingersheimerStrasse_0_1))) {
+                            return ImmutableSet.of(routeSegment, new RouteSegmentWithEquality(kingersheimerStrasse_1_2));
+                        }
+                        if (routeSegment.equals(new RouteSegmentWithEquality(kingersheimerStrasse_1_2))) {
+                            return ImmutableSet.of(routeSegment, new RouteSegmentWithEquality(kingersheimerStrasse_2_3));
+                        }
+                        return Collections.emptySet();
                     }
-                    if (routeSegment.equals(new RouteSegmentWithEquality(kingersheimerStrasse_1_2))) {
-                        return ImmutableSet.of(routeSegment, new RouteSegmentWithEquality(kingersheimerStrasse_2_3));
+
+                    @Override
+                    public Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtStartOf(final RouteSegmentWithEquality routeSegment) {
+                        return ImmutableSet.of(routeSegment);
                     }
-                    return Collections.singleton(routeSegment);
                 };
         final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
 

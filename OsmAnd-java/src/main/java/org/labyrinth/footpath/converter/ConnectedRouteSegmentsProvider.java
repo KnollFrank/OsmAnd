@@ -1,6 +1,5 @@
 package org.labyrinth.footpath.converter;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
 
 import net.osmand.binary.RouteDataObject;
@@ -23,38 +22,38 @@ public class ConnectedRouteSegmentsProvider implements IConnectedRouteSegmentsPr
     }
 
     @Override
-    public Set<RouteSegmentWithEquality> getConnectedRouteSegments(final RouteSegmentWithEquality routeSegment) {
-        return ImmutableSet
-                .<RouteSegmentWithEquality>builder()
-                .add(routeSegment)
-                .addAll(_getConnectedRouteSegments(loadConnectedRouteSegment(routeSegment)))
-                .build();
+    public Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtEndOf(final RouteSegmentWithEquality routeSegment) {
+        return getRouteSegmentsStartingAt(
+                routeSegment,
+                routeSegment.delegate.getSegmentEnd());
     }
 
-    private RouteSegmentWithEquality loadConnectedRouteSegment(final RouteSegmentWithEquality segment) {
-        return new RouteSegmentWithEquality(loadConnectedRouteSegment(segment.delegate));
+    @Override
+    public Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtStartOf(final RouteSegmentWithEquality routeSegment) {
+        return getRouteSegmentsStartingAt(
+                routeSegment,
+                routeSegment.delegate.getSegmentStart());
     }
 
-    private RouteSegment loadConnectedRouteSegment(final RouteSegment routeSegment) {
-        final RouteDataObject road = routeSegment.getRoad();
-        final short segmentEnd = routeSegment.getSegmentEnd();
-        final RouteSegment routeSegmentEnd =
-                routingContext.loadRouteSegment(
-                        road.getPoint31XTile(segmentEnd),
-                        road.getPoint31YTile(segmentEnd),
-                        0,
-                        false);
-        final short segmentStart = routeSegment.getSegmentStart();
-        final RouteSegment routeSegmentStart =
-                routingContext.loadRouteSegment(
-                        road.getPoint31XTile(segmentStart),
-                        road.getPoint31YTile(segmentStart),
-                        0,
-                        false);
-        return routeSegmentEnd;
+    private Set<RouteSegmentWithEquality> getRouteSegmentsStartingAt(
+            final RouteSegmentWithEquality routeSegment,
+            final short index) {
+        return getConnectedRouteSegments(
+                new RouteSegmentWithEquality(
+                        loadRouteSegmentStartingAtIndex(
+                                routeSegment.delegate.getRoad(),
+                                index)));
     }
 
-    private static Set<RouteSegmentWithEquality> _getConnectedRouteSegments(final RouteSegmentWithEquality routeSegment) {
+    private RouteSegment loadRouteSegmentStartingAtIndex(final RouteDataObject road, final short index) {
+        return routingContext.loadRouteSegment(
+                road.getPoint31XTile(index),
+                road.getPoint31YTile(index),
+                0,
+                false);
+    }
+
+    private static Set<RouteSegmentWithEquality> getConnectedRouteSegments(final RouteSegmentWithEquality routeSegment) {
         final Iterable<RouteSegment> iterable = () -> getIterator(routeSegment.delegate);
         return StreamSupport
                 .stream(iterable.spliterator(), false)

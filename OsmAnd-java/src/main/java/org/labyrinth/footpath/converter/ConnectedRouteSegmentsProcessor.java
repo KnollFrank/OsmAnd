@@ -2,6 +2,8 @@ package org.labyrinth.footpath.converter;
 
 import static org.labyrinth.common.SetUtils.union;
 
+import com.google.common.collect.ImmutableSet;
+
 import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import org.jgrapht.alg.util.Pair;
@@ -49,10 +51,20 @@ class ConnectedRouteSegmentsProcessor<T> {
     }
 
     private Pair<T, Set<RouteSegmentWithEquality>> getTAndRouteSegments(final RouteSegmentWithEquality start) {
-        final Set<RouteSegmentWithEquality> routeSegments = connectedRouteSegmentsProvider.getConnectedRouteSegments(start);
-        return Pair.of(
-                connectedRouteSegmentsVisitor.processConnectedRouteSegments(start, routeSegments),
-                routeSegments);
+        final Set<RouteSegmentWithEquality> routeSegmentsStartingAtEndOfStart = connectedRouteSegmentsProvider.getRouteSegmentsStartingAtEndOf(start);
+        final Set<RouteSegmentWithEquality> routeSegmentsStartingAtStartOfStart = connectedRouteSegmentsProvider.getRouteSegmentsStartingAtStartOf(start);
+        final T t =
+                connectedRouteSegmentsVisitor.processConnectedRouteSegments(
+                        start,
+                        routeSegmentsStartingAtEndOfStart,
+                        routeSegmentsStartingAtStartOfStart);
+        final Set<RouteSegmentWithEquality> routeSegments =
+                ImmutableSet
+                        .<RouteSegmentWithEquality>builder()
+                        .addAll(routeSegmentsStartingAtEndOfStart)
+                        .addAll(routeSegmentsStartingAtStartOfStart)
+                        .build();
+        return Pair.of(t, routeSegments);
     }
 
     private T getT(final List<Pair<T, Set<RouteSegmentWithEquality>>> tAndRouteSegmentsList) {

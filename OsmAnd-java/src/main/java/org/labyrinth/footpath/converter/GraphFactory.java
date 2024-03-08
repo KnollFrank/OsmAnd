@@ -68,8 +68,13 @@ public class GraphFactory {
         }
 
         @Override
-        public Set<Edge> processConnectedRouteSegments(final RouteSegmentWithEquality source, final Set<RouteSegmentWithEquality> destinations) {
-            return asEdges(destinations);
+        public Set<Edge> processConnectedRouteSegments(
+                final RouteSegmentWithEquality start,
+                final Set<RouteSegmentWithEquality> routeSegmentsStartingAtEndOfStart,
+                final Set<RouteSegmentWithEquality> routeSegmentsStartingAtStartOfStart) {
+            return union(
+                    asEdges(routeSegmentsStartingAtStartOfStart),
+                    asEdges(routeSegmentsStartingAtEndOfStart));
         }
 
         @Override

@@ -4,8 +4,9 @@ import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import java.util.Set;
 
-@FunctionalInterface
 public interface IConnectedRouteSegmentsProvider {
 
-    Set<RouteSegmentWithEquality> getConnectedRouteSegments(final RouteSegmentWithEquality routeSegment);
+    Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtEndOf(final RouteSegmentWithEquality routeSegment);
+
+    Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtStartOf(final RouteSegmentWithEquality routeSegment);
 }
