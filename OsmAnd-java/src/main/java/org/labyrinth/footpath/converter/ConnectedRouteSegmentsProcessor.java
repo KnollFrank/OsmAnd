@@ -29,7 +29,7 @@ class ConnectedRouteSegmentsProcessor<T> {
         while (!routeSegments2Process.isEmpty()) {
             final RouteSegmentWithEquality routeSegment2Process = Utils.getAny(routeSegments2Process);
             if (!routeSegmentsAlreadyProcessed.contains(routeSegment2Process)) {
-                final T t = _processConnectedRouteSegments(routeSegment2Process, routeSegments2Process);
+                final T t = processConnectedRouteSegments(routeSegment2Process, routeSegments2Process);
                 tsBuilder.add(t);
                 routeSegmentsAlreadyProcessed.add(routeSegment2Process);
             }
@@ -38,7 +38,7 @@ class ConnectedRouteSegmentsProcessor<T> {
         return connectedRouteSegmentsVisitor.combine(tsBuilder.build());
     }
 
-    private T _processConnectedRouteSegments(final RouteSegmentWithEquality start, final Set<RouteSegmentWithEquality> routeSegments2Process) {
+    private T processConnectedRouteSegments(final RouteSegmentWithEquality start, final Set<RouteSegmentWithEquality> routeSegments2Process) {
         final Set<RouteSegmentWithEquality> routeSegmentsStartingAtEndOfStart = connectedRouteSegmentsProvider.getRouteSegmentsStartingAtEndOf(start);
         final Set<RouteSegmentWithEquality> routeSegmentsStartingAtStartOfStart = connectedRouteSegmentsProvider.getRouteSegmentsStartingAtStartOf(start);
         final T t =
