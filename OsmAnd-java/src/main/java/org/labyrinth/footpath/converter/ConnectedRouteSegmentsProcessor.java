@@ -36,8 +36,8 @@ class ConnectedRouteSegmentsProcessor<T> {
                 routeSegmentsAlreadyProcessed.add(routeSegment2Process);
                 tsBuilder.add(t_routeSegments2Process.getFirst());
                 routeSegments2Process.addAll(t_routeSegments2Process.getSecond());
+                routeSegments2Process.removeAll(routeSegmentsAlreadyProcessed);
             }
-            routeSegments2Process.removeAll(routeSegmentsAlreadyProcessed);
         }
         return connectedRouteSegmentsVisitor.combine(tsBuilder.build());
     }
