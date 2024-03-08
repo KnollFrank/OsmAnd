@@ -1,10 +1,10 @@
 package org.labyrinth.footpath.converter;
 
+import static com.google.common.collect.Sets.union;
 import static org.labyrinth.common.SetUtils.popAny;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import net.osmand.router.postman.RouteSegmentWithEquality;
@@ -45,17 +45,11 @@ class ConnectedRouteSegmentsProcessor<T> {
     private Pair<T, Set<RouteSegmentWithEquality>> process(final RouteSegmentWithEquality start) {
         final Set<RouteSegmentWithEquality> routeSegmentsStartingAtEndOfStart = connectedRouteSegmentsProvider.getRouteSegmentsStartingAtEndOf(start);
         final Set<RouteSegmentWithEquality> routeSegmentsStartingAtStartOfStart = connectedRouteSegmentsProvider.getRouteSegmentsStartingAtStartOf(start);
-        final T t =
+        return Pair.of(
                 connectedRouteSegmentsVisitor.processConnectedRouteSegments(
                         start,
                         routeSegmentsStartingAtEndOfStart,
-                        routeSegmentsStartingAtStartOfStart);
-        final Set<RouteSegmentWithEquality> routeSegments2Process =
-                ImmutableSet
-                        .<RouteSegmentWithEquality>builder()
-                        .addAll(routeSegmentsStartingAtEndOfStart)
-                        .addAll(routeSegmentsStartingAtStartOfStart)
-                        .build();
-        return Pair.of(t, routeSegments2Process);
+                        routeSegmentsStartingAtStartOfStart),
+                union(routeSegmentsStartingAtEndOfStart, routeSegmentsStartingAtStartOfStart));
     }
 }
