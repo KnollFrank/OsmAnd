@@ -1,5 +1,7 @@
 package org.labyrinth.footpath.converter;
 
+import static org.labyrinth.common.SetUtils.popAny;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableSet;
@@ -8,7 +10,6 @@ import com.google.common.collect.Sets;
 import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import org.jgrapht.alg.util.Pair;
-import org.labyrinth.common.Utils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,8 +29,8 @@ class ConnectedRouteSegmentsProcessor<T> {
         final Set<RouteSegmentWithEquality> routeSegments2Process = Sets.newHashSet(start);
         final Set<RouteSegmentWithEquality> routeSegmentsAlreadyProcessed = new HashSet<>();
         final Builder<T> tsBuilder = ImmutableList.builder();
-        while (!routeSegments2Process.isEmpty()) {
-            final RouteSegmentWithEquality routeSegment2Process = Utils.getAny(routeSegments2Process);
+        RouteSegmentWithEquality routeSegment2Process;
+        while ((routeSegment2Process = popAny(routeSegments2Process)) != null) {
             if (!routeSegmentsAlreadyProcessed.contains(routeSegment2Process)) {
                 final Pair<T, Set<RouteSegmentWithEquality>> t_routeSegments2Process = process(routeSegment2Process);
                 routeSegmentsAlreadyProcessed.add(routeSegment2Process);

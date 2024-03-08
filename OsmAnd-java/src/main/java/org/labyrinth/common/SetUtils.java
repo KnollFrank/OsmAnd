@@ -1,6 +1,7 @@
 package org.labyrinth.common;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,5 +18,11 @@ public class SetUtils {
 
     private static <T> Set<T> union(final Stream<Set<T>> streamOfSets) {
         return streamOfSets.flatMap(Set::stream).collect(Collectors.toSet());
+    }
+
+    public static <T> T popAny(final Set<T> ts) {
+        final Optional<T> t = ts.stream().findAny();
+        t.map(ts::remove);
+        return t.orElse(null);
     }
 }
