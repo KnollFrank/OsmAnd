@@ -2,10 +2,12 @@ package org.labyrinth.footpath.converter;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import net.osmand.router.postman.RouteSegmentWithEquality;
 
+import org.jgrapht.alg.util.Pair;
 import org.labyrinth.common.Utils;
 
 import java.util.HashSet;
@@ -29,8 +31,11 @@ class ConnectedRouteSegmentsProcessor<T> {
         while (!routeSegments2Process.isEmpty()) {
             final RouteSegmentWithEquality routeSegment2Process = Utils.getAny(routeSegments2Process);
             if (!routeSegmentsAlreadyProcessed.contains(routeSegment2Process)) {
-                final T t = processConnectedRouteSegments(routeSegment2Process, routeSegments2Process);
+                final Pair<T, Set<RouteSegmentWithEquality>> t_newRouteSegments2Process = process(routeSegment2Process);
+                final T t = t_newRouteSegments2Process.getFirst();
+                final Set<RouteSegmentWithEquality> newRouteSegments2Process = t_newRouteSegments2Process.getSecond();
                 tsBuilder.add(t);
+                routeSegments2Process.addAll(newRouteSegments2Process);
                 routeSegmentsAlreadyProcessed.add(routeSegment2Process);
             }
             routeSegments2Process.removeAll(routeSegmentsAlreadyProcessed);
@@ -38,7 +43,7 @@ class ConnectedRouteSegmentsProcessor<T> {
         return connectedRouteSegmentsVisitor.combine(tsBuilder.build());
     }
 
-    private T processConnectedRouteSegments(final RouteSegmentWithEquality start, final Set<RouteSegmentWithEquality> routeSegments2Process) {
+    private Pair<T, Set<RouteSegmentWithEquality>> process(final RouteSegmentWithEquality start) {
         final Set<RouteSegmentWithEquality> routeSegmentsStartingAtEndOfStart = connectedRouteSegmentsProvider.getRouteSegmentsStartingAtEndOf(start);
         final Set<RouteSegmentWithEquality> routeSegmentsStartingAtStartOfStart = connectedRouteSegmentsProvider.getRouteSegmentsStartingAtStartOf(start);
         final T t =
@@ -46,8 +51,12 @@ class ConnectedRouteSegmentsProcessor<T> {
                         start,
                         routeSegmentsStartingAtEndOfStart,
                         routeSegmentsStartingAtStartOfStart);
-        routeSegments2Process.addAll(routeSegmentsStartingAtEndOfStart);
-        routeSegments2Process.addAll(routeSegmentsStartingAtStartOfStart);
-        return t;
+        final Set<RouteSegmentWithEquality> routeSegments2Process =
+                ImmutableSet
+                        .<RouteSegmentWithEquality>builder()
+                        .addAll(routeSegmentsStartingAtEndOfStart)
+                        .addAll(routeSegmentsStartingAtStartOfStart)
+                        .build();
+        return Pair.of(t, routeSegments2Process);
     }
 }
