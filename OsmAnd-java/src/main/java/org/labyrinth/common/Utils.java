@@ -2,6 +2,7 @@ package org.labyrinth.common;
 
 import org.jgrapht.alg.util.Pair;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Spliterator;
@@ -31,5 +32,9 @@ public class Utils {
         return StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED),
                 false);
+    }
+
+    public static <T> T getAny(final Collection<T> ts) {
+        return ts.stream().findAny().get();
     }
 }

@@ -1,12 +1,14 @@
 package org.labyrinth.footpath.converter;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.Sets;
 
 import net.osmand.router.postman.RouteSegmentWithEquality;
 
-import java.util.ArrayList;
+import org.labyrinth.common.Utils;
+
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 class ConnectedRouteSegmentsProcessor<T> {
@@ -21,22 +23,22 @@ class ConnectedRouteSegmentsProcessor<T> {
     }
 
     public final T processConnectedRouteSegments(final RouteSegmentWithEquality start) {
-        final Set<RouteSegmentWithEquality> routeSegments2Process = new HashSet<>();
-        routeSegments2Process.add(start);
+        final Set<RouteSegmentWithEquality> routeSegments2Process = Sets.newHashSet(start);
         final Set<RouteSegmentWithEquality> routeSegmentsAlreadyProcessed = new HashSet<>();
-        final List<T> ts = new ArrayList<>();
+        final Builder<T> tsBuilder = ImmutableList.builder();
         while (!routeSegments2Process.isEmpty()) {
-            final RouteSegmentWithEquality routeSegment2Process = routeSegments2Process.stream().findAny().get();
+            final RouteSegmentWithEquality routeSegment2Process = Utils.getAny(routeSegments2Process);
             if (!routeSegmentsAlreadyProcessed.contains(routeSegment2Process)) {
-                ts.add(getT(routeSegment2Process, routeSegments2Process));
+                final T t = _processConnectedRouteSegments(routeSegment2Process, routeSegments2Process);
+                tsBuilder.add(t);
                 routeSegmentsAlreadyProcessed.add(routeSegment2Process);
             }
             routeSegments2Process.removeAll(routeSegmentsAlreadyProcessed);
         }
-        return connectedRouteSegmentsVisitor.combine(ts);
+        return connectedRouteSegmentsVisitor.combine(tsBuilder.build());
     }
 
-    private T getT(final RouteSegmentWithEquality start, final Set<RouteSegmentWithEquality> routeSegments2Process) {
+    private T _processConnectedRouteSegments(final RouteSegmentWithEquality start, final Set<RouteSegmentWithEquality> routeSegments2Process) {
         final Set<RouteSegmentWithEquality> routeSegmentsStartingAtEndOfStart = connectedRouteSegmentsProvider.getRouteSegmentsStartingAtEndOf(start);
         final Set<RouteSegmentWithEquality> routeSegmentsStartingAtStartOfStart = connectedRouteSegmentsProvider.getRouteSegmentsStartingAtStartOf(start);
         final T t =
@@ -44,13 +46,8 @@ class ConnectedRouteSegmentsProcessor<T> {
                         start,
                         routeSegmentsStartingAtEndOfStart,
                         routeSegmentsStartingAtStartOfStart);
-        final Set<RouteSegmentWithEquality> routeSegments =
-                ImmutableSet
-                        .<RouteSegmentWithEquality>builder()
-                        .addAll(routeSegmentsStartingAtEndOfStart)
-                        .addAll(routeSegmentsStartingAtStartOfStart)
-                        .build();
-        routeSegments2Process.addAll(routeSegments);
+        routeSegments2Process.addAll(routeSegmentsStartingAtEndOfStart);
+        routeSegments2Process.addAll(routeSegmentsStartingAtStartOfStart);
         return t;
     }
 }
