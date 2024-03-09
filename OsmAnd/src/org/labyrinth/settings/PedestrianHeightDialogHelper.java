@@ -1,6 +1,5 @@
 package org.labyrinth.settings;
-
-import static org.labyrinth.footpath.StepLengthProvider.getStepLength;
+import static org.labyrinth.footpath.StepLengthProvider.height2StepLength;
 import static tec.units.ri.quantity.Quantities.getQuantity;
 import static tec.units.ri.unit.MetricPrefix.CENTI;
 import static tec.units.ri.unit.Units.METRE;
@@ -33,7 +32,7 @@ public class PedestrianHeightDialogHelper {
                         Height.fromQuantity(getInitialPedestrianHeight(app.getSettings().getPedestrianHeight())),
                         pedestrianHeight -> {
                             app.getSettings().setPedestrianHeight(pedestrianHeight);
-                            app.getLocationProvider().footPath.setStepLength(getStepLength(pedestrianHeight));
+                            app.getLocationProvider().footPath.setStepLength(height2StepLength(pedestrianHeight));
                         },
                         UiUtilities.getThemedContext(context, isNightMode(app, mode)))
                 .show();

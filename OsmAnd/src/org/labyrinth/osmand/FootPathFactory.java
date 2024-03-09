@@ -32,6 +32,6 @@ public class FootPathFactory {
         return app
                 .getSettings()
                 .getPedestrianHeight()
-                .map(StepLengthProvider::getStepLength);
+                .map(StepLengthProvider::height2StepLength);
     }
 }
