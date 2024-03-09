@@ -37,7 +37,7 @@ public class ConnectedRouteSegmentsProvider implements IConnectedRouteSegmentsPr
 
     private Set<RouteSegmentWithEquality> getRouteSegmentsStartingAt(
             final RouteSegmentWithEquality routeSegment,
-            final short index) {
+            final int index) {
         return getConnectedRouteSegments(
                 new RouteSegmentWithEquality(
                         loadRouteSegmentStartingAtIndex(
@@ -45,7 +45,7 @@ public class ConnectedRouteSegmentsProvider implements IConnectedRouteSegmentsPr
                                 index)));
     }
 
-    private RouteSegment loadRouteSegmentStartingAtIndex(final RouteDataObject road, final short index) {
+    private RouteSegment loadRouteSegmentStartingAtIndex(final RouteDataObject road, final int index) {
         return routingContext.loadRouteSegment(
                 road.getPoint31XTile(index),
                 road.getPoint31YTile(index),
