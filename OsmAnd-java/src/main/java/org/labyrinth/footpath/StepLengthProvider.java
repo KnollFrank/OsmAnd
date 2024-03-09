@@ -5,7 +5,7 @@ import javax.measure.quantity.Length;
 
 public class StepLengthProvider {
 
-    public static Quantity<Length> getStepLength(final Quantity<Length> height) {
+    public static Quantity<Length> height2StepLength(final Quantity<Length> height) {
         return height.multiply(0.415f);
     }
 }
