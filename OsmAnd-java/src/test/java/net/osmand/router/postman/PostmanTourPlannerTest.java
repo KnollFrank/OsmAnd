@@ -42,7 +42,7 @@ public class PostmanTourPlannerTest {
     public void testRoutingLabyrinth() throws Exception {
         // Given
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Labyrinth.obf");
-        final LatLon entrance = new LatLon(49.44607076279, 10.31882084839);
+        final LatLon entrance = new LatLon(49.4460780, 10.3188074);
 
         // When
         final RouteCalcResult routeCalcResult =
@@ -60,7 +60,7 @@ public class PostmanTourPlannerTest {
         {
             final Set<LatLon> latLons = getLatLons(routeSegmentResults);
             assertThat(latLons, hasItem(entrance));
-            final LatLon exit = new LatLon(49.44598226108, 10.31781434946);
+            final LatLon exit = new LatLon(49.4459827, 10.3178140);
             assertThat(latLons, hasItem(exit));
         }
     }

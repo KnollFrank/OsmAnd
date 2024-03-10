@@ -37,8 +37,80 @@ public class GraphFactoryTest {
     }
 
     @Test
+    public void test_getGraphAndStartNode_T_junction2() throws Exception {
+        // Given
+        // node2--B--node1--A--node0
+        //             |
+        //             C
+        //             |
+        //           node3
+        final LatLon start = new LatLon(49.44617713901, 10.31896367602);
+        final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/T_junction2.obf");
+        final RouteSegmentPoint startSegment =
+                new RoutePlannerFrontEnd().findRouteSegment(
+                        start.getLatitude(),
+                        start.getLongitude(),
+                        routingContext,
+                        null,
+                        false);
+
+        // When
+        final Pair<Graph, Node> graphAndStartNode =
+                GraphFactory.getGraphAndStartNode(routingContext, startSegment);
+
+        // Then
+        final Graph graph = graphAndStartNode.getFirst();
+        final Node startNode = graphAndStartNode.getSecond();
+        assertThat(getTallestConnectedSet(graph).contains(startNode), is(true));
+        final Node node0 =
+                new Node(
+                        new EquivalentRoadPositions(
+                                ImmutableSet.of(
+                                        new RoadPosition(-1360, 0))),
+                        GeodeticFactory.createGeodetic(start));
+        final Node node1 =
+                new Node(
+                        new EquivalentRoadPositions(
+                                ImmutableSet.of(
+                                        new RoadPosition(-1360, 1),
+                                        new RoadPosition(-1362, 0),
+                                        new RoadPosition(-1386, 0))),
+                        GeodeticFactory.createGeodetic(new LatLon(49.44617844691, 10.31871356003)));
+        final Node node2 =
+                new Node(
+                        new EquivalentRoadPositions(
+                                ImmutableSet.of(
+                                        new RoadPosition(-1386, 1))),
+                        GeodeticFactory.createGeodetic(new LatLon(49.44617888288, 10.31844735079)));
+        final Node node3 =
+                new Node(
+                        new EquivalentRoadPositions(
+                                ImmutableSet.of(
+                                        new RoadPosition(-1362, 1))),
+                        GeodeticFactory.createGeodetic(new LatLon(49.44592689294, 10.31871087782)));
+        assertThat(startNode, is(node0));
+        final Graph graphExpected =
+                org.labyrinth.footpath.graph.GraphFactory.createGraph(
+                        ImmutableSet.of(
+                                // A:
+                                new Edge(node0, node1, null),
+                                new Edge(node1, node0, null),
+                                // B:
+                                new Edge(node1, node2, null),
+                                new Edge(node2, node1, null),
+                                // C:
+                                new Edge(node1, node3, null),
+                                new Edge(node3, node1, null)));
+        assertThat(graph, is(graphExpected));
+    }
+
+    @Test
     public void test_getGraphAndStartNode_T_junction() throws Exception {
         // Given
+        // node3---node1---node2
+        //           |
+        //           |
+        //         node0
         final LatLon start = new LatLon(43.0257384, 9.4062576);
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/T_junction.obf");
         final RouteSegmentPoint startSegment =
@@ -58,10 +130,6 @@ public class GraphFactoryTest {
         final Node startNode = graphAndStartNode.getSecond();
         assertThat(getTallestConnectedSet(graph).contains(startNode), is(true));
         assertThat(startNode, is(node2()));
-        // node3---node1---node2
-        //           |
-        //           |
-        //         node0
         final Graph graphExpected =
                 org.labyrinth.footpath.graph.GraphFactory.createGraph(
                         ImmutableSet.of(

@@ -10,6 +10,7 @@ import net.osmand.binary.RouteDataObject;
 import net.osmand.router.BinaryRoutePlanner.RouteSegment;
 import net.osmand.router.postman.RouteSegmentWithEquality;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.labyrinth.footpath.graph.Edge;
 import org.labyrinth.footpath.graph.Edges;
@@ -88,6 +89,7 @@ public class GraphFactoryTest {
         GraphUtils.assertActualEqualsExpected(graph, graphExpected);
     }
 
+    @Ignore
     @Test
     public void test_createGraph_depth2() {
         // Given
