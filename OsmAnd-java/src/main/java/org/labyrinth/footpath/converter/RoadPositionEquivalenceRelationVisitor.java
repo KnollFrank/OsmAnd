@@ -4,15 +4,15 @@ import static org.labyrinth.common.SetUtils.union;
 
 import com.google.common.collect.ImmutableSet;
 
-import net.osmand.router.BinaryRoutePlanner.RouteSegment;
+import net.osmand.router.postman.RouteSegmentWithEqualities;
 import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import org.labyrinth.footpath.graph.EquivalentRoadPositions;
 import org.labyrinth.footpath.graph.RoadPosition;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 class RoadPositionEquivalenceRelationVisitor implements IConnectedRouteSegmentsVisitor<Set<EquivalentRoadPositions>> {
 
@@ -21,19 +21,11 @@ class RoadPositionEquivalenceRelationVisitor implements IConnectedRouteSegmentsV
             final RouteSegmentWithEquality start,
             final Set<RouteSegmentWithEquality> routeSegmentsStartingAtEndOfStart,
             final Set<RouteSegmentWithEquality> routeSegmentsStartingAtStartOfStart) {
-        final RoadPosition endOfStart = getEndRoadPosition(start.delegate);
-        return ImmutableSet.of(
+        return Collections.singleton(
                 new EquivalentRoadPositions(
-                        ImmutableSet
-                                .<RoadPosition>builder()
-                                .add(endOfStart)
-                                .addAll(
-                                        routeSegmentsStartingAtEndOfStart
-                                                .stream()
-                                                .map(routeSegmentFromOtherRoadStartingAtEndOfStart -> routeSegmentFromOtherRoadStartingAtEndOfStart.delegate)
-                                                .map(RoadPositionEquivalenceRelationVisitor::getStartRoadPosition)
-                                                .collect(Collectors.toSet()))
-                                .build()));
+                        getEquivalentRoadPositions(
+                                start,
+                                routeSegmentsStartingAtEndOfStart)));
     }
 
     @Override
@@ -41,11 +33,13 @@ class RoadPositionEquivalenceRelationVisitor implements IConnectedRouteSegmentsV
         return union(equivalenceRelations);
     }
 
-    private static RoadPosition getStartRoadPosition(final RouteSegment routeSegment) {
-        return new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentStart());
-    }
-
-    private static RoadPosition getEndRoadPosition(final RouteSegment routeSegment) {
-        return new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentEnd());
+    private static ImmutableSet<RoadPosition> getEquivalentRoadPositions(
+            final RouteSegmentWithEquality start,
+            final Set<RouteSegmentWithEquality> routeSegmentsStartingAtEndOfStart) {
+        return ImmutableSet
+                .<RoadPosition>builder()
+                .add(RouteSegmentWithEqualities.getEndRoadPosition(start))
+                .addAll(RouteSegmentWithEqualities.getStartRoadPositions(routeSegmentsStartingAtEndOfStart))
+                .build();
     }
 }

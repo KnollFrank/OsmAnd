@@ -1,5 +1,7 @@
 package org.labyrinth.footpath.converter;
 
+import static net.osmand.router.postman.RouteSegmentWithEqualities.getEndRoadPosition;
+import static net.osmand.router.postman.RouteSegmentWithEqualities.getStartRoadPosition;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.labyrinth.footpath.converter.GraphFactoryTest.createRouteDataObject;
@@ -11,7 +13,6 @@ import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import org.junit.Test;
 import org.labyrinth.footpath.graph.EquivalentRoadPositions;
-import org.labyrinth.footpath.graph.RoadPosition;
 
 import java.util.Set;
 
@@ -112,15 +113,15 @@ public class RoadPositionEquivalenceRelationProviderTest {
                         ImmutableSet.of(
                                 new EquivalentRoadPositions(
                                         ImmutableSet.of(
-                                                getEndRoadPosition(kingersheimerStrasse_0_1.delegate),
-                                                getStartRoadPosition(kreuzlingerWeg_0_1.delegate),
-                                                getStartRoadPosition(hofweg_0_1.delegate))),
+                                                getEndRoadPosition(kingersheimerStrasse_0_1),
+                                                getStartRoadPosition(kreuzlingerWeg_0_1),
+                                                getStartRoadPosition(hofweg_0_1))),
                                 new EquivalentRoadPositions(
-                                        ImmutableSet.of(getEndRoadPosition(kreuzlingerWeg_0_1.delegate))),
+                                        ImmutableSet.of(getEndRoadPosition(kreuzlingerWeg_0_1))),
                                 new EquivalentRoadPositions(
-                                        ImmutableSet.of(getEndRoadPosition(hofweg_0_1.delegate))),
+                                        ImmutableSet.of(getEndRoadPosition(hofweg_0_1))),
                                 new EquivalentRoadPositions(
-                                        ImmutableSet.of(getStartRoadPosition(kingersheimerStrasse_0_1.delegate))))));
+                                        ImmutableSet.of(getStartRoadPosition(kingersheimerStrasse_0_1))))));
     }
 
     @Test
@@ -218,20 +219,14 @@ public class RoadPositionEquivalenceRelationProviderTest {
                         ImmutableSet.of(
                                 new EquivalentRoadPositions(
                                         ImmutableSet.of(
-                                                getEndRoadPosition(kingersheimerStrasse_0_1.delegate),
-                                                getStartRoadPosition(kreuzlingerWeg_1_0.delegate),
-                                                getStartRoadPosition(kingersheimerStrasse_1_2.delegate))),
-                                new EquivalentRoadPositions(ImmutableSet.of(getStartRoadPosition(kingersheimerStrasse_2_1.delegate))),
-                                new EquivalentRoadPositions(ImmutableSet.of(getStartRoadPosition(kingersheimerStrasse_0_1.delegate))),
-                                new EquivalentRoadPositions(ImmutableSet.of(getStartRoadPosition(kreuzlingerWeg_0_1.delegate))))));
-        ;
-    }
-
-    private static RoadPosition getStartRoadPosition(final RouteSegment routeSegment) {
-        return new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentStart());
-    }
-
-    private static RoadPosition getEndRoadPosition(final RouteSegment routeSegment) {
-        return new RoadPosition(routeSegment.getRoad().id, routeSegment.getSegmentEnd());
+                                                getEndRoadPosition(kingersheimerStrasse_0_1),
+                                                getStartRoadPosition(kreuzlingerWeg_1_0),
+                                                getStartRoadPosition(kingersheimerStrasse_1_2))),
+                                new EquivalentRoadPositions(ImmutableSet.of(
+                                        getStartRoadPosition(kingersheimerStrasse_2_1))),
+                                new EquivalentRoadPositions(ImmutableSet.of(
+                                        getStartRoadPosition(kingersheimerStrasse_0_1))),
+                                new EquivalentRoadPositions(ImmutableSet.of(
+                                        getStartRoadPosition(kreuzlingerWeg_0_1))))));
     }
 }
