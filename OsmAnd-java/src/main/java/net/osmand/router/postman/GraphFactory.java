@@ -38,7 +38,7 @@ class GraphFactory {
                         new RouteSegmentWithinCirclePredicate(
                                 new Circle(
                                         GeodeticFactory.createGeodetic(start.getPreciseLatLon()),
-                                        getQuantity(0.5, KILO(METRE))))));
+                                        getQuantity(0.25, KILO(METRE))))));
     }
 
     private static Node getNode(final RouteSegmentPoint routeSegmentPoint, final Graph graph) {

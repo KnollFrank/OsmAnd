@@ -1,10 +1,11 @@
 package org.labyrinth.footpath.converter;
 
+import static net.osmand.router.postman.RouteSegmentWithEqualities.getEndRoadPosition;
+import static net.osmand.router.postman.RouteSegmentWithEqualities.getStartRoadPositions;
 import static org.labyrinth.common.SetUtils.union;
 
 import com.google.common.collect.ImmutableSet;
 
-import net.osmand.router.postman.RouteSegmentWithEqualities;
 import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import org.labyrinth.footpath.graph.EquivalentRoadPositions;
@@ -38,8 +39,8 @@ class RoadPositionEquivalenceRelationVisitor implements IConnectedRouteSegmentsV
             final Set<RouteSegmentWithEquality> routeSegmentsStartingAtEndOfStart) {
         return ImmutableSet
                 .<RoadPosition>builder()
-                .add(RouteSegmentWithEqualities.getEndRoadPosition(start))
-                .addAll(RouteSegmentWithEqualities.getStartRoadPositions(routeSegmentsStartingAtEndOfStart))
+                .add(getEndRoadPosition(start))
+                .addAll(getStartRoadPositions(routeSegmentsStartingAtEndOfStart))
                 .build();
     }
 }
