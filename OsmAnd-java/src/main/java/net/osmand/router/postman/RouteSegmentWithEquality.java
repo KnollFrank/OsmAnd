@@ -39,9 +39,8 @@ public class RouteSegmentWithEquality {
     }
 
     private static RouteSegment reverse(final RouteSegment routeSegment) {
-        return new RouteSegment(
-                routeSegment.getRoad(),
-                routeSegment.getSegmentEnd(),
-                routeSegment.getSegmentStart());
+        final short segmentStart = routeSegment.getSegmentEnd();
+        final short segmentEnd = routeSegment.getSegmentStart();
+        return new RouteSegment(routeSegment.getRoad(), segmentStart, segmentEnd);
     }
 }
