@@ -1,13 +1,13 @@
-package net.osmand.router;
+package net.osmand.router.postman;
 
 import java.util.Objects;
 
-public class RouteSegmentResultWithEquality {
+class RouteSegmentResultWithEquality {
 
-    private final long road;
-    private final String roadName;
-    private final int startPointIndex;
-    private final int endPointIndex;
+    public final long road;
+    public final String roadName;
+    public final int startPointIndex;
+    public final int endPointIndex;
 
     public RouteSegmentResultWithEquality(final long road,
                                           final String roadName,

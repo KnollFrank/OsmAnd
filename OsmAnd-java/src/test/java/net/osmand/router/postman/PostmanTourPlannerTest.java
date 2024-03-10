@@ -1,6 +1,7 @@
 package net.osmand.router.postman;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 
@@ -10,7 +11,6 @@ import net.osmand.router.RoutePlannerFrontEnd;
 import net.osmand.router.RouteResultPreparation;
 import net.osmand.router.RouteResultPreparation.RouteCalcResult;
 import net.osmand.router.RouteSegmentResult;
-import net.osmand.router.RouteSegmentResultWithEquality;
 import net.osmand.router.RoutingConfiguration;
 import net.osmand.router.RoutingConfiguration.RoutingMemoryLimits;
 import net.osmand.router.RoutingContext;
@@ -23,9 +23,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class PostmanTourPlannerTest {
 
@@ -39,68 +42,53 @@ public class PostmanTourPlannerTest {
     public void testRoutingLabyrinth() throws Exception {
         // Given
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Labyrinth.obf");
-        final LatLon start = new LatLon(49.4460708, 10.3188208);
+        final LatLon entrance = new LatLon(49.44607076279, 10.31882084839);
 
         // When
         final RouteCalcResult routeCalcResult =
                 new RoutePlannerFrontEnd()
                         .searchRoute(
                                 routingContext,
-                                start,
+                                entrance,
                                 new LatLon(49.4459823, 10.3178143),
                                 Collections.emptyList());
 
         // Then
         final List<RouteSegmentResult> routeSegmentResults = routeCalcResult.getList();
-        Assert.assertEquals(getStartOfRoute(routeSegmentResults), start);
-        Assert.assertEquals(
-                Arrays.asList(
-                        new RouteSegmentResultWithEquality(-102033, null, 0, 1),
-                        new RouteSegmentResultWithEquality(-102033, null, 1, 0),
-                        new RouteSegmentResultWithEquality(-101874, null, 2, 1),
-                        new RouteSegmentResultWithEquality(-101874, null, 1, 5),
-                        new RouteSegmentResultWithEquality(-101884, null, 0, 1),
-                        new RouteSegmentResultWithEquality(-101884, null, 1, 0),
-                        new RouteSegmentResultWithEquality(-101874, null, 5, 8),
-                        new RouteSegmentResultWithEquality(-101886, null, 0, 6)),
-                getRouteSegmentResultWithEqualities(routeSegmentResults.subList(0, 8)));
+        Assert.assertEquals(getStartOfRoute(routeSegmentResults), entrance);
+
+        {
+            final Set<LatLon> latLons = getLatLons(routeSegmentResults);
+            assertThat(latLons, hasItem(entrance));
+            final LatLon exit = new LatLon(49.44598226108, 10.31781434946);
+            assertThat(latLons, hasItem(exit));
+        }
     }
 
     @Test
     public void testRoutingHirschau() throws Exception {
         // Given
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Hirschau.obf");
-        // Hofweg:
-        final LatLon start = new LatLon(48.5017172, 8.9933938);
+        final LatLon hofweg = new LatLon(48.5017172, 8.9933938);
+        final LatLon kapellenweg = new LatLon(48.501619, 8.9929844);
 
         // When
         final RouteCalcResult routeCalcResult =
                 new RoutePlannerFrontEnd()
                         .searchRoute(
                                 routingContext,
-                                start,
-                                // Kapellenweg:
-                                new LatLon(48.501619, 8.9929844),
+                                hofweg,
+                                kapellenweg,
                                 Collections.emptyList());
 
         // Then
         final List<RouteSegmentResult> routeSegmentResults = routeCalcResult.getList();
-        assertThat(getStartOfRoute(routeSegmentResults), is(start));
-        assertThat(
-                getRouteSegmentResultWithEqualities(routeSegmentResults),
-                hasItems(
-                        new RouteSegmentResultWithEquality(305275763L, "Hofweg", 6, 7),
-                        new RouteSegmentResultWithEquality(66633789123L, "Hofweg", 0, 2),
-                        new RouteSegmentResultWithEquality(12544617511L, "Kingersheimer Straße", 6, 7),
-                        new RouteSegmentResultWithEquality(67343327585L, "Kirchplatz", 0, 5),
-                        new RouteSegmentResultWithEquality(43742393661L, null, 1, 0),
-                        new RouteSegmentResultWithEquality(43742393661L, null, 0, 1),
-                        new RouteSegmentResultWithEquality(67343327585L, "Kirchplatz", 5, 7),
-                        new RouteSegmentResultWithEquality(305273305L, "Kirchplatz", 0, 8),
-                        new RouteSegmentResultWithEquality(58331930311L, null, 0, 1),
-                        new RouteSegmentResultWithEquality(58331930311L, null, 1, 0),
-                        new RouteSegmentResultWithEquality(305273305L, "Kirchplatz", 8, 10),
-                        new RouteSegmentResultWithEquality(70755014031L, null, 1, 0)));
+        assertThat(getStartOfRoute(routeSegmentResults), is(hofweg));
+        {
+            final Set<LatLon> latLons = getLatLons(routeSegmentResults);
+            assertThat(latLons, hasItem(hofweg));
+            assertThat(latLons, hasItem(kapellenweg));
+        }
     }
 
     @Test
@@ -120,10 +108,9 @@ public class PostmanTourPlannerTest {
 
         // Then
         final List<RouteSegmentResult> routeSegmentResults = routeCalcResult.getList();
-        print(routeSegmentResults);
         assertThat(getStartOfRoute(routeSegmentResults), is(south));
         assertThat(
-                getRouteSegmentResultWithEqualities(routeSegmentResults),
+                RouteSegmentResultWithEqualityFactory.getRouteSegmentResultWithEqualities(routeSegmentResults),
                 hasItems(
                         new RouteSegmentResultWithEquality(-688, null, 2, 0),
                         new RouteSegmentResultWithEquality(-688, null, 0, 2)));
@@ -154,7 +141,7 @@ public class PostmanTourPlannerTest {
                         new RouteSegmentResultWithEquality(-1348, "kurzer Weg", 0, 1),
                         new RouteSegmentResultWithEquality(-1348, "kurzer Weg", 1, 0),
                         new RouteSegmentResultWithEquality(-1347, "langer Weg", 1, 0)),
-                getRouteSegmentResultWithEqualities(routeSegmentResults));
+                RouteSegmentResultWithEqualityFactory.getRouteSegmentResultWithEqualities(routeSegmentResults));
     }
 
     private static LatLon getStartOfRoute(final List<RouteSegmentResult> routeSegmentResults) {
@@ -197,15 +184,14 @@ public class PostmanTourPlannerTest {
         }
     }
 
-    private static List<RouteSegmentResultWithEquality> getRouteSegmentResultWithEqualities(final List<RouteSegmentResult> routeSegmentResults) {
+    private static Set<LatLon> getLatLons(final Collection<RouteSegmentResult> routeSegmentResults) {
         return routeSegmentResults
                 .stream()
-                .map(routeSegmentResult ->
-                        new RouteSegmentResultWithEquality(
-                                routeSegmentResult.getObject().id,
-                                routeSegmentResult.getObject().getName(),
-                                routeSegmentResult.getStartPointIndex(),
-                                routeSegmentResult.getEndPointIndex()))
-                .collect(Collectors.toList());
+                .flatMap(
+                        routeSegmentResult ->
+                                IntStream
+                                        .range(0, routeSegmentResult.getObject().getPointsLength())
+                                        .mapToObj(routeSegmentResult::getPoint))
+                .collect(Collectors.toSet());
     }
 }

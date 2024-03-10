@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class GraphUtils {
 
-    static void assertActualEqualsExpected(final Graph actual, final Graph expected) {
+    public static void assertActualEqualsExpected(final Graph actual, final Graph expected) {
         assertActualEqualsExpected(actual.nodes, expected.nodes);
         assertActualEdgesEqualsExpectedEdges(actual.edges, expected.edges);
     }

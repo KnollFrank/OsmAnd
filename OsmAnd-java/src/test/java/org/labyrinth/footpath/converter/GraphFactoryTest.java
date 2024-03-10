@@ -33,19 +33,19 @@ public class GraphFactoryTest {
         //  3: Road (2), name ('Kreuzlinger Weg') [12-11] 4.8 m
         final RouteSegment kingersheimerStrasse_0_1 =
                 new RouteSegment(
-                        createRouteDataObject(1, "Kingersheimer Straße"),
+                        createRouteDataObject(1, "Kingersheimer Straße", 3),
                         0,
                         1);
         final RouteSegment kingersheimerStrasse_1_2 =
                 new RouteSegment(
-                        createRouteDataObject(1, "Kingersheimer Straße"),
+                        createRouteDataObject(1, "Kingersheimer Straße", 3),
                         1,
                         2);
-        final RouteSegment kreuzlingerWeg_12_11 =
+        final RouteSegment kreuzlingerWeg_1_0 =
                 new RouteSegment(
-                        createRouteDataObject(2, "Kreuzlinger Weg"),
-                        12,
-                        11);
+                        createRouteDataObject(2, "Kreuzlinger Weg", 2),
+                        1,
+                        0);
         final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider =
                 new IConnectedRouteSegmentsProvider() {
 
@@ -55,7 +55,7 @@ public class GraphFactoryTest {
                                 ImmutableSet
                                         .<RouteSegmentWithEquality>builder()
                                         .add(new RouteSegmentWithEquality(kingersheimerStrasse_1_2))
-                                        .add(new RouteSegmentWithEquality(kreuzlingerWeg_12_11))
+                                        .add(new RouteSegmentWithEquality(kreuzlingerWeg_1_0))
                                         .build() :
                                 Collections.emptySet();
                     }
@@ -75,13 +75,13 @@ public class GraphFactoryTest {
         final Node kingersheimerStrasse_0 = getStartNode(kingersheimerStrasse_0_1, equivalenceRelation);
         final Node kingersheimerStrasse_1 = getEndNode(kingersheimerStrasse_0_1, equivalenceRelation);
         final Node kingersheimerStrasse_2 = getEndNode(kingersheimerStrasse_1_2, equivalenceRelation);
-        final Node kreuzlingerWeg_12 = getStartNode(kreuzlingerWeg_12_11, equivalenceRelation);
-        final Node kreuzlingerWeg_11 = getEndNode(kreuzlingerWeg_12_11, equivalenceRelation);
+        final Node kreuzlingerWeg_1 = getStartNode(kreuzlingerWeg_1_0, equivalenceRelation);
+        final Node kreuzlingerWeg_0 = getEndNode(kreuzlingerWeg_1_0, equivalenceRelation);
         final Set<Edge> edges =
                 ImmutableSet.of(
                         new Edge(kingersheimerStrasse_0, kingersheimerStrasse_1, Arrays.asList(kingersheimerStrasse_0_1)),
                         new Edge(kingersheimerStrasse_1, kingersheimerStrasse_2, Arrays.asList(kingersheimerStrasse_1_2)),
-                        new Edge(kreuzlingerWeg_12, kreuzlingerWeg_11, Arrays.asList(kreuzlingerWeg_12_11)));
+                        new Edge(kreuzlingerWeg_1, kreuzlingerWeg_0, Arrays.asList(kreuzlingerWeg_1_0)));
         final Graph graphExpected =
                 org.labyrinth.footpath.graph.GraphFactory.createGraph(
                         union(edges, Edges.reverse(edges)));
@@ -93,17 +93,17 @@ public class GraphFactoryTest {
         // Given
         final RouteSegment kingersheimerStrasse_0_1 =
                 new RouteSegment(
-                        createRouteDataObject(1, "Kingersheimer Straße"),
+                        createRouteDataObject(1, "Kingersheimer Straße", 4),
                         0,
                         1);
         final RouteSegment kingersheimerStrasse_1_2 =
                 new RouteSegment(
-                        createRouteDataObject(1, "Kingersheimer Straße"),
+                        createRouteDataObject(1, "Kingersheimer Straße", 4),
                         1,
                         2);
         final RouteSegment kingersheimerStrasse_2_3 =
                 new RouteSegment(
-                        createRouteDataObject(1, "Kingersheimer Straße"),
+                        createRouteDataObject(1, "Kingersheimer Straße", 4),
                         2,
                         3);
         final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider =
@@ -159,11 +159,11 @@ public class GraphFactoryTest {
                 RouteSegment2Geodetic.getGeodetic(routeSegment, routeSegment.getSegmentEnd()));
     }
 
-    static RouteDataObject createRouteDataObject(final int id, final String name) {
+    static RouteDataObject createRouteDataObject(final int id, final String name, final int numPoints) {
         final RouteDataObject routeDataObject = new RouteDataObject((RouteRegion) null);
         routeDataObject.id = id;
-        routeDataObject.pointsX = new int[20];
-        routeDataObject.pointsY = new int[20];
+        routeDataObject.pointsX = new int[numPoints];
+        routeDataObject.pointsY = new int[numPoints];
         return new RouteDataObject(routeDataObject) {
 
             @Override

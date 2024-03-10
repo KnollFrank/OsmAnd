@@ -23,17 +23,17 @@ public class RoadPositionEquivalenceRelationProviderTest {
         // Given
         final RouteSegment kingersheimerStrasse_0_1 =
                 new RouteSegment(
-                        createRouteDataObject(1, "Kingersheimer Straße"),
+                        createRouteDataObject(1, "Kingersheimer Straße", 20),
                         0,
                         1);
         final RouteSegment kingersheimerStrasse_1_2 =
                 new RouteSegment(
-                        createRouteDataObject(1, "Kingersheimer Straße"),
+                        createRouteDataObject(1, "Kingersheimer Straße", 20),
                         1,
                         2);
         final RouteSegment kreuzlingerWeg_12_11 =
                 new RouteSegment(
-                        createRouteDataObject(2, "Kreuzlinger Weg"),
+                        createRouteDataObject(2, "Kreuzlinger Weg", 20),
                         12,
                         11);
         final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider =
