@@ -1,18 +1,22 @@
 package org.labyrinth.footpath.converter;
 
-import static com.google.common.collect.Sets.union;
 import static org.labyrinth.common.SetUtils.popAny;
+import static org.labyrinth.common.SetUtils.union;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Sets;
 
+import net.osmand.binary.RouteDataObject;
+import net.osmand.router.BinaryRoutePlanner.RouteSegment;
 import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import org.jgrapht.alg.util.Pair;
+import org.labyrinth.common.Utils;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 class ConnectedRouteSegmentsProcessor<T> {
 
@@ -50,6 +54,40 @@ class ConnectedRouteSegmentsProcessor<T> {
                         start,
                         routeSegmentsStartingAtEndOfStart,
                         routeSegmentsStartingAtStartOfStart),
-                union(routeSegmentsStartingAtEndOfStart, routeSegmentsStartingAtStartOfStart));
+                getRouteSegments2Process(union(routeSegmentsStartingAtEndOfStart, routeSegmentsStartingAtStartOfStart)));
+    }
+
+    private static Set<RouteSegmentWithEquality> getRouteSegments2Process(final Set<RouteSegmentWithEquality> routeSegments) {
+        final Set<RouteSegmentWithEquality> explodedRouteSegments = explode(routeSegments);
+        return union(
+                routeSegments,
+                explodedRouteSegments,
+                reverse(explodedRouteSegments));
+    }
+
+    private static Set<RouteSegmentWithEquality> explode(final Set<RouteSegmentWithEquality> routeSegments) {
+        return routeSegments
+                .stream()
+                .flatMap(routeSegment -> explode(routeSegment.delegate.getRoad()).stream())
+                .collect(Collectors.toSet());
+    }
+
+    private static Set<RouteSegmentWithEquality> explode(final RouteDataObject road) {
+        return Utils
+                .getConsecutivePairs(0, road.getPointsLength() - 1)
+                .map(segmentStart_segmentEnd ->
+                        new RouteSegment(
+                                road,
+                                segmentStart_segmentEnd.getFirst(),
+                                segmentStart_segmentEnd.getSecond()))
+                .map(RouteSegmentWithEquality::new)
+                .collect(Collectors.toSet());
+    }
+
+    private static Set<RouteSegmentWithEquality> reverse(final Set<RouteSegmentWithEquality> routeSegments) {
+        return routeSegments
+                .stream()
+                .map(RouteSegmentWithEquality::reverse)
+                .collect(Collectors.toSet());
     }
 }

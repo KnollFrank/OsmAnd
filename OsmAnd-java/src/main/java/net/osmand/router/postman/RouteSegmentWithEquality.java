@@ -12,6 +12,10 @@ public class RouteSegmentWithEquality {
         this.delegate = delegate;
     }
 
+    public RouteSegmentWithEquality reverse() {
+        return new RouteSegmentWithEquality(reverse(delegate));
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
@@ -32,5 +36,12 @@ public class RouteSegmentWithEquality {
         return "RouteSegmentWrapper{" +
                 "delegate=" + delegate +
                 '}';
+    }
+
+    private static RouteSegment reverse(final RouteSegment routeSegment) {
+        return new RouteSegment(
+                routeSegment.getRoad(),
+                routeSegment.getSegmentEnd(),
+                routeSegment.getSegmentStart());
     }
 }

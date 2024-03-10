@@ -104,6 +104,32 @@ public class PostmanTourPlannerTest {
     }
 
     @Test
+    public void testRoutingHirschauKapellenweg() throws Exception {
+        // Given
+        final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/HirschauKapellenweg.obf");
+        final LatLon south = new LatLon(48.50146813118, 8.99308606848);
+
+        // When
+        final RouteCalcResult routeCalcResult =
+                new RoutePlannerFrontEnd()
+                        .searchRoute(
+                                routingContext,
+                                south,
+                                new LatLon(48.501619, 8.9929844),
+                                Collections.emptyList());
+
+        // Then
+        final List<RouteSegmentResult> routeSegmentResults = routeCalcResult.getList();
+        print(routeSegmentResults);
+        assertThat(getStartOfRoute(routeSegmentResults), is(south));
+        assertThat(
+                getRouteSegmentResultWithEqualities(routeSegmentResults),
+                hasItems(
+                        new RouteSegmentResultWithEquality(-688, null, 2, 0),
+                        new RouteSegmentResultWithEquality(-688, null, 0, 2)));
+    }
+
+    @Test
     public void testRoutingT_junction() throws Exception {
         // Given
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/T_junction.obf");
