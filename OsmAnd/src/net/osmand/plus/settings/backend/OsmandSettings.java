@@ -105,6 +105,7 @@ import net.osmand.plus.settings.enums.HistorySource;
 import net.osmand.plus.settings.enums.LocationSource;
 import net.osmand.plus.settings.enums.MapsSortMode;
 import net.osmand.plus.settings.enums.MetricsConstants;
+import net.osmand.plus.settings.enums.RoutingType;
 import net.osmand.plus.settings.enums.SimulationMode;
 import net.osmand.plus.settings.enums.SpeedConstants;
 import net.osmand.plus.settings.enums.SpeedLimitWarningState;

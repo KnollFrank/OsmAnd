@@ -154,7 +154,7 @@ public class WeatherRasterLayer extends BaseMapLayer {
 			//if (provider == null) {
 			//	requireTimePeriodChange = false;
 				provider = new WeatherRasterLayerProvider(resourcesManager, weatherLayer,
-						timePeriodStart, timePeriodEnd, timePeriodStep, bands, false);
+						timePeriodStart, /* FK-FIXME: timePeriodEnd, timePeriodStep, */ bands, false);
 				mapRenderer.setMapLayerProvider(view.getLayerIndex(this), provider);
 				MapLayerConfiguration mapLayerConfiguration = new MapLayerConfiguration();
 				mapLayerConfiguration.setOpacityFactor(1.0f);
@@ -165,7 +165,7 @@ public class WeatherRasterLayer extends BaseMapLayer {
 			//	provider.setDateTime(timePeriodStart, timePeriodEnd, timePeriodStep);
 			//	mapRenderer.changeTimePeriod();
 			//}
-			mapRenderer.setDateTime(dateTime);
+			// FK-FIXME: mapRenderer.setDateTime(dateTime);
 		}
 	}
 
