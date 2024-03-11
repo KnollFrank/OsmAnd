@@ -1,18 +1,5 @@
 package net.osmand.router;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-
-import gnu.trove.list.array.TIntArrayList;
 import net.osmand.LocationsHolder;
 import net.osmand.NativeLibrary;
 import net.osmand.PlatformUtil;
@@ -31,8 +18,21 @@ import net.osmand.router.HHRouteDataStructure.NetworkDBPoint;
 import net.osmand.router.RouteCalculationProgress.HHIteration;
 import net.osmand.router.RouteResultPreparation.RouteCalcResult;
 import net.osmand.router.postman.PostmanTourPlanner;
-import net.osmand.router.postman.PostmanTourPlanner;
 import net.osmand.util.MapUtils;
+
+import org.apache.commons.logging.Log;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import gnu.trove.list.array.TIntArrayList;
 
 
 public class RoutePlannerFrontEnd {
@@ -1140,10 +1140,13 @@ public class RoutePlannerFrontEnd {
 		} else {
 			refreshProgressDistance(ctx);
 			RoutingContext local = new RoutingContext(ctx);
-			ctx.finalRouteSegment = new /*BinaryRoutePlanner*/PostmanTourPlanner().searchRouteInternal(local, s, e, null);
+			// FK-TODO: wieder aktivieren für non-Postman-Fälle:
+			// ctx.finalRouteSegment = new BinaryRoutePlanner().searchRouteInternal(local, s, e, null);
+			ctx.finalRouteSegment = new PostmanTourPlanner().searchRoute(local, s);
 			result = RouteResultPreparation.convertFinalSegmentToResults(ctx, ctx.finalRouteSegment);
 			addPrecalculatedToResult(recalculationEnd, result);
-			makeStartEndPointsPrecise(result, s.getPreciseLatLon(), e.getPreciseLatLon());
+			// FK-TODO: wieder aktivieren für non-Postman-Fälle:
+			// makeStartEndPointsPrecise(result, s.getPreciseLatLon(), e.getPreciseLatLon());
 		}
 		return new RouteCalcResult(result); // prepareResult() should be called finally (not between interpoints)
 	}
