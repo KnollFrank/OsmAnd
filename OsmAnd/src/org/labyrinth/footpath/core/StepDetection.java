@@ -36,7 +36,7 @@ public class StepDetection {
     private final double peak;
     private final int step_timeout_ms;
     private long last_step_ts = 0;
-    private final double[] lastAcc = new double[]{0.0, 0.0, 0.0};
+    private double lastAcc = 0.0;
     private Angle lastComp = Angle.ZERO;
     private int round = 0;
     private Timer timer;
@@ -52,9 +52,7 @@ public class StepDetection {
             switch (event.sensor.getType()) {
                 case Sensor.TYPE_ACCELEROMETER:
                     // just update the oldest z value
-                    lastAcc[0] = lowpassFilter(lastAcc[0], event.values[0], a);
-                    lastAcc[1] = lowpassFilter(lastAcc[1], event.values[1], a);
-                    lastAcc[2] = lowpassFilter(lastAcc[2], event.values[2], a);
+                    lastAcc = lowpassFilter(lastAcc, event.values[2], a);
                     break;
                 case Sensor.TYPE_ORIENTATION:
                     lastComp = new Angle(event.values[0], Angle.Unit.DEGREES);
@@ -123,11 +121,8 @@ public class StepDetection {
     private void updateData() {
         final long now_ms = System.currentTimeMillis();
 
-        final double[] oldAcc = new double[3];
-        System.arraycopy(lastAcc, 0, oldAcc, 0, 3);
         final Angle lCompass = lastComp;
-        // FK-TODO: change oldAcc from array to a single value
-        final double lOld_z = oldAcc[2];
+        final double lOld_z = lastAcc;
 
         addData(lOld_z);
 
