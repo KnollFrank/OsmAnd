@@ -37,7 +37,7 @@ public class StepDetection {
     private final int step_timeout_ms;
     private long last_step_ts = 0;
     private final double[] lastAcc = new double[]{0.0, 0.0, 0.0};
-    private final Angle[] lastComp = new Angle[]{Angle.ZERO, Angle.ZERO, Angle.ZERO};
+    private Angle lastComp = Angle.ZERO;
     private int round = 0;
     private Timer timer;
 
@@ -57,9 +57,7 @@ public class StepDetection {
                     lastAcc[2] = lowpassFilter(lastAcc[2], event.values[2], a);
                     break;
                 case Sensor.TYPE_ORIENTATION:
-                    lastComp[0] = new Angle(event.values[0], Angle.Unit.DEGREES);
-                    lastComp[1] = new Angle(event.values[1], Angle.Unit.DEGREES);
-                    lastComp[2] = new Angle(event.values[2], Angle.Unit.DEGREES);
+                    lastComp = new Angle(event.values[0], Angle.Unit.DEGREES);
                     break;
                 default:
             }
@@ -127,10 +125,7 @@ public class StepDetection {
 
         final double[] oldAcc = new double[3];
         System.arraycopy(lastAcc, 0, oldAcc, 0, 3);
-        final Angle[] oldComp = new Angle[3];
-        System.arraycopy(lastComp, 0, oldComp, 0, 3);
-        // FK-TODO: change oldComp from array to a single value
-        final Angle lCompass = oldComp[0];
+        final Angle lCompass = lastComp;
         // FK-TODO: change oldAcc from array to a single value
         final double lOld_z = oldAcc[2];
 
