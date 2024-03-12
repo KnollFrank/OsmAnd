@@ -36,7 +36,7 @@ public class StepDetection {
     private final double peak;
     private final int step_timeout_ms;
     private long last_step_ts = 0;
-    private double lastAcc = 0.0;
+    private double lastAcc = 0;
     private Angle lastComp = Angle.ZERO;
     private int round = 0;
     private Timer timer;
