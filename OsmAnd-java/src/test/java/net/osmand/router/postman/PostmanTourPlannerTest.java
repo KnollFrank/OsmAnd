@@ -144,7 +144,7 @@ public class PostmanTourPlannerTest {
                         new RouteSegmentResultWithEquality(-1347, "langer Weg", 2, 1),
                         new RouteSegmentResultWithEquality(-1348, "kurzer Weg", 0, 1),
                         new RouteSegmentResultWithEquality(-1348, "kurzer Weg", 1, 0),
-                        new RouteSegmentResultWithEquality(-1347, "langer Weg", 1, 0)),
+                        new RouteSegmentResultWithEquality(-1347, "langer Weg", 2, 1)),
                 RouteSegmentResultWithEqualityFactory.getRouteSegmentResultWithEqualities(routeSegmentResults));
     }
 

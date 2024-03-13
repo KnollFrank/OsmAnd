@@ -914,7 +914,7 @@ public class RoutePlannerFrontEnd {
 			if (ctx.previouslyCalculatedRoute == null || intermediatesEmpty) {
 				List<RouteSegmentPoint> points = new ArrayList<>();
 				for (int i = 0; i < targets.size() - 1; i++) {
-					RouteCalcResult lr = searchRouteAndPrepareTurns(ctx, targets.get(i), null, targets.get(i + 1), null, points, i, routeDirection);
+					RouteCalcResult lr = searchRouteAndPrepareTurns(ctx, targets.get(i), null, targets.get(i + 1), null, points, i, routeDirection, postmanTour);
 					if (lr == null || !lr.isCorrect()) {
 						return lr;
 					}
