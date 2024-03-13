@@ -1,5 +1,7 @@
 package net.osmand.plus.routing;
 
+import static net.osmand.plus.notifications.OsmandNotification.NotificationType.NAVIGATION;
+
 import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
@@ -29,8 +31,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import static net.osmand.plus.notifications.OsmandNotification.NotificationType.NAVIGATION;
 
 class RouteRecalculationHelper {
 
@@ -410,7 +410,7 @@ class RouteRecalculationHelper {
 			}
 			RouteProvider provider = routingHelper.getProvider();
 			OsmandSettings settings = getSettings();
-			RouteCalculationResult res = provider.calculateRouteImpl(params);
+			RouteCalculationResult res = provider.calculateRouteImpl(params, params.ctx.getSettings().POSTMAN_TOUR_MODE.get());
 			if (params.calculationProgress.isCancelled) {
 				return;
 			}

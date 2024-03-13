@@ -51,7 +51,8 @@ public class PostmanTourPlannerTest {
                                 routingContext,
                                 entrance,
                                 new LatLon(49.4459823, 10.3178143),
-                                Collections.emptyList());
+                                Collections.emptyList(),
+                                true);
 
         // Then
         final List<RouteSegmentResult> routeSegmentResults = routeCalcResult.getList();
@@ -79,7 +80,8 @@ public class PostmanTourPlannerTest {
                                 routingContext,
                                 hofweg,
                                 kapellenweg,
-                                Collections.emptyList());
+                                Collections.emptyList(),
+                                true);
 
         // Then
         final List<RouteSegmentResult> routeSegmentResults = routeCalcResult.getList();
@@ -104,7 +106,8 @@ public class PostmanTourPlannerTest {
                                 routingContext,
                                 south,
                                 new LatLon(48.501619, 8.9929844),
-                                Collections.emptyList());
+                                Collections.emptyList(),
+                                true);
 
         // Then
         final List<RouteSegmentResult> routeSegmentResults = routeCalcResult.getList();
@@ -129,7 +132,8 @@ public class PostmanTourPlannerTest {
                                 routingContext,
                                 start,
                                 new LatLon(43.0258502, 9.4061449),
-                                Collections.emptyList());
+                                Collections.emptyList(),
+                                true);
 
         // Then
         final List<RouteSegmentResult> routeSegmentResults = routeCalcResult.getList();

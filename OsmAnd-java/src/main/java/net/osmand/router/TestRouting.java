@@ -221,7 +221,7 @@ public class TestRouting {
 		double endLon = Double.parseDouble(parser.getAttributeValue("", "target_lon"));
 		LatLon start = new LatLon(startLat, startLon);
 		LatLon end = new LatLon(endLat, endLon);
-		List<RouteSegmentResult> route = router.searchRoute(ctx, start, end, null).detailed;
+		List<RouteSegmentResult> route = router.searchRoute(ctx, start, end, null, false).detailed;
 		final float calcRoutingTime = ctx.routingTime;
 		float completeTime = 0;
 		float completeDistance = 0;
@@ -270,7 +270,7 @@ public class TestRouting {
 	private static void runTestSpecialTest(NativeLibrary lib, BinaryMapIndexReader[] rs, RoutingConfiguration rconfig, RoutePlannerFrontEnd router,
 			LatLon start, LatLon end, final float calcRoutingTime, String msg) throws IOException, InterruptedException {
 		RoutingContext ctx = router.buildRoutingContext(rconfig, lib, rs);
-		router.searchRoute(ctx, start, end, null);
+		router.searchRoute(ctx, start, end, null, false);
 		FinalRouteSegment frs = ctx.finalRouteSegment;
 		if(frs == null || !equalPercent(calcRoutingTime, frs.distanceFromStart, 0.5f)){
 			throw new IllegalArgumentException(MessageFormat.format(msg, calcRoutingTime+"",frs == null?"0":frs.distanceFromStart+""));
@@ -324,7 +324,7 @@ public class TestRouting {
 		// Clear ctx
 		ctx = router.buildRoutingContext(rconfig, lib, rs);
 		List<RouteSegmentResult> route = router.searchRoute(ctx,
-				new LatLon(startLat, startLon), new LatLon(endLat, endLon), null).detailed;
+				new LatLon(startLat, startLon), new LatLon(endLat, endLon), null, false).detailed;
 		System.out.println("Route is " + route.size() + " segments " + (System.currentTimeMillis() - ts) + " ms ");
 	}
 

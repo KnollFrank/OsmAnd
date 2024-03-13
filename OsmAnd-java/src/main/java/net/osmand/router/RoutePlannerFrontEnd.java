@@ -266,9 +266,9 @@ public class RoutePlannerFrontEnd {
 		return null;
 	}
 
-	public RouteCalcResult searchRoute(final RoutingContext ctx, LatLon start, LatLon end, List<LatLon> intermediates)
+	public RouteCalcResult searchRoute(final RoutingContext ctx, LatLon start, LatLon end, List<LatLon> intermediates, final boolean postmanTour)
 			throws IOException, InterruptedException {
-		return searchRoute(ctx, start, end, intermediates, null);
+		return searchRoute(ctx, start, end, intermediates, null, postmanTour);
 	}
 
 	public RoutePlannerFrontEnd setUseFastRecalculation(boolean use) {
@@ -735,7 +735,7 @@ public class RoutePlannerFrontEnd {
 			gctx.routeDistCalculations += (target.cumDist - start.cumDist);
 			gctx.routeCalculations++;
 			RoutingContext local = new RoutingContext(gctx.ctx);
-			res = searchRouteAndPrepareTurns(local, start.pnt, target.pnt, null);
+			res = searchRouteAndPrepareTurns(local, start.pnt, target.pnt, null, false);
 			// BinaryRoutePlanner.printDebugMemoryInformation(gctx.ctx);
 			routeIsCorrect = res != null && res.isCorrect();
 			for (int k = start.ind + 1; routeIsCorrect && k < target.ind; k++) {
@@ -854,7 +854,7 @@ public class RoutePlannerFrontEnd {
 	}
 
 	public RouteCalcResult searchRoute(final RoutingContext ctx, LatLon start, LatLon end, List<LatLon> intermediates,
-			PrecalculatedRouteDirection routeDirection) throws IOException, InterruptedException {
+			PrecalculatedRouteDirection routeDirection, final boolean postmanTour) throws IOException, InterruptedException {
 		RouteCalcResult res = null;
 		long timeToCalculate = System.nanoTime();
 		if (ctx.calculationProgress == null) {
@@ -897,7 +897,7 @@ public class RoutePlannerFrontEnd {
 				RoutingContext nctx = buildRoutingContext(ctx.config, ctx.nativeLib, ctx.getMaps(),
 						RouteCalculationMode.BASE);
 				nctx.calculationProgress = ctx.calculationProgress;
-				RouteCalcResult baseRes = searchRoute(nctx, start, end, intermediates); // recursion for base routing
+				RouteCalcResult baseRes = searchRoute(nctx, start, end, intermediates, postmanTour); // recursion for base routing
 				if (baseRes == null || !baseRes.isCorrect()) {
 					return baseRes;
 				}
@@ -913,7 +913,7 @@ public class RoutePlannerFrontEnd {
 			if (ctx.previouslyCalculatedRoute == null || intermediatesEmpty) {
 				List<RouteSegmentPoint> points = new ArrayList<>();
 				for (int i = 0; i < targets.size() - 1; i++) {
-					RouteCalcResult lr = searchRouteAndPrepareTurns(ctx, targets.get(i), null, targets.get(i + 1), null, points, i, routeDirection);
+					RouteCalcResult lr = searchRouteAndPrepareTurns(ctx, targets.get(i), null, targets.get(i + 1), null, points, i, routeDirection, postmanTour);
 					if (res == null) {
 						res = lr;
 					} else if (lr == null || !lr.isCorrect()) {
@@ -1091,16 +1091,16 @@ public class RoutePlannerFrontEnd {
 	}
 
 	private RouteCalcResult searchRouteAndPrepareTurns(final RoutingContext ctx, RouteSegmentPoint s,
-			RouteSegmentPoint e, PrecalculatedRouteDirection routeDirection) throws IOException, InterruptedException {
+			RouteSegmentPoint e, PrecalculatedRouteDirection routeDirection, final boolean postmanTour) throws IOException, InterruptedException {
 		List<RouteSegmentPoint> points = new ArrayList<>();
 		points.add(s);
 		points.add(e);
-		return searchRouteAndPrepareTurns(ctx, s.getPreciseLatLon(), s, e.getPreciseLatLon(), e, points, 0, routeDirection);
+		return searchRouteAndPrepareTurns(ctx, s.getPreciseLatLon(), s, e.getPreciseLatLon(), e, points, 0, routeDirection, postmanTour);
 	}
 
 	private RouteCalcResult searchRouteAndPrepareTurns(final RoutingContext ctx, LatLon start, RouteSegmentPoint s,
 			LatLon end, RouteSegmentPoint e, List<RouteSegmentPoint> points, int i,
-			PrecalculatedRouteDirection routeDirection)
+			PrecalculatedRouteDirection routeDirection, final boolean postmanTour)
 			throws IOException, InterruptedException {
 		RouteSegmentPoint recalculationEnd = getRecalculationEnd(ctx);
 		if (recalculationEnd != null) {
@@ -1140,13 +1140,15 @@ public class RoutePlannerFrontEnd {
 		} else {
 			refreshProgressDistance(ctx);
 			RoutingContext local = new RoutingContext(ctx);
-			// FK-TODO: wieder aktivieren für non-Postman-Fälle:
-			// ctx.finalRouteSegment = new BinaryRoutePlanner().searchRouteInternal(local, s, e, null);
-			ctx.finalRouteSegment = new PostmanTourPlanner().searchRoute(local, s);
+			ctx.finalRouteSegment =
+					postmanTour ?
+							new PostmanTourPlanner().searchRoute(local, s) :
+							new BinaryRoutePlanner().searchRouteInternal(local, s, e, null);
 			result = RouteResultPreparation.convertFinalSegmentToResults(ctx, ctx.finalRouteSegment);
 			addPrecalculatedToResult(recalculationEnd, result);
-			// FK-TODO: wieder aktivieren für non-Postman-Fälle:
-			// makeStartEndPointsPrecise(result, s.getPreciseLatLon(), e.getPreciseLatLon());
+			if (!postmanTour) {
+				makeStartEndPointsPrecise(result, s.getPreciseLatLon(), e.getPreciseLatLon());
+			}
 		}
 		return new RouteCalcResult(result); // prepareResult() should be called finally (not between interpoints)
 	}
@@ -1301,7 +1303,7 @@ public class RoutePlannerFrontEnd {
 					local.previouslyCalculatedRoute = firstPartRecalculatedRoute;
 				}
 			}
-			RouteCalcResult res = searchRouteAndPrepareTurns(local, pnts.get(i), pnts.get(i + 1), routeDirection);
+			RouteCalcResult res = searchRouteAndPrepareTurns(local, pnts.get(i), pnts.get(i + 1), routeDirection, false);
 			results.detailed.addAll(res.detailed);
 			ctx.routingTime += local.routingTime;
 //			local.unloadAllData(ctx);

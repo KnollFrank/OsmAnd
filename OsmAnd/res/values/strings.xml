@@ -5016,6 +5016,7 @@ Download tile maps directly, or copy them as SQLite database files to OsmAnd\'s 
     <string name="items_were_selected">{0} item(s) selected</string>
     <string name="filter_existing_indexes">Downloaded</string>
     <string name="fast_route_mode">Fastest route</string>
+    <string name="postman_tour_mode">Postman tour</string>
     <string name="fast_route_mode_descr">Enable to calculate fastest route or disable for fuel-saving route.</string>
     <string name="tiles_to_download_estimated_size">At zoom {0} download {1} tiles ({2} MB)</string>
     <string name="shared_string_download_map">Download map</string>

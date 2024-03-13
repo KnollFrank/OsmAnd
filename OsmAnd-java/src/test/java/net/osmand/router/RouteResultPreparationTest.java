@@ -125,7 +125,7 @@ public class RouteResultPreparationTest {
         }
         ctx.leftSideNavigation = false;
         
-        List<RouteSegmentResult> routeSegments = fe.searchRoute(ctx, te.getStartPoint(), te.getEndPoint(), null).detailed;
+        List<RouteSegmentResult> routeSegments = fe.searchRoute(ctx, te.getStartPoint(), te.getEndPoint(), null, false).detailed;
         Set<Long> reachedSegments = new TreeSet<Long>();
         Assert.assertNotNull(routeSegments);
         int prevSegment = -1;

@@ -10,8 +10,7 @@ public enum RouteService {
 	BROUTER("BRouter (offline)"),
 	STRAIGHT("Straight line"),
 	DIRECT_TO("Direct To"),
-	ONLINE("Online engine"),
-	POSTMAN_TOUR("Postman Tour (offline)");
+	ONLINE("Online engine");
 
 	private final String name;
 
@@ -24,7 +23,7 @@ public enum RouteService {
 	}
 
 	public boolean isOnline() {
-		return this != OSMAND && this != BROUTER && this != POSTMAN_TOUR;
+		return this != OSMAND && this != BROUTER;
 	}
 
 	boolean isAvailable(OsmandApplication ctx) {

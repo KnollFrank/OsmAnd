@@ -296,6 +296,9 @@ public class RoutingOptionsHelper {
 		if (gpxParam.id == R.string.fast_route_mode) {
 			settings.FAST_ROUTE_MODE.set(selected);
 		}
+		if (gpxParam.id == R.string.postman_tour_mode) {
+			settings.POSTMAN_TOUR_MODE.set(selected);
+		}
 		if (gpxParam.id == R.string.speak_favorites) {
 			settings.ANNOUNCE_NEARBY_FAVORITES.set(selected);
 		}
@@ -483,6 +486,11 @@ public class RoutingOptionsHelper {
 			list.add(new OtherLocalRoutingParameter(R.string.fast_route_mode, app.getString(R.string.fast_route_mode),
 					settings.FAST_ROUTE_MODE.get()));
 		}
+		list.add(
+				new OtherLocalRoutingParameter(
+						R.string.postman_tour_mode,
+						app.getString(R.string.postman_tour_mode),
+						settings.POSTMAN_TOUR_MODE.get()));
 		return list;
 	}
 

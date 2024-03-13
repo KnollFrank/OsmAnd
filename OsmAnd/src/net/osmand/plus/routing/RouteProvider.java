@@ -23,8 +23,8 @@ import net.osmand.gpx.GPXUtilities.WptPt;
 import net.osmand.map.WorldRegion;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
-import net.osmand.plus.avoidroads.DirectionPointsHelper;
 import net.osmand.plus.avoidroads.AvoidRoadsHelper;
+import net.osmand.plus.avoidroads.DirectionPointsHelper;
 import net.osmand.plus.helpers.TargetPointsHelper;
 import net.osmand.plus.helpers.TargetPointsHelper.TargetPoint;
 import net.osmand.plus.onlinerouting.OnlineRoutingHelper;
@@ -114,10 +114,8 @@ public class RouteProvider {
 		return locations;
 	}
 
-	public RouteCalculationResult calculateRouteImpl(RouteCalculationParams params) {
+	public RouteCalculationResult calculateRouteImpl(RouteCalculationParams params, final boolean postmanTour) {
 		long time = System.currentTimeMillis();
-		// FK-FIXME: remove the following line and replace with UI
-		params.mode.setRouteService(RouteService.POSTMAN_TOUR);
 		if (params.start != null && params.end != null) {
 			params.calculationProgress.routeCalculationStartTime = time;
 			if (log.isInfoEnabled()) {
@@ -132,7 +130,7 @@ public class RouteProvider {
 					res = calculateGpxRoute(params);
 				} else if (params.mode.getRouteService() == RouteService.OSMAND) {
 					if (params.inPublicTransportMode) {
-						res = findVectorMapsRoute(params, calcGPXRoute);
+						res = findVectorMapsRoute(params, calcGPXRoute, postmanTour);
 					} else {
 						MissingMapsHelper missingMapsHelper = new MissingMapsHelper(params);
 						List<Location> points = missingMapsHelper.getStartFinishIntermediatePoints();
@@ -145,26 +143,7 @@ public class RouteProvider {
 							if (!missingMapsHelper.isAnyPointOnWater(pathPoints)) {
 								params.calculationProgress.missingMaps = missingMapsHelper.getMissingMaps(pathPoints);
 							}
-							res = findVectorMapsRoute(params, calcGPXRoute);
-						}
-					}
-				} else if (params.mode.getRouteService() == RouteService.POSTMAN_TOUR) {
-					// FK-TODO: calculate postman tour
-					if (params.inPublicTransportMode) {
-						res = findVectorMapsRoute(params, calcGPXRoute);
-					} else {
-						final MissingMapsHelper missingMapsHelper = new MissingMapsHelper(params);
-						final List<Location> points = missingMapsHelper.getStartFinishIntermediatePoints();
-						final List<WorldRegion> missingMaps = missingMapsHelper.getMissingMaps(points);
-						final List<Location> pathPoints = missingMapsHelper.getDistributedPathPoints(points);
-						if (!Algorithms.isEmpty(missingMaps)) {
-							res = new RouteCalculationResult("Additional maps available");
-							res.missingMaps = missingMapsHelper.getMissingMaps(pathPoints);
-						} else {
-							if (!missingMapsHelper.isAnyPointOnWater(pathPoints)) {
-								params.calculationProgress.missingMaps = missingMapsHelper.getMissingMaps(pathPoints);
-							}
-							res = findVectorMapsRoute(params, calcGPXRoute);
+							res = findVectorMapsRoute(params, calcGPXRoute, postmanTour);
 						}
 					}
 				} else if (params.mode.getRouteService() == RouteService.BROUTER) {
@@ -183,7 +162,7 @@ public class RouteProvider {
 						String engineKey = params.mode.getRoutingProfile();
 						OnlineRoutingEngine engine = helper.getEngineByKey(engineKey);
 						if (engine != null && engine.useRoutingFallback()) {
-							res = findVectorMapsRoute(params, calcGPXRoute);
+							res = findVectorMapsRoute(params, calcGPXRoute, postmanTour);
 						}
 					}
 				} else if (params.mode.getRouteService() == RouteService.STRAIGHT ||
@@ -421,7 +400,7 @@ public class RouteProvider {
 		} else if (routeService == RouteService.STRAIGHT || routeService == RouteService.DIRECT_TO || connectPointsStraightly) {
 			return findStraightRoute(rp);
 		}
-		return findVectorMapsRoute(rp, false);
+		return findVectorMapsRoute(rp, false, false);
 	}
 
 	private int findClosestIntermediate(RouteCalculationParams params, List<Location> intermediates) {
@@ -619,7 +598,7 @@ public class RouteProvider {
 		try {
 			RouteService routeService = params.mode.getRouteService();
 			if (routeService == RouteService.OSMAND) {
-				newRes = findVectorMapsRoute(newParams, false);
+				newRes = findVectorMapsRoute(newParams, false, false);
 			} else if (routeService == RouteService.BROUTER) {
 				newRes = findBROUTERRoute(newParams);
 			} else if (routeService == RouteService.STRAIGHT || routeService == RouteService.DIRECT_TO) {
@@ -860,7 +839,7 @@ public class RouteProvider {
 		return new RoutingEnvironment(router, ctx, complexCtx, precalculated);
 	}
 
-	protected RouteCalculationResult findVectorMapsRoute(RouteCalculationParams params, boolean calcGPXRoute) throws IOException {
+	protected RouteCalculationResult findVectorMapsRoute(RouteCalculationParams params, boolean calcGPXRoute, final boolean postmanTour) throws IOException {
 		RoutingEnvironment env = calculateRoutingEnvironment(params, calcGPXRoute, false);
 		if (env == null) {
 			return applicationModeNotSupported(params);
@@ -871,7 +850,7 @@ public class RouteProvider {
 		if (params.intermediates != null) {
 			inters = new ArrayList<LatLon>(params.intermediates);
 		}
-		return calcOfflineRouteImpl(params, env.getRouter(), env.getCtx(), env.getComplexCtx(), st, en, inters, env.getPrecalculated());
+		return calcOfflineRouteImpl(params, env.getRouter(), env.getCtx(), env.getComplexCtx(), st, en, inters, env.getPrecalculated(), postmanTour);
 	}
 
 	private RoutingConfiguration initOsmAndRoutingConfig(Builder config, RouteCalculationParams params, OsmandSettings settings,
@@ -932,12 +911,12 @@ public class RouteProvider {
 
 	private RouteCalculationResult calcOfflineRouteImpl(RouteCalculationParams params,
 	                                                    RoutePlannerFrontEnd router, RoutingContext ctx, RoutingContext complexCtx, LatLon st, LatLon en,
-	                                                    List<LatLon> inters, PrecalculatedRouteDirection precalculated) throws IOException {
+	                                                    List<LatLon> inters, PrecalculatedRouteDirection precalculated, final boolean postmanTour) throws IOException {
 		try {
 			RouteResultPreparation.RouteCalcResult result = null;
 			if (complexCtx != null) {
 				try {
-					result = router.searchRoute(complexCtx, st, en, inters, precalculated);
+					result = router.searchRoute(complexCtx, st, en, inters, precalculated, postmanTour);
 					// discard ctx and replace with calculated
 					ctx = complexCtx;
 				} catch(RuntimeException e) {
@@ -948,7 +927,7 @@ public class RouteProvider {
 				}
 			}
 			if (result == null) {
-				result = router.searchRoute(ctx, st, en, inters);
+				result = router.searchRoute(ctx, st, en, inters, postmanTour);
 			}
 			
 			if(result == null || result.getList().isEmpty()) {
