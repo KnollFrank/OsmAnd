@@ -1,5 +1,17 @@
 package net.osmand.router;
 
+import com.google.protobuf.CodedInputStream;
+
+import net.osmand.binary.BinaryHHRouteReaderAdapter.HHRouteRegion;
+import net.osmand.binary.BinaryMapIndexReader;
+import net.osmand.binary.BinaryMapIndexReader.TagValuePair;
+import net.osmand.data.DataTileManager;
+import net.osmand.data.LatLon;
+import net.osmand.router.BinaryRoutePlanner.FinalRouteSegment;
+import net.osmand.router.BinaryRoutePlanner.RouteSegment;
+import net.osmand.router.RouteResultPreparation.RouteCalcResult;
+import net.osmand.util.MapUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -12,27 +24,16 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.TreeMap;
 
-import com.google.protobuf.CodedInputStream;
-
 import gnu.trove.iterator.TLongObjectIterator;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.hash.TLongHashSet;
-import net.osmand.binary.BinaryHHRouteReaderAdapter.HHRouteRegion;
-import net.osmand.binary.BinaryMapIndexReader;
-import net.osmand.binary.BinaryMapIndexReader.TagValuePair;
-import net.osmand.data.DataTileManager;
-import net.osmand.data.LatLon;
-import net.osmand.router.BinaryRoutePlanner.FinalRouteSegment;
-import net.osmand.router.BinaryRoutePlanner.RouteSegment;
-import net.osmand.router.RouteResultPreparation.RouteCalcResult;
-import net.osmand.util.MapUtils;
 
 public class HHRouteDataStructure {
 	
 	public static class HHRoutingConfig {
 		public final static int CALCULATE_ALL_DETAILED = 3;
-		public int STATS_VERBOSE_LEVEL = 1; // 0 less verbose
+		public static int STATS_VERBOSE_LEVEL = 1; // 0 less verbose
 		float HEURISTIC_COEFFICIENT = 0; // A* - 1, Dijkstra - 0
 		float DIJKSTRA_DIRECTION = 0; // 0 - 2 directions, 1 - positive, -1 - reverse
 		public HHRoutingContext<NetworkDBPoint> cacheCtx;

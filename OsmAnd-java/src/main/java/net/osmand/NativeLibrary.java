@@ -5,6 +5,8 @@ import static net.osmand.IndexConstants.GPX_GZ_FILE_EXT;
 import static net.osmand.router.RoutePlannerFrontEnd.GpxPoint;
 import static net.osmand.router.RoutePlannerFrontEnd.GpxRouteApproximation;
 
+import com.google.gson.JsonObject;
+
 import net.osmand.binary.BinaryMapIndexReader;
 import net.osmand.binary.BinaryMapRouteReaderAdapter.RouteRegion;
 import net.osmand.binary.BinaryMapRouteReaderAdapter.RouteSubregion;
@@ -14,10 +16,15 @@ import net.osmand.data.MapObject;
 import net.osmand.data.QuadRect;
 import net.osmand.render.RenderingRuleSearchRequest;
 import net.osmand.render.RenderingRulesStorage;
-import net.osmand.router.*;
+import net.osmand.router.HHRouteDataStructure.HHRoutingConfig;
+import net.osmand.router.NativeTransportRoutingResult;
+import net.osmand.router.RouteCalculationProgress;
+import net.osmand.router.RouteResultPreparation;
+import net.osmand.router.RouteSegmentResult;
+import net.osmand.router.RoutingContext;
+import net.osmand.router.TransportRoutingConfiguration;
 import net.osmand.util.Algorithms;
 import net.osmand.util.MapUtils;
-import net.osmand.router.HHRouteDataStructure.HHRoutingConfig;
 
 import org.apache.commons.logging.Log;
 
@@ -44,11 +51,23 @@ public class NativeLibrary {
 	}
 
 	public static class RenderingGenerationResult {
+		public ByteBuffer bitmapBuffer;
+		private JsonObject info;
 		public RenderingGenerationResult(ByteBuffer bitmap) {
-			bitmapBuffer = bitmap;
+			this.bitmapBuffer = bitmap;
 		}
-
-		public final ByteBuffer bitmapBuffer;
+		public RenderingGenerationResult(ByteBuffer bitmap, JsonObject info) {
+			this.bitmapBuffer = bitmap;
+			this.info = info;
+		}
+		
+		public JsonObject getInfo() {
+			return info;
+		}
+		
+		public void setInfo(JsonObject info) {
+			this.info = info;
+		}
 	}
 
 	public static class NativeSearchResult {

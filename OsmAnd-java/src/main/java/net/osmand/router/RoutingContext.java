@@ -1,23 +1,6 @@
 package net.osmand.router;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.apache.commons.logging.Log;
-
-import gnu.trove.iterator.TIntObjectIterator;
-import gnu.trove.iterator.TLongIterator;
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.set.hash.TLongHashSet;
 import net.osmand.NativeLibrary;
 import net.osmand.NativeLibrary.NativeRouteSearchResult;
 import net.osmand.PlatformUtil;
@@ -37,6 +20,24 @@ import net.osmand.router.BinaryRoutePlanner.RouteSegmentVisitor;
 import net.osmand.router.RoutePlannerFrontEnd.RouteCalculationMode;
 import net.osmand.router.RoutingConfiguration.DirectionPoint;
 import net.osmand.util.MapUtils;
+
+import org.apache.commons.logging.Log;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import gnu.trove.iterator.TIntObjectIterator;
+import gnu.trove.iterator.TLongIterator;
+import gnu.trove.map.TLongObjectMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.set.hash.TLongHashSet;
 
 
 public class RoutingContext {
@@ -482,11 +483,10 @@ public class RoutingContext {
 		if (memoryLimit == 0) {
 			memoryLimit = config.memoryLimitation;
 		}
-		if (getCurrentEstimatedSize() > 0.9 * memoryLimit) {
+		if (getCurrentEstimatedSize() > 0.85 * memoryLimit) {
 			int sz1 = getCurrentEstimatedSize();
 			long h1 = 0;
 			if (SHOW_GC_SIZE && sz1 > 0.7 * memoryLimit) {
-				runGCUsedMemory();
 				h1 = runGCUsedMemory();
 			}
 			int clt = getCurrentlyLoadedTiles();
@@ -494,7 +494,6 @@ public class RoutingContext {
 			unloadUnusedTiles(memoryLimit);
 			if (h1 != 0 && getCurrentlyLoadedTiles() != clt) {
 				int sz2 = getCurrentEstimatedSize();
-				runGCUsedMemory();
 				long h2 = runGCUsedMemory();
 				float mb = (1 << 20);
 				log.warn("Unload tiles :  estimated " + (sz1 - sz2) / mb + " ?= " + (h1 - h2) / mb + " actual");
@@ -729,17 +728,11 @@ public class RoutingContext {
 	protected static long runGCUsedMemory()  {
 		Runtime runtime = Runtime.getRuntime();
 		long usedMem1 = runtime.totalMemory() - runtime.freeMemory();
-		long usedMem2 = Long.MAX_VALUE;
-		int cnt = 4;
+		int cnt = 1;
 		while (cnt-- >= 0) {
-			for (int i = 0; (usedMem1 < usedMem2) && (i < 1000); ++i) {
-				runtime.runFinalization();
-				runtime.gc();
-				Thread.yield();
-
-				usedMem2 = usedMem1;
-				usedMem1 = runtime.totalMemory() - runtime.freeMemory();
-			}
+			runtime.runFinalization();
+			runtime.gc();
+			usedMem1 = runtime.totalMemory() - runtime.freeMemory();
 		}
 		return usedMem1;
 	}

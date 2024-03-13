@@ -33,8 +33,8 @@ import net.osmand.search.SearchUICore.SearchResultMatcher;
 import net.osmand.search.core.SearchPhrase.NameStringMatcher;
 import net.osmand.search.core.SearchPhrase.SearchPhraseDataType;
 import net.osmand.util.Algorithms;
-import net.osmand.util.GeoPointParserUtil;
 import net.osmand.util.GeoParsedPoint;
+import net.osmand.util.GeoPointParserUtil;
 import net.osmand.util.LocationParser;
 import net.osmand.util.LocationParser.ParsedOpenLocationCode;
 import net.osmand.util.MapUtils;
@@ -579,7 +579,7 @@ public class SearchCoreFactory {
 	public static class SearchAmenityByNameAPI extends SearchBaseAPI {
 		private static final int LIMIT = 10000;
 		private static final int BBOX_RADIUS = 500 * 1000;
-		private static final int BBOX_RADIUS_INSIDE = 10000 * 1000; // to support city search for basemap
+		private static final int BBOX_RADIUS_INSIDE = 20000 * 1000; // to support city search for basemap
 		private static final int BBOX_RADIUS_POI_IN_CITY = 25 * 1000;
 		private static final int FIRST_WORD_MIN_LENGTH = 3;
 
@@ -689,7 +689,6 @@ public class SearchCoreFactory {
 					resultMatcher.apiSearchRegionFinished(this, r, phrase);
 				}
 			}
-			
 			return true;
 		}
 

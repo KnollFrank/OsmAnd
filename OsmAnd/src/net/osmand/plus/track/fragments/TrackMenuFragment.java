@@ -77,8 +77,6 @@ import net.osmand.plus.OsmAndLocationProvider.OsmAndLocationListener;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
-import net.osmand.plus.plugins.srtm.SRTMPlugin;
-import net.osmand.plus.search.ShowQuickSearchMode;
 import net.osmand.plus.base.ContextMenuFragment;
 import net.osmand.plus.base.ContextMenuScrollFragment;
 import net.osmand.plus.charts.TrackChartPoints;
@@ -98,19 +96,21 @@ import net.osmand.plus.myplaces.tracks.dialogs.SplitSegmentDialogFragment;
 import net.osmand.plus.myplaces.tracks.tasks.DeletePointsTask.OnPointsDeleteListener;
 import net.osmand.plus.myplaces.tracks.tasks.OpenGpxDetailsTask;
 import net.osmand.plus.plugins.PluginsHelper;
-import net.osmand.plus.simulation.SimulateLocationFragment;
 import net.osmand.plus.plugins.osmedit.OsmEditingPlugin;
+import net.osmand.plus.plugins.srtm.SRTMPlugin;
 import net.osmand.plus.routepreparationmenu.cards.BaseCard;
 import net.osmand.plus.routepreparationmenu.cards.BaseCard.CardListener;
 import net.osmand.plus.routepreparationmenu.cards.MapBaseCard;
+import net.osmand.plus.search.ShowQuickSearchMode;
 import net.osmand.plus.search.dialogs.QuickSearchDialogFragment;
+import net.osmand.plus.simulation.SimulateLocationFragment;
 import net.osmand.plus.track.GpxSelectionParams;
 import net.osmand.plus.track.cards.AuthorCard;
 import net.osmand.plus.track.cards.CopyrightCard;
 import net.osmand.plus.track.cards.DescriptionCard;
+import net.osmand.plus.track.cards.GpxInfoCard;
 import net.osmand.plus.track.cards.InfoCard;
 import net.osmand.plus.track.cards.MetadataExtensionsCard;
-import net.osmand.plus.track.cards.GpxInfoCard;
 import net.osmand.plus.track.cards.OptionsCard;
 import net.osmand.plus.track.cards.OverviewCard;
 import net.osmand.plus.track.cards.PointsGroupsCard;
@@ -656,9 +656,10 @@ public class TrackMenuFragment extends ContextMenuScrollFragment implements Card
 
 	private void setupDisplayGroupsWidget() {
 		OnClickListener listener = view -> {
-			MapActivity mapActivity = getMapActivity();
-			if (mapActivity != null && getDisplayGroupsHolder().getTotalTrackGroupsNumber() > 0) {
-				DisplayGroupsBottomSheet.showInstance(mapActivity, this, true);
+			MapActivity activity = getMapActivity();
+			if (activity != null && getDisplayGroupsHolder().getTotalTrackGroupsNumber() > 0) {
+				FragmentManager manager = activity.getSupportFragmentManager();
+				DisplayGroupsBottomSheet.showInstance(manager, this, true);
 			}
 		};
 		displayGroupsButton.setOnClickListener(listener);
@@ -747,7 +748,7 @@ public class TrackMenuFragment extends ContextMenuScrollFragment implements Card
 		}
 	}
 
-	private void setupOverviewCards(MapActivity mapActivity, ViewGroup cardsContainer, boolean shouldReattachCards){
+	private void setupOverviewCards(MapActivity mapActivity, ViewGroup cardsContainer, boolean shouldReattachCards) {
 		if (shouldReattachCards && overviewCard != null && overviewCard.getView() != null) {
 			reattachCard(cardsContainer, overviewCard);
 		} else {
@@ -1445,10 +1446,6 @@ public class TrackMenuFragment extends ContextMenuScrollFragment implements Card
 
 	@Override
 	public void scrollBy(int px) {
-	}
-
-	@Override
-	public void onPointsDeletionStarted() {
 	}
 
 	@Override

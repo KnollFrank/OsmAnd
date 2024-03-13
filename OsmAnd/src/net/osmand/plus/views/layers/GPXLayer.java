@@ -1,13 +1,13 @@
 package net.osmand.plus.views.layers;
 
 import static net.osmand.gpx.GPXUtilities.calculateTrackBounds;
-import static net.osmand.plus.configmap.ConfigureMapMenu.CURRENT_TRACK_COLOR_ATTR;
-import static net.osmand.plus.configmap.ConfigureMapMenu.CURRENT_TRACK_WIDTH_ATTR;
 import static net.osmand.gpx.GpxParameter.COLOR;
 import static net.osmand.gpx.GpxParameter.COLORING_TYPE;
 import static net.osmand.gpx.GpxParameter.SHOW_ARROWS;
 import static net.osmand.gpx.GpxParameter.SHOW_START_FINISH;
 import static net.osmand.gpx.GpxParameter.WIDTH;
+import static net.osmand.plus.configmap.ConfigureMapMenu.CURRENT_TRACK_COLOR_ATTR;
+import static net.osmand.plus.configmap.ConfigureMapMenu.CURRENT_TRACK_WIDTH_ATTR;
 import static net.osmand.plus.routing.ColoringStyleAlgorithms.isAvailableInSubscription;
 
 import android.content.Context;
@@ -92,6 +92,7 @@ import net.osmand.plus.utils.NativeUtilities;
 import net.osmand.plus.utils.UiUtilities;
 import net.osmand.plus.views.OsmandMapTileView;
 import net.osmand.plus.views.PointImageDrawable;
+import net.osmand.plus.views.PointImageUtils;
 import net.osmand.plus.views.Renderable;
 import net.osmand.plus.views.Renderable.RenderableSegment;
 import net.osmand.plus.views.layers.ContextMenuLayer.ApplyMovedObjectCallback;
@@ -846,7 +847,7 @@ public class GPXLayer extends OsmandMapLayer implements IContextMenuProvider, IM
 							} else {
 								color = disabledColor;
 							}
-							PointImageDrawable pointImageDrawable = PointImageDrawable.getFromWpt(getContext(), color,
+							PointImageDrawable pointImageDrawable = PointImageUtils.getFromPoint(getContext(), color,
 									true, wpt);
 							pointImageDrawable.drawSmallPoint(canvas, x, y, textScale);
 							smallObjectsLatLon.add(new LatLon(wpt.lat, wpt.lon));
@@ -1068,10 +1069,10 @@ public class GPXLayer extends OsmandMapLayer implements IContextMenuProvider, IM
 		PointImageDrawable pointImageDrawable;
 		boolean history = false;
 		if (marker != null) {
-			pointImageDrawable = PointImageDrawable.getOrCreateSyncedIcon(getContext(), pointColor, wpt);
+			pointImageDrawable = PointImageUtils.getOrCreateSyncedIcon(getContext(), pointColor, wpt);
 			history = marker.history;
 		} else {
-			pointImageDrawable = PointImageDrawable.getFromWpt(getContext(), pointColor, true, wpt);
+			pointImageDrawable = PointImageUtils.getFromPoint(getContext(), pointColor, true, wpt);
 		}
 		pointImageDrawable.drawPoint(canvas, x, y, textScale, history);
 	}

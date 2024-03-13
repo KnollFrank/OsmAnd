@@ -4,14 +4,14 @@ import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 
-import net.osmand.gpx.GPXUtilities;
 import net.osmand.gpx.GPXFile;
-import net.osmand.plus.track.helpers.GpxDisplayItem;
-import net.osmand.plus.track.helpers.GpxSelectionHelper.GpxDisplayItemType;
+import net.osmand.gpx.GPXUtilities;
 import net.osmand.plus.OsmandApplication;
-import net.osmand.plus.plugins.monitoring.SavingTrackHelper;
 import net.osmand.plus.mapmarkers.MapMarkersGroup;
 import net.osmand.plus.mapmarkers.MapMarkersHelper;
+import net.osmand.plus.plugins.monitoring.SavingTrackHelper;
+import net.osmand.plus.track.helpers.GpxDisplayItem;
+import net.osmand.plus.track.helpers.GpxSelectionHelper.GpxDisplayItemType;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -83,7 +83,9 @@ public class DeletePointsTask extends AsyncTask<Void, Void, Void> {
 	}
 
 	public interface OnPointsDeleteListener {
-		void onPointsDeletionStarted();
+		default void onPointsDeletionStarted() {
+
+		}
 
 		void onPointsDeleted();
 	}
