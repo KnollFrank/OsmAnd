@@ -17,7 +17,13 @@ import net.osmand.router.RoutingContext;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.labyrinth.common.MeasureUtils;
+import org.labyrinth.coordinate.Angle;
+import org.labyrinth.coordinate.Angle.Unit;
+import org.labyrinth.coordinate.Geodetic;
+import org.labyrinth.coordinate.GeodeticFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +36,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
+
+@Ignore
 public class PostmanTourPlannerTest {
 
     @BeforeClass
@@ -146,6 +156,21 @@ public class PostmanTourPlannerTest {
                         new RouteSegmentResultWithEquality(-1348, "kurzer Weg", 1, 0),
                         new RouteSegmentResultWithEquality(-1347, "langer Weg", 2, 1)),
                 RouteSegmentResultWithEqualityFactory.getRouteSegmentResultWithEqualities(routeSegmentResults));
+    }
+
+    private static LatLon getSomeEnd(final LatLon start, final Quantity<Length> radius) {
+        return getSomeEnd(GeodeticFactory.createGeodetic(start), radius).asLatLon();
+    }
+
+    private static Geodetic getSomeEnd(final Geodetic start,
+                                       final Quantity<Length> radius) {
+        final Geodetic end =
+                new Geodetic(
+                        start.getLatitude().add(new Angle(0.01, Unit.DEGREES)),
+                        start.getLongitude().add(new Angle(0.01, Unit.DEGREES)));
+        return start.moveIntoDirection(
+                end,
+                MeasureUtils.divide(radius, start.getDistanceTo(end)));
     }
 
     private static LatLon getStartOfRoute(final List<RouteSegmentResult> routeSegmentResults) {

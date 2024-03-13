@@ -3,6 +3,9 @@ package net.osmand.router.postman;
 import static net.osmand.router.postman.PostmanTourPlannerTest.createRoutingContext;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static tec.units.ri.quantity.Quantities.getQuantity;
+import static tec.units.ri.unit.MetricPrefix.KILO;
+import static tec.units.ri.unit.Units.METRE;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -56,7 +59,10 @@ public class GraphFactoryTest {
 
         // When
         final Pair<Graph, Node> graphAndStartNode =
-                GraphFactory.getGraphAndStartNode(routingContext, startSegment);
+                GraphFactory.getGraphAndStartNode(
+                        routingContext,
+                        startSegment,
+                        getQuantity(0.25, KILO(METRE)));
 
         // Then
         final Graph graph = graphAndStartNode.getFirst();
@@ -123,7 +129,10 @@ public class GraphFactoryTest {
 
         // When
         final Pair<Graph, Node> graphAndStartNode =
-                GraphFactory.getGraphAndStartNode(routingContext, startSegment);
+                GraphFactory.getGraphAndStartNode(
+                        routingContext,
+                        startSegment,
+                        getQuantity(0.25, KILO(METRE)));
 
         // Then
         final Graph graph = graphAndStartNode.getFirst();

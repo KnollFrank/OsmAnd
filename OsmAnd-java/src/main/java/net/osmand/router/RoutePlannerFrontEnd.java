@@ -1,5 +1,7 @@
 package net.osmand.router;
 
+import static org.labyrinth.coordinate.GeodeticFactory.createGeodetic;
+
 import net.osmand.LocationsHolder;
 import net.osmand.NativeLibrary;
 import net.osmand.PlatformUtil;
@@ -32,6 +34,9 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
 
 import gnu.trove.list.array.TIntArrayList;
 
@@ -1145,7 +1150,7 @@ public class RoutePlannerFrontEnd {
 			RoutingContext local = new RoutingContext(ctx);
 			ctx.finalRouteSegment =
 					postmanTour ?
-							new PostmanTourPlanner().searchRoute(local, s) :
+							new PostmanTourPlanner().searchRoute(local, s, getDistance(s, e)) :
 							new BinaryRoutePlanner().searchRouteInternal(local, s, e, null);
 			result = RouteResultPreparation.convertFinalSegmentToResults(ctx, ctx.finalRouteSegment);
 			addPrecalculatedToResult(recalculationEnd, result);
@@ -1154,6 +1159,10 @@ public class RoutePlannerFrontEnd {
 			}
 		}
 		return new RouteCalcResult(result);
+	}
+
+	private static Quantity<Length> getDistance(final RouteSegmentPoint start, final RouteSegmentPoint end) {
+		return createGeodetic(start).getDistanceTo(createGeodetic(end));
 	}
 
 	public RouteSegmentPoint getRecalculationEnd(final RoutingContext ctx) {

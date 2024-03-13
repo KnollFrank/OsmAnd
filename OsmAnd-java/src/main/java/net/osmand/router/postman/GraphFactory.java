@@ -1,9 +1,5 @@
 package net.osmand.router.postman;
 
-import static tec.units.ri.quantity.Quantities.getQuantity;
-import static tec.units.ri.unit.MetricPrefix.KILO;
-import static tec.units.ri.unit.Units.METRE;
-
 import net.osmand.router.BinaryRoutePlanner.RouteSegmentPoint;
 import net.osmand.router.RoutingContext;
 
@@ -20,25 +16,35 @@ import org.labyrinth.footpath.graph.Edges;
 import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
 
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
+
 class GraphFactory {
 
-    public static Pair<Graph, Node> getGraphAndStartNode(final RoutingContext ctx, final RouteSegmentPoint start) {
-        final Graph graph = getGraph(ctx, start);
+    public static Pair<Graph, Node> getGraphAndStartNode(final RoutingContext ctx,
+                                                         final RouteSegmentPoint start,
+                                                         final Quantity<Length> radius) {
+        final Graph graph = getGraph(ctx, start, radius);
         return Pair.of(graph, getNode(start, graph));
     }
 
-    private static Graph getGraph(final RoutingContext ctx, final RouteSegmentPoint start) {
-        return createGraphFactory(ctx, start).createGraph(new RouteSegmentWithEquality(start));
+    private static Graph getGraph(final RoutingContext ctx,
+                                  final RouteSegmentPoint start,
+                                  final Quantity<Length> radius) {
+        return createGraphFactory(ctx, start, radius).createGraph(new RouteSegmentWithEquality(start));
     }
 
-    private static org.labyrinth.footpath.converter.GraphFactory createGraphFactory(final RoutingContext ctx, final RouteSegmentPoint start) {
+    private static org.labyrinth.footpath.converter.GraphFactory createGraphFactory(
+            final RoutingContext ctx,
+            final RouteSegmentPoint start,
+            final Quantity<Length> radius) {
         return new org.labyrinth.footpath.converter.GraphFactory(
                 new ConnectedRouteSegmentsWithinAreaProvider(
                         new ConnectedRouteSegmentsProvider(ctx),
                         new RouteSegmentWithinCirclePredicate(
                                 new Circle(
-                                        GeodeticFactory.createGeodetic(start.getPreciseLatLon()),
-                                        getQuantity(0.25, KILO(METRE))))));
+                                        GeodeticFactory.createGeodetic(start),
+                                        radius))));
     }
 
     private static Node getNode(final RouteSegmentPoint routeSegmentPoint, final Graph graph) {

@@ -1,5 +1,7 @@
 package org.labyrinth.coordinate;
 
+import net.osmand.data.LatLon;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -25,6 +27,12 @@ public class Geodetic implements Serializable {
 
     public LocationExtension asOsmAndLocation() {
         return new LocationExtension(this.location);
+    }
+
+    public LatLon asLatLon() {
+        return new LatLon(
+                getLatitude().to(Angle.Unit.DEGREES),
+                getLongitude().to(Angle.Unit.DEGREES));
     }
 
     public Quantity<Length> getDistanceTo(final Geodetic other) {

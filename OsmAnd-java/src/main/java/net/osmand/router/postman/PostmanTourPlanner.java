@@ -18,11 +18,16 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
+
 public class PostmanTourPlanner {
 
-    public FinalRouteSegment searchRoute(final RoutingContext ctx, final RouteSegmentPoint start) {
+    public FinalRouteSegment searchRoute(final RoutingContext ctx,
+                                         final RouteSegmentPoint start,
+                                         final Quantity<Length> radius) {
         ctx.memoryOverhead = 1000;
-        final Pair<Graph, Node> graphAndStartNode = GraphFactory.getGraphAndStartNode(ctx, start);
+        final Pair<Graph, Node> graphAndStartNode = GraphFactory.getGraphAndStartNode(ctx, start, radius);
         final Graph graph = graphAndStartNode.getFirst();
         final Node startNode = graphAndStartNode.getSecond();
         final List<Node> shortestClosedPath = createShortestClosedPathStartingAtNode(graph, startNode);
