@@ -18,11 +18,6 @@ import net.osmand.router.RoutingContext;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.labyrinth.common.MeasureUtils;
-import org.labyrinth.coordinate.Angle;
-import org.labyrinth.coordinate.Angle.Unit;
-import org.labyrinth.coordinate.Geodetic;
-import org.labyrinth.coordinate.GeodeticFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,9 +30,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Length;
-
 public class PostmanTourPlannerTest {
 
     @BeforeClass
@@ -47,7 +39,7 @@ public class PostmanTourPlannerTest {
     }
 
     @Test
-    public void testRoutingLabyrinth() throws Exception {
+    public void test_searchRoute_Labyrinth() throws Exception {
         // Given
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Labyrinth.obf");
         final LatLon entrance = new LatLon(49.4460780, 10.3188074);
@@ -75,7 +67,7 @@ public class PostmanTourPlannerTest {
     }
 
     @Test
-    public void testRoutingHirschau() throws Exception {
+    public void test_searchRoute_Hirschau() throws Exception {
         // Given
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/Hirschau.obf");
         final LatLon hofweg = new LatLon(48.5017172, 8.9933938);
@@ -102,7 +94,7 @@ public class PostmanTourPlannerTest {
     }
 
     @Test
-    public void testRoutingHirschauKapellenweg() throws Exception {
+    public void test_searchRoute_HirschauKapellenweg() throws Exception {
         // Given
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/HirschauKapellenweg.obf");
         final LatLon south = new LatLon(48.50146813118, 8.99308606848);
@@ -129,7 +121,7 @@ public class PostmanTourPlannerTest {
     }
 
     @Test
-    public void testRoutingT_junction() throws Exception {
+    public void test_searchRoute_T_junction() throws Exception {
         // Given
         final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/T_junction.obf");
         final LatLon start = new LatLon(43.0257384, 9.4062576);
@@ -157,19 +149,30 @@ public class PostmanTourPlannerTest {
                 RouteSegmentResultWithEqualityFactory.getRouteSegmentResultWithEqualities(routeSegmentResults));
     }
 
-    private static LatLon getSomeEnd(final LatLon start, final Quantity<Length> radius) {
-        return getSomeEnd(GeodeticFactory.createGeodetic(start), radius).asLatLon();
-    }
+    @Test
+    public void test_searchRoute_roundTrip() throws Exception {
+        // Given
+        final RoutingContext routingContext = createRoutingContext("src/test/resources/routing/roundTrip.obf");
+        final LatLon entrance = new LatLon(48.50126124127, 8.99390518993);
+        final LatLon cafe = new LatLon(48.50147958211, 8.99437651036);
 
-    private static Geodetic getSomeEnd(final Geodetic start,
-                                       final Quantity<Length> radius) {
-        final Geodetic end =
-                new Geodetic(
-                        start.getLatitude().add(new Angle(0.01, Unit.DEGREES)),
-                        start.getLongitude().add(new Angle(0.01, Unit.DEGREES)));
-        return start.moveIntoDirection(
-                end,
-                MeasureUtils.divide(radius, start.getDistanceTo(end)));
+        // When
+        final RouteCalcResult routeCalcResult =
+                new RoutePlannerFrontEnd()
+                        .searchRoute(
+                                routingContext,
+                                entrance,
+                                cafe,
+                                Collections.emptyList(),
+                                true);
+
+        // Then
+        final List<RouteSegmentResult> routeSegmentResults = routeCalcResult.getList();
+        Assert.assertEquals(getStartOfRoute(routeSegmentResults), entrance);
+        final List<RouteSegmentResultWithEquality> routeSegmentResultWithEqualities = RouteSegmentResultWithEqualityFactory.getRouteSegmentResultWithEqualities(routeSegmentResults);
+        Assert.assertEquals(
+                Collections.singletonList(new RouteSegmentResultWithEquality(-579, "round trip", 0, 4)),
+                routeSegmentResultWithEqualities);
     }
 
     private static LatLon getStartOfRoute(final List<RouteSegmentResult> routeSegmentResults) {
