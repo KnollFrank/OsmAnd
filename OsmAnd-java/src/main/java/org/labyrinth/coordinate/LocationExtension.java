@@ -29,7 +29,7 @@ public class LocationExtension extends Location {
     }
 
     public Quantity<Length> _distanceTo(final Location dest) {
-        // FK-TODO: oder MapUtils.getDistance() verwenden?
+        // FK-TODO: oder "return getQuantity(net.osmand.util.MapUtils.getDistance(this, dest), METRE);"?
         return getQuantity(this.distanceTo(dest), METRE);
     }
 

@@ -8,29 +8,29 @@ import java.util.stream.Collectors;
 public class ConnectedRouteSegmentsWithinAreaProvider implements IConnectedRouteSegmentsProvider {
 
     private final IConnectedRouteSegmentsProvider delegate;
-    private final RouteSegmentWithinAreaPredicate routeSegmentWithinAreaPredicate;
+    private final RouteSegmentPartlyWithinAreaPredicate routeSegmentPartlyWithinAreaPredicate;
 
     public ConnectedRouteSegmentsWithinAreaProvider(
             final IConnectedRouteSegmentsProvider delegate,
-            final RouteSegmentWithinAreaPredicate routeSegmentWithinAreaPredicate) {
+            final RouteSegmentPartlyWithinAreaPredicate routeSegmentPartlyWithinAreaPredicate) {
         this.delegate = delegate;
-        this.routeSegmentWithinAreaPredicate = routeSegmentWithinAreaPredicate;
+        this.routeSegmentPartlyWithinAreaPredicate = routeSegmentPartlyWithinAreaPredicate;
     }
 
     @Override
     public Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtEndOf(final RouteSegmentWithEquality routeSegment) {
-        return getRouteSegmentsWithinArea(delegate.getRouteSegmentsStartingAtEndOf(routeSegment));
+        return getRouteSegmentsPartlyWithinArea(delegate.getRouteSegmentsStartingAtEndOf(routeSegment));
     }
 
     @Override
     public Set<RouteSegmentWithEquality> getRouteSegmentsStartingAtStartOf(final RouteSegmentWithEquality routeSegment) {
-        return getRouteSegmentsWithinArea(delegate.getRouteSegmentsStartingAtStartOf(routeSegment));
+        return getRouteSegmentsPartlyWithinArea(delegate.getRouteSegmentsStartingAtStartOf(routeSegment));
     }
 
-    private Set<RouteSegmentWithEquality> getRouteSegmentsWithinArea(final Set<RouteSegmentWithEquality> routeSegments) {
+    private Set<RouteSegmentWithEquality> getRouteSegmentsPartlyWithinArea(final Set<RouteSegmentWithEquality> routeSegments) {
         return routeSegments
                 .stream()
-                .filter(routeSegment -> routeSegmentWithinAreaPredicate.isRouteSegmentWithinArea(routeSegment.delegate))
+                .filter(routeSegment -> routeSegmentPartlyWithinAreaPredicate.isRouteSegmentPartlyWithinArea(routeSegment.delegate))
                 .collect(Collectors.toSet());
     }
 }

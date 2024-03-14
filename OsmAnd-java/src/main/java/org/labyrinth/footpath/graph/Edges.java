@@ -2,11 +2,10 @@ package org.labyrinth.footpath.graph;
 
 import static org.labyrinth.common.MeasureUtils.sum;
 
-import com.google.common.collect.MoreCollectors;
-
 import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,11 +25,11 @@ public class Edges {
         return sum(edges.stream().map(Edge::getLength));
     }
 
-    public static Edge getEdgeContainingRouteSegment(final Set<Edge> edges, final RouteSegmentWithEquality routeSegment) {
+    public static Optional<Edge> getEdgeContainingRouteSegment(final Set<Edge> edges, final RouteSegmentWithEquality routeSegment) {
         return edges
                 .stream()
                 .filter(edge -> edgeContainsRouteSegment(edge, routeSegment))
-                .collect(MoreCollectors.onlyElement());
+                .findFirst();
     }
 
     private static boolean edgeContainsRouteSegment(final Edge edge, final RouteSegmentWithEquality routeSegment) {

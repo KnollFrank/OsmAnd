@@ -3,19 +3,20 @@ package net.osmand.router.postman;
 import static net.osmand.router.BinaryRoutePlanner.FinalRouteSegment;
 import static net.osmand.router.BinaryRoutePlanner.RouteSegment;
 import static net.osmand.router.BinaryRoutePlanner.RouteSegmentPoint;
-import static org.labyrinth.footpath.core.ShortestClosedPathProvider.createShortestClosedPathStartingAtNode;
 
 import net.osmand.router.RoutingContext;
 
 import org.jgrapht.alg.util.Pair;
 import org.labyrinth.common.ListUtils;
 import org.labyrinth.common.Utils;
+import org.labyrinth.footpath.core.ShortestClosedPathProvider;
 import org.labyrinth.footpath.graph.Edge;
 import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.measure.Quantity;
@@ -23,15 +24,22 @@ import javax.measure.quantity.Length;
 
 public class PostmanTourPlanner {
 
-    public FinalRouteSegment searchRoute(final RoutingContext ctx,
-                                         final RouteSegmentPoint start,
-                                         final Quantity<Length> radius) {
+    public Optional<FinalRouteSegment> searchRoute(final RoutingContext ctx,
+                                                   final RouteSegmentPoint start,
+                                                   final Quantity<Length> radius) {
         ctx.memoryOverhead = 1000;
-        final Pair<Graph, Node> graphAndStartNode = GraphFactory.getGraphAndStartNode(ctx, start, radius);
-        final Graph graph = graphAndStartNode.getFirst();
-        final Node startNode = graphAndStartNode.getSecond();
-        final List<Node> shortestClosedPath = createShortestClosedPathStartingAtNode(graph, startNode);
-        return path2StartOfConnectedRouteSegments(shortestClosedPath, graph);
+        return GraphFactory
+                .getGraphAndStartNode(ctx, start, radius)
+                .map(graphAndStartNode ->
+                        searchRoute(
+                                graphAndStartNode.getFirst(),
+                                graphAndStartNode.getSecond()));
+    }
+
+    private static FinalRouteSegment searchRoute(final Graph graph, final Node startNode) {
+        return path2StartOfConnectedRouteSegments(
+                ShortestClosedPathProvider.createShortestClosedPathStartingAtNode(graph, startNode),
+                graph);
     }
 
     private static FinalRouteSegment path2StartOfConnectedRouteSegments(final List<Node> path,

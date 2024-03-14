@@ -1148,10 +1148,12 @@ public class RoutePlannerFrontEnd {
 		} else {
 			refreshProgressDistance(ctx);
 			RoutingContext local = new RoutingContext(ctx);
-			ctx.finalRouteSegment =
-					postmanTour ?
-							new PostmanTourPlanner().searchRoute(local, s, getDistance(s, e)) :
-							new BinaryRoutePlanner().searchRouteInternal(local, s, e, null);
+            ctx.finalRouteSegment =
+                    postmanTour ?
+                            new PostmanTourPlanner()
+                                    .searchRoute(local, s, getDistance(s, e))
+                                    .orElse(null) :
+                            new BinaryRoutePlanner().searchRouteInternal(local, s, e, null);
 			result = RouteResultPreparation.convertFinalSegmentToResults(ctx, ctx.finalRouteSegment);
 			addPrecalculatedToResult(recalculationEnd, result);
 			if (!postmanTour) {

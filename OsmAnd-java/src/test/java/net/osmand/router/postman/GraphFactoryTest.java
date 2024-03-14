@@ -30,6 +30,7 @@ import org.labyrinth.footpath.graph.RoadPosition;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class GraphFactoryTest {
@@ -58,13 +59,15 @@ public class GraphFactoryTest {
                         false);
 
         // When
-        final Pair<Graph, Node> graphAndStartNode =
+        final Optional<Pair<Graph, Node>> graphAndStartNodeOption =
                 GraphFactory.getGraphAndStartNode(
                         routingContext,
                         startSegment,
                         getQuantity(0.25, KILO(METRE)));
 
         // Then
+        assertThat(graphAndStartNodeOption.isPresent(), is(true));
+        final Pair<Graph, Node> graphAndStartNode = graphAndStartNodeOption.get();
         final Graph graph = graphAndStartNode.getFirst();
         final Node startNode = graphAndStartNode.getSecond();
         assertThat(getTallestConnectedSet(graph).contains(startNode), is(true));
@@ -128,13 +131,15 @@ public class GraphFactoryTest {
                         false);
 
         // When
-        final Pair<Graph, Node> graphAndStartNode =
+        final Optional<Pair<Graph, Node>> graphAndStartNodeOption =
                 GraphFactory.getGraphAndStartNode(
                         routingContext,
                         startSegment,
                         getQuantity(0.25, KILO(METRE)));
 
         // Then
+        assertThat(graphAndStartNodeOption.isPresent(), is(true));
+        final Pair<Graph, Node> graphAndStartNode = graphAndStartNodeOption.get();
         final Graph graph = graphAndStartNode.getFirst();
         final Node startNode = graphAndStartNode.getSecond();
         assertThat(getTallestConnectedSet(graph).contains(startNode), is(true));

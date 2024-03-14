@@ -10,22 +10,24 @@ import org.labyrinth.coordinate.GeodeticFactory;
 import org.labyrinth.footpath.converter.Circle;
 import org.labyrinth.footpath.converter.ConnectedRouteSegmentsProvider;
 import org.labyrinth.footpath.converter.ConnectedRouteSegmentsWithinAreaProvider;
-import org.labyrinth.footpath.converter.RouteSegmentWithinCirclePredicate;
+import org.labyrinth.footpath.converter.RouteSegmentPartlyWithinCirclePredicate;
 import org.labyrinth.footpath.graph.Edge;
 import org.labyrinth.footpath.graph.Edges;
 import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
+
+import java.util.Optional;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 
 class GraphFactory {
 
-    public static Pair<Graph, Node> getGraphAndStartNode(final RoutingContext ctx,
-                                                         final RouteSegmentPoint start,
-                                                         final Quantity<Length> radius) {
+    public static Optional<Pair<Graph, Node>> getGraphAndStartNode(final RoutingContext ctx,
+                                                                   final RouteSegmentPoint start,
+                                                                   final Quantity<Length> radius) {
         final Graph graph = getGraph(ctx, start, radius);
-        return Pair.of(graph, getNode(start, graph));
+        return getNode(start, graph).map(startNode -> Pair.of(graph, startNode));
     }
 
     private static Graph getGraph(final RoutingContext ctx,
@@ -41,16 +43,18 @@ class GraphFactory {
         return new org.labyrinth.footpath.converter.GraphFactory(
                 new ConnectedRouteSegmentsWithinAreaProvider(
                         new ConnectedRouteSegmentsProvider(ctx),
-                        new RouteSegmentWithinCirclePredicate(
+                        new RouteSegmentPartlyWithinCirclePredicate(
                                 new Circle(
                                         GeodeticFactory.createGeodetic(start),
                                         radius))));
     }
 
-    private static Node getNode(final RouteSegmentPoint routeSegmentPoint, final Graph graph) {
-        return getNode(
-                routeSegmentPoint,
-                Edges.getEdgeContainingRouteSegment(graph.edges, new RouteSegmentWithEquality(routeSegmentPoint)));
+    private static Optional<Node> getNode(final RouteSegmentPoint routeSegmentPoint, final Graph graph) {
+        return Edges
+                .getEdgeContainingRouteSegment(
+                        graph.edges,
+                        new RouteSegmentWithEquality(routeSegmentPoint))
+                .map(edge -> getNode(routeSegmentPoint, edge));
     }
 
     private static Node getNode(final RouteSegmentPoint needle, final Edge haystack) {
