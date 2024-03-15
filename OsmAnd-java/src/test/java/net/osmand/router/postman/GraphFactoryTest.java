@@ -3,6 +3,7 @@ package net.osmand.router.postman;
 import static net.osmand.router.postman.PostmanTourPlannerTest.createRoutingContext;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.labyrinth.footpath.converter.PostmanTourPlannerProgressTestFactory.createDummyPostmanTourPlannerProgress;
 import static tec.units.ri.quantity.Quantities.getQuantity;
 import static tec.units.ri.unit.MetricPrefix.KILO;
 import static tec.units.ri.unit.Units.METRE;
@@ -62,6 +63,7 @@ public class GraphFactoryTest {
         final Optional<Pair<Graph, Node>> graphAndStartNodeOption =
                 GraphFactory.getGraphAndStartNode(
                         routingContext,
+                        createDummyPostmanTourPlannerProgress(),
                         startSegment,
                         getQuantity(0.25, KILO(METRE)));
 
@@ -134,6 +136,7 @@ public class GraphFactoryTest {
         final Optional<Pair<Graph, Node>> graphAndStartNodeOption =
                 GraphFactory.getGraphAndStartNode(
                         routingContext,
+                        createDummyPostmanTourPlannerProgress(),
                         startSegment,
                         getQuantity(0.25, KILO(METRE)));
 

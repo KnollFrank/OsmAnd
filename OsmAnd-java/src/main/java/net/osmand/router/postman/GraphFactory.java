@@ -24,20 +24,23 @@ import javax.measure.quantity.Length;
 class GraphFactory {
 
     public static Optional<Pair<Graph, Node>> getGraphAndStartNode(final RoutingContext routingContext,
+                                                                   final IPostmanTourPlannerProgress postmanTourPlannerProgress,
                                                                    final RouteSegmentPoint start,
                                                                    final Quantity<Length> radius) {
-        final Graph graph = getGraph(routingContext, start, radius);
+        final Graph graph = getGraph(routingContext, postmanTourPlannerProgress, start, radius);
         return getNode(start, graph).map(startNode -> Pair.of(graph, startNode));
     }
 
     private static Graph getGraph(final RoutingContext routingContext,
+                                  final IPostmanTourPlannerProgress postmanTourPlannerProgress,
                                   final RouteSegmentPoint start,
                                   final Quantity<Length> radius) {
-        return createGraphFactory(routingContext, start, radius).createGraph(new RouteSegmentWithEquality(start));
+        return createGraphFactory(routingContext, postmanTourPlannerProgress, start, radius).createGraph(new RouteSegmentWithEquality(start));
     }
 
     private static org.labyrinth.footpath.converter.GraphFactory createGraphFactory(
             final RoutingContext routingContext,
+            final IPostmanTourPlannerProgress postmanTourPlannerProgress,
             final RouteSegmentPoint start,
             final Quantity<Length> radius) {
         return new org.labyrinth.footpath.converter.GraphFactory(
@@ -46,7 +49,8 @@ class GraphFactory {
                         new RouteSegmentPartlyWithinCirclePredicate(
                                 new Circle(
                                         GeodeticFactory.createGeodetic(start),
-                                        radius))));
+                                        radius))),
+                postmanTourPlannerProgress);
     }
 
     private static Optional<Node> getNode(final RouteSegmentPoint routeSegmentPoint, final Graph graph) {

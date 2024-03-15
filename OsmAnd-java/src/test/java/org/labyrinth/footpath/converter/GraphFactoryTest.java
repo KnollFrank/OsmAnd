@@ -109,7 +109,10 @@ public class GraphFactoryTest {
                         throw new IllegalStateException();
                     }
                 };
-        final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
+        final GraphFactory graphFactory =
+                new GraphFactory(
+                        connectedRouteSegmentsProvider,
+                        PostmanTourPlannerProgressTestFactory.createDummyPostmanTourPlannerProgress());
         final RouteSegmentWithEquality start = kingersheimerStrasse_0_1;
 
         // When
@@ -227,7 +230,10 @@ public class GraphFactoryTest {
                         throw new IllegalArgumentException();
                     }
                 };
-        final GraphFactory graphFactory = new GraphFactory(connectedRouteSegmentsProvider);
+        final GraphFactory graphFactory =
+                new GraphFactory(
+                        connectedRouteSegmentsProvider,
+                        PostmanTourPlannerProgressTestFactory.createDummyPostmanTourPlannerProgress());
         final RouteSegmentWithEquality start = kingersheimerStrasse_0_1;
 
         // When

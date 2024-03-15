@@ -4,6 +4,7 @@ import static org.labyrinth.common.SetUtils.union;
 
 import com.google.common.collect.ImmutableSet;
 
+import net.osmand.router.postman.IPostmanTourPlannerProgress;
 import net.osmand.router.postman.RouteSegmentWithEquality;
 
 import org.labyrinth.footpath.graph.Edge;
@@ -17,9 +18,12 @@ import java.util.Set;
 public class GraphFactory {
 
     private final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider;
+    private final IPostmanTourPlannerProgress postmanTourPlannerProgress;
 
-    public GraphFactory(final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider) {
+    public GraphFactory(final IConnectedRouteSegmentsProvider connectedRouteSegmentsProvider,
+                        final IPostmanTourPlannerProgress postmanTourPlannerProgress) {
         this.connectedRouteSegmentsProvider = connectedRouteSegmentsProvider;
+        this.postmanTourPlannerProgress = postmanTourPlannerProgress;
     }
 
     public Graph createGraph(final RouteSegmentWithEquality start) {
@@ -31,19 +35,27 @@ public class GraphFactory {
     }
 
     private Set<Edge> getEdges(final RouteSegmentWithEquality start) {
-        return this
-                .createConnectedRouteSegmentsProcessor(start)
-                .processConnectedRouteSegments(start);
+        final ConnectedRouteSegmentsProcessor<Set<Edge>> connectedRouteSegmentsProcessor =
+                this.createConnectedRouteSegmentsProcessor(start);
+        this.postmanTourPlannerProgress.connectedRouteSegmentsProcessorStarted();
+        final Set<Edge> edges = connectedRouteSegmentsProcessor.processConnectedRouteSegments(start);
+        this.postmanTourPlannerProgress.connectedRouteSegmentsProcessorFinished();
+        return edges;
     }
 
     private ConnectedRouteSegmentsProcessor<Set<Edge>> createConnectedRouteSegmentsProcessor(final RouteSegmentWithEquality start) {
         return new ConnectedRouteSegmentsProcessor<>(
-                connectedRouteSegmentsProvider,
+                this.connectedRouteSegmentsProvider,
                 new EdgesVisitor(getRoadPositionEquivalenceRelation(start)));
     }
 
     private Set<EquivalentRoadPositions> getRoadPositionEquivalenceRelation(final RouteSegmentWithEquality start) {
-        return new RoadPositionEquivalenceRelationProvider(connectedRouteSegmentsProvider).getRoadPositionEquivalenceRelation(start);
+        this.postmanTourPlannerProgress.getRoadPositionEquivalenceRelationStarted();
+        final Set<EquivalentRoadPositions> roadPositionEquivalenceRelation =
+                new RoadPositionEquivalenceRelationProvider(connectedRouteSegmentsProvider)
+                        .getRoadPositionEquivalenceRelation(start);
+        this.postmanTourPlannerProgress.getRoadPositionEquivalenceRelationFinished();
+        return roadPositionEquivalenceRelation;
     }
 
     static EquivalentRoadPositions getEquivalentRoadPositions(final RoadPosition roadPosition, final Set<EquivalentRoadPositions> equivalenceRelation) {

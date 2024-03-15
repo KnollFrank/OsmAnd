@@ -25,7 +25,7 @@ import javax.measure.quantity.Length;
 public class PostmanTourPlanner {
 
     private final RoutingContext routingContext;
-    private final PostmanTourPlannerProgress postmanTourPlannerProgress;
+    private final IPostmanTourPlannerProgress postmanTourPlannerProgress;
 
     public PostmanTourPlanner(final RoutingContext routingContext) {
         this.routingContext = routingContext;
@@ -38,7 +38,11 @@ public class PostmanTourPlanner {
         this.postmanTourPlannerProgress.searchRouteStarted();
         final Optional<FinalRouteSegment> finalRouteSegment =
                 GraphFactory
-                        .getGraphAndStartNode(this.routingContext, start, radius)
+                        .getGraphAndStartNode(
+                                this.routingContext,
+                                this.postmanTourPlannerProgress,
+                                start,
+                                radius)
                         .map(graphAndStartNode -> {
                             this.postmanTourPlannerProgress.getGraphAndStartNodeFinished();
                             return searchRoute(
