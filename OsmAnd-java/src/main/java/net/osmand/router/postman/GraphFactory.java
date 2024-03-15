@@ -23,26 +23,26 @@ import javax.measure.quantity.Length;
 
 class GraphFactory {
 
-    public static Optional<Pair<Graph, Node>> getGraphAndStartNode(final RoutingContext ctx,
+    public static Optional<Pair<Graph, Node>> getGraphAndStartNode(final RoutingContext routingContext,
                                                                    final RouteSegmentPoint start,
                                                                    final Quantity<Length> radius) {
-        final Graph graph = getGraph(ctx, start, radius);
+        final Graph graph = getGraph(routingContext, start, radius);
         return getNode(start, graph).map(startNode -> Pair.of(graph, startNode));
     }
 
-    private static Graph getGraph(final RoutingContext ctx,
+    private static Graph getGraph(final RoutingContext routingContext,
                                   final RouteSegmentPoint start,
                                   final Quantity<Length> radius) {
-        return createGraphFactory(ctx, start, radius).createGraph(new RouteSegmentWithEquality(start));
+        return createGraphFactory(routingContext, start, radius).createGraph(new RouteSegmentWithEquality(start));
     }
 
     private static org.labyrinth.footpath.converter.GraphFactory createGraphFactory(
-            final RoutingContext ctx,
+            final RoutingContext routingContext,
             final RouteSegmentPoint start,
             final Quantity<Length> radius) {
         return new org.labyrinth.footpath.converter.GraphFactory(
                 new ConnectedRouteSegmentsWithinAreaProvider(
-                        new ConnectedRouteSegmentsProvider(ctx),
+                        new ConnectedRouteSegmentsProvider(routingContext),
                         new RouteSegmentPartlyWithinCirclePredicate(
                                 new Circle(
                                         GeodeticFactory.createGeodetic(start),

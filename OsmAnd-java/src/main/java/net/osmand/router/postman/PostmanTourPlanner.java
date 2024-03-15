@@ -24,16 +24,23 @@ import javax.measure.quantity.Length;
 
 public class PostmanTourPlanner {
 
-    public Optional<FinalRouteSegment> searchRoute(final RoutingContext ctx,
+    public Optional<FinalRouteSegment> searchRoute(final RoutingContext routingContext,
                                                    final RouteSegmentPoint start,
                                                    final Quantity<Length> radius) {
-        ctx.memoryOverhead = 1000;
-        return GraphFactory
-                .getGraphAndStartNode(ctx, start, radius)
-                .map(graphAndStartNode ->
-                        searchRoute(
-                                graphAndStartNode.getFirst(),
-                                graphAndStartNode.getSecond()));
+        routingContext.memoryOverhead = 1000;
+        routingContext.calculationProgress.totalIterations = 2;
+        routingContext.calculationProgress.iteration = 0;
+        final Optional<FinalRouteSegment> finalRouteSegment =
+                GraphFactory
+                        .getGraphAndStartNode(routingContext, start, radius)
+                        .map(graphAndStartNode -> {
+                            routingContext.calculationProgress.nextIteration();
+                            return searchRoute(
+                                    graphAndStartNode.getFirst(),
+                                    graphAndStartNode.getSecond());
+                        });
+        routingContext.calculationProgress.nextIteration();
+        return finalRouteSegment;
     }
 
     private static FinalRouteSegment searchRoute(final Graph graph, final Node startNode) {

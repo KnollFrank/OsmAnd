@@ -46,6 +46,7 @@ public class ConnectedRouteSegmentsProvider implements IConnectedRouteSegmentsPr
     }
 
     private RouteSegment loadRouteSegmentStartingAtIndex(final RouteDataObject road, final int index) {
+        // FK-TODO: nicht den ganzen routingContext an diese Klasse übergeben, sondern nur die Methode routingContext.loadRouteSegment()
         return routingContext.loadRouteSegment(
                 road.getPoint31XTile(index),
                 road.getPoint31YTile(index),

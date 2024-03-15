@@ -14,6 +14,12 @@ RouteTestingTest
 
 BinaryRoutePlanner.processIntersections()
 
+hier weiterlesen für progress-Button:
+- MapRouteInfoMenuFragment.updateRouteCalculationProgress()
+- RouteCalculationProgressListener
+- RouteCalculationProgress:
+  - totalIterations, iteration, nextIteration()
+
 lese
 - https://en.wikipedia.org/wiki/Tiled_web_map
 - https://en.wikipedia.org/wiki/Web_Mercator_projection

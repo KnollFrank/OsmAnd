@@ -1,12 +1,12 @@
 package org.labyrinth.footpath.core;
 
 import org.jgrapht.alg.connectivity.ConnectivityInspector;
-import org.jgrapht.alg.cycle.ChinesePostman;
 import org.jgrapht.graph.AsSubgraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.labyrinth.footpath.converter.Graph2JGraphConverter;
 import org.labyrinth.footpath.graph.Graph;
 import org.labyrinth.footpath.graph.Node;
+import org.labyrinth.jgrapht.alg.cycle.ChinesePostman;
 
 import java.util.List;
 
