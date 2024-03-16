@@ -1,6 +1,6 @@
 package org.labyrinth.footpath.converter;
 
-import static org.labyrinth.common.SetUtils.popAny;
+import static org.labyrinth.common.SetUtils.popAnyOrElseNull;
 import static org.labyrinth.common.SetUtils.union;
 
 import com.google.common.collect.ImmutableList;
@@ -34,7 +34,7 @@ class ConnectedRouteSegmentsProcessor<T> {
         final Set<RouteSegmentWithEquality> routeSegmentsAlreadyProcessed = new HashSet<>();
         final Builder<T> tsBuilder = ImmutableList.builder();
         RouteSegmentWithEquality routeSegment2Process;
-        while ((routeSegment2Process = popAny(routeSegments2Process)) != null) {
+        while ((routeSegment2Process = popAnyOrElseNull(routeSegments2Process)) != null) {
             if (!routeSegmentsAlreadyProcessed.contains(routeSegment2Process)) {
                 final Pair<T, Set<RouteSegmentWithEquality>> t_routeSegments2Process = process(routeSegment2Process);
                 routeSegmentsAlreadyProcessed.add(routeSegment2Process);

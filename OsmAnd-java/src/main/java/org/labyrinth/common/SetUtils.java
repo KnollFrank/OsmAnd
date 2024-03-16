@@ -20,7 +20,7 @@ public class SetUtils {
         return streamOfSets.flatMap(Set::stream).collect(Collectors.toSet());
     }
 
-    public static <T> T popAny(final Set<T> ts) {
+    public static <T> T popAnyOrElseNull(final Set<T> ts) {
         final Optional<T> t = ts.stream().findAny();
         t.map(ts::remove);
         return t.orElse(null);
