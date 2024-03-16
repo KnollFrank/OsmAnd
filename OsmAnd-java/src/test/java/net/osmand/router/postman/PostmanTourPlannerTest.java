@@ -171,7 +171,7 @@ public class PostmanTourPlannerTest {
         Assert.assertEquals(getStartOfRoute(routeSegmentResults), entrance);
         final List<RouteSegmentResultWithEquality> routeSegmentResultWithEqualities = RouteSegmentResultWithEqualityFactory.getRouteSegmentResultWithEqualities(routeSegmentResults);
         Assert.assertEquals(
-                Collections.singletonList(new RouteSegmentResultWithEquality(-579, "round trip", 0, 4)),
+                Collections.singletonList(new RouteSegmentResultWithEquality(-579, "round trip", 1, 5)),
                 routeSegmentResultWithEqualities);
     }
 

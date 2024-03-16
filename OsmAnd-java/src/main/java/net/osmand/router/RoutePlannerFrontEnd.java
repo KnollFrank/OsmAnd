@@ -1,19 +1,8 @@
 package net.osmand.router;
 
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import static org.labyrinth.coordinate.GeodeticFactory.createGeodetic;
 
-import org.apache.commons.logging.Log;
-
-import gnu.trove.list.array.TIntArrayList;
 import net.osmand.LocationsHolder;
 import net.osmand.NativeLibrary;
 import net.osmand.PlatformUtil;
@@ -34,6 +23,23 @@ import net.osmand.router.RouteCalculationProgress.HHIteration;
 import net.osmand.router.RouteResultPreparation.RouteCalcResult;
 import net.osmand.router.postman.PostmanTourPlanner;
 import net.osmand.util.MapUtils;
+
+import org.apache.commons.logging.Log;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
+
+import gnu.trove.list.array.TIntArrayList;
 
 
 public class RoutePlannerFrontEnd {
@@ -270,8 +276,8 @@ public class RoutePlannerFrontEnd {
 		return null;
 	}
 
-	public RouteCalcResult searchRoute(final RoutingContext ctx, LatLon start, LatLon end, List<LatLon> intermediates) throws IOException, InterruptedException {
-		return searchRoute(ctx, start, end, intermediates, null);
+	public RouteCalcResult searchRoute(final RoutingContext ctx, LatLon start, LatLon end, List<LatLon> intermediates, final boolean postmanTour) throws IOException, InterruptedException {
+		return searchRoute(ctx, start, end, intermediates, null, postmanTour);
 	}
 
 	public RoutePlannerFrontEnd setUseFastRecalculation(boolean use) {
@@ -852,7 +858,7 @@ public class RoutePlannerFrontEnd {
 	}
 
 	public RouteCalcResult searchRoute(final RoutingContext ctx, LatLon start, LatLon end, List<LatLon> intermediates,
-	                                            PrecalculatedRouteDirection routeDirection, boolean postmanTour) throws IOException, InterruptedException {
+	                                            PrecalculatedRouteDirection routeDirection, final boolean postmanTour) throws IOException, InterruptedException {
 		long timeToCalculate = System.nanoTime();
 		if (ctx.calculationProgress == null) {
 			ctx.calculationProgress = new RouteCalculationProgress();
@@ -898,7 +904,7 @@ public class RoutePlannerFrontEnd {
 			ctx.calculationProgress.totalIterations++;
 			RoutingContext nctx = buildRoutingContext(ctx.config, ctx.nativeLib, ctx.getMaps(), RouteCalculationMode.BASE);
 			nctx.calculationProgress = ctx.calculationProgress;
-			RouteCalcResult res = searchRoute(nctx, start, end, intermediates);
+			RouteCalcResult res = searchRoute(nctx, start, end, intermediates, postmanTour);
 			routeDirection = PrecalculatedRouteDirection.build(res.detailed, RoutingConfiguration.DEVIATION_RADIUS, ctx.getRouter().getMaxSpeed());
 			ctx.calculationProgressFirstPhase = RouteCalculationProgress.capture(ctx.calculationProgress);
 		}
@@ -933,7 +939,7 @@ public class RoutePlannerFrontEnd {
 				return new RouteCalcResult("End point is not located");
 			}
 			ctx.calculationProgress.nextIteration();
-			res = searchRouteImpl(ctx, points, routeDirection);
+			res = searchRouteImpl(ctx, points, routeDirection, postmanTour);
 		}
 		ctx.calculationProgress.timeToCalculate = (System.nanoTime() - timeToCalculate);
 		RouteResultPreparation.printResults(ctx, start, end, res.detailed);
@@ -1269,7 +1275,7 @@ public class RoutePlannerFrontEnd {
 		return false;
 	}
 
-	private RouteCalcResult searchRouteImpl(final RoutingContext ctx, List<RouteSegmentPoint> points, PrecalculatedRouteDirection routeDirection)
+	private RouteCalcResult searchRouteImpl(final RoutingContext ctx, List<RouteSegmentPoint> points, PrecalculatedRouteDirection routeDirection, final boolean postmanTour)
 			throws IOException, InterruptedException {
 		if (points.size() <= 2) {
 			// simple case 2 points only
@@ -1277,7 +1283,7 @@ public class RoutePlannerFrontEnd {
 				ctx.previouslyCalculatedRoute = null;
 			}
 			pringGC(ctx, true);
-			RouteCalcResult res = searchRouteInternalPrepare(ctx, points.get(0), points.get(1), routeDirection);
+			RouteCalcResult res = searchRouteInternalPrepare(ctx, points.get(0), points.get(1), routeDirection, postmanTour);
 			pringGC(ctx, false);
 			makeStartEndPointsPrecise(res, points.get(0).getPreciseLatLon(), points.get(1).getPreciseLatLon(), null);
 			return res;
@@ -1319,7 +1325,7 @@ public class RoutePlannerFrontEnd {
 					local.previouslyCalculatedRoute = firstPartRecalculatedRoute;
 				}
 			}
-			RouteCalcResult res = searchRouteInternalPrepare(local, points.get(i), points.get(i + 1), routeDirection);
+			RouteCalcResult res = searchRouteInternalPrepare(local, points.get(i), points.get(i + 1), routeDirection, postmanTour);
 			makeStartEndPointsPrecise(res, points.get(i).getPreciseLatLon(), points.get(i + 1).getPreciseLatLon(), null);
 			results.detailed.addAll(res.detailed);
 			ctx.routingTime += local.routingTime;
