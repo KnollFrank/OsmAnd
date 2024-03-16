@@ -1,8 +1,11 @@
 package org.labyrinth.common;
 
+import static org.labyrinth.coordinate.GeodeticFactory.createGeodetic;
 import static tec.units.ri.quantity.Quantities.getQuantity;
 import static tec.units.ri.unit.MetricPrefix.CENTI;
 import static tec.units.ri.unit.Units.METRE;
+
+import net.osmand.router.BinaryRoutePlanner.RouteSegmentPoint;
 
 import java.util.stream.Stream;
 
@@ -71,5 +74,9 @@ public class MeasureUtils {
 
     public static double toCentiMetres(final Quantity<Length> length) {
         return length.to(CENTI(METRE)).getValue().doubleValue();
+    }
+
+    public static Quantity<Length> getDistance(final RouteSegmentPoint start, final RouteSegmentPoint end) {
+        return createGeodetic(start).getDistanceTo(createGeodetic(end));
     }
 }
