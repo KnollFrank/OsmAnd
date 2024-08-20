@@ -536,7 +536,7 @@ public class GpxRouteApproximation {
 			gctx.routeDistCalculations += (target.cumDist - start.cumDist);
 			gctx.routeCalculations++;
 			RoutingContext local = new RoutingContext(gctx.ctx);
-			res = router.searchRouteInternalPrepare(local, start.pnt, target.pnt, null);
+			res = router.searchRouteInternalPrepare(local, start.pnt, target.pnt, null, false);
 			//BinaryRoutePlanner.printDebugMemoryInformation(gctx.ctx);
 			routeIsCorrect = res != null && res.isCorrect();
 			for (int k = start.ind + 1; routeIsCorrect && k < target.ind; k++) {
