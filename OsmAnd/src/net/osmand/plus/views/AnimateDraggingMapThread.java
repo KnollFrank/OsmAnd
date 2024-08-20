@@ -40,7 +40,7 @@ public class AnimateDraggingMapThread implements TouchListener {
 	protected static final Log log = PlatformUtil.getLog(AnimateDraggingMapThread.class);
 
 	private static final float DRAGGING_ANIMATION_TIME = 1200f;
-	private static final float ZOOM_ANIMATION_TIME = 250f;
+	public static final float ZOOM_ANIMATION_TIME = 250f;
 	private static final float ZOOM_MOVE_ANIMATION_TIME = 350f;
 	private static final float MOVE_MOVE_ANIMATION_TIME = 900f;
 	public static final float NAV_ANIMATION_TIME = 1000f;
@@ -277,9 +277,10 @@ public class AnimateDraggingMapThread implements TouchListener {
 		float animationDuration = Math.max(movingTime, NAV_ANIMATION_TIME / 4);
 
 		boolean animateZoom = zoomParams != null && (zoom != startZoom || zoomFP != startZoomFP);
+		boolean allowRotationAfterReset = app.getMapViewTrackingUtilities().allowRotationAfterReset();
 		float rotationDiff = finalRotation != null
 				? Math.abs(MapUtils.unifyRotationDiff(rotation, startRotation)) : 0;
-		boolean animateRotation = rotationDiff > 0.1;
+		boolean animateRotation = rotationDiff > 0.1 && allowRotationAfterReset;
 		boolean animateTarget;
 
 		MapAnimator animator = getAnimator();
@@ -331,7 +332,7 @@ public class AnimateDraggingMapThread implements TouchListener {
 			if (!animateZoom) {
 				tileView.setFractionalZoom(zoom, zoomFP, notifyListener);
 			}
-			if (!animateRotation && finalRotation != null) {
+			if (!animateRotation && finalRotation != null && allowRotationAfterReset) {
 				tileView.rotateToAnimate(rotation);
 			}
 			if (!animateTarget) {
@@ -901,7 +902,7 @@ public class AnimateDraggingMapThread implements TouchListener {
 		});
 	}
 
-	public void startTilting(float elevationAngle) {
+	public void startTilting(float elevationAngle, float elevationTime) {
 		if (animationsDisabled)
 			return;
 
@@ -911,7 +912,7 @@ public class AnimateDraggingMapThread implements TouchListener {
 		float elevationAngleDiff = elevationAngle - initialElevationAngle;
 
 		boolean doNotUseAnimations = tileView.getSettings().DO_NOT_USE_ANIMATIONS.get();
-		float animationTime = doNotUseAnimations ? 1 : Math.abs(elevationAngleDiff) * 5;
+		float animationTime = doNotUseAnimations ? 1 : (elevationTime > 0.0f ? elevationTime : Math.abs(elevationAngleDiff) * 5);
 
 		MapRendererView mapRenderer = getMapRenderer();
 		MapAnimator animator = getAnimator();

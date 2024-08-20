@@ -327,8 +327,8 @@ public class OsmAndFormatter {
 	public static class OsmAndFormatterParams {
 		public static final boolean DEFAULT_FORCE_TRAILING = true;
 		public static final int DEFAULT_EXTRA_DECIMAL_PRECISION = 1;
-		boolean forceTrailingZerosInDecimalMainUnit = DEFAULT_FORCE_TRAILING ;
-		int extraDecimalPrecision =  DEFAULT_EXTRA_DECIMAL_PRECISION;
+		boolean forceTrailingZerosInDecimalMainUnit = DEFAULT_FORCE_TRAILING;
+		int extraDecimalPrecision = DEFAULT_EXTRA_DECIMAL_PRECISION;
 
 		public static final OsmAndFormatterParams USE_LOWER_BOUNDS = useLowerBoundParam();
 		public static final OsmAndFormatterParams NO_TRAILING_ZEROS = new OsmAndFormatterParams().setTrailingZerosForMainUnit(false);
@@ -368,7 +368,7 @@ public class OsmAndFormatter {
 
 	@NonNull
 	public static String getFormattedDistance(float meters, @NonNull OsmandApplication ctx,
-											  OsmAndFormatterParams pms, @NonNull MetricsConstants mc) {
+	                                          OsmAndFormatterParams pms, @NonNull MetricsConstants mc) {
 		return getFormattedDistanceValue(meters, ctx, pms, mc).format(ctx);
 	}
 
@@ -379,9 +379,10 @@ public class OsmAndFormatter {
 	public static FormattedValue getFormattedDistanceValue(float meters, @NonNull OsmandApplication ctx, OsmAndFormatterParams pms) {
 		return getFormattedDistanceValue(meters, ctx, pms, ctx.getSettings().METRIC_SYSTEM.get());
 	}
+
 	@NonNull
 	public static FormattedValue getFormattedDistanceValue(float meters, @NonNull OsmandApplication ctx,
-														   OsmAndFormatterParams pms, @NonNull MetricsConstants mc) {
+	                                                       OsmAndFormatterParams pms, @NonNull MetricsConstants mc) {
 		int mainUnitStr;
 		float mainUnitInMeters;
 		if (pms == null) {
@@ -402,7 +403,7 @@ public class OsmAndFormatter {
 		}
 
 		float floatDistance = meters / mainUnitInMeters;
-		boolean forceTrailingZeros  = pms.forceTrailingZerosInDecimalMainUnit;
+		boolean forceTrailingZeros = pms.forceTrailingZerosInDecimalMainUnit;
 		int decimalPrecision = pms.extraDecimalPrecision;
 		if (meters >= 100 * mainUnitInMeters) {
 			return formatValue((int) (meters / mainUnitInMeters + 0.5), mainUnitStr, forceTrailingZeros,
@@ -660,11 +661,18 @@ public class OsmAndFormatter {
 	@NonNull
 	public static FormattedValue formatValue(float value, @StringRes int unitId, boolean forceTrailingZeroes,
 	                                         int decimalPlacesNumber, @NonNull OsmandApplication app) {
-		return formatValue(value, app.getString(unitId), forceTrailingZeroes, decimalPlacesNumber, app);
+
+		return formatValue(value, app.getString(unitId), unitId, forceTrailingZeroes, decimalPlacesNumber, app);
 	}
 
 	@NonNull
 	public static FormattedValue formatValue(float value, @NonNull String unit, boolean forceTrailingZeroes,
+	                                         int decimalPlacesNumber, @NonNull OsmandApplication app) {
+		return formatValue(value, unit, -1, forceTrailingZeroes, decimalPlacesNumber, app);
+	}
+
+	@NonNull
+	public static FormattedValue formatValue(float value, @NonNull String unit, @StringRes int unitId, boolean forceTrailingZeroes,
 	                                         int decimalPlacesNumber, @NonNull OsmandApplication app) {
 		String pattern = "0";
 		if (decimalPlacesNumber > 0) {
@@ -693,7 +701,7 @@ public class OsmAndFormatter {
 		messageFormat.setFormatByArgumentIndex(0, decimalFormat);
 		String formattedValue = messageFormat.format(new Object[] {value})
 				.replace('\n', ' ');
-		return new FormattedValue(value, formattedValue, unit);
+		return new FormattedValue(value, formattedValue, unit, unitId, true);
 	}
 
 	public static boolean isSameDay(long firstTime, long secondTime) {
@@ -734,13 +742,26 @@ public class OsmAndFormatter {
 
 	public static String getPoiStringWithoutType(Amenity amenity, String locale, boolean transliterate) {
 		PoiCategory pc = amenity.getType();
-		PoiType pt = pc.getPoiTypeByKeyName(amenity.getSubType());
-		String typeName = amenity.getSubType();
-		if (pt != null) {
-			typeName = pt.getTranslation();
-		} else if (typeName != null) {
-			typeName = Algorithms.capitalizeFirstLetterAndLowercase(typeName.replace('_', ' '));
+
+		//multivalued amenity
+		String[] subtypes = amenity.getSubType().split(";");
+		String typeName = "";
+		for (String subType : subtypes) {
+			PoiType pt = pc.getPoiTypeByKeyName(subType);
+			String tmp;
+			if (pt != null) {
+				tmp = pt.getTranslation();
+			} else {
+				tmp = Algorithms.capitalizeFirstLetterAndLowercase(typeName.replace('_', ' '));
+			}
+			if (!typeName.isEmpty()) {
+				typeName += ", " + tmp.toLowerCase();
+				break;
+			} else {
+				typeName = tmp;
+			}
 		}
+
 		String localName = amenity.getName(locale, transliterate);
 		if (typeName != null && localName.contains(typeName)) {
 			// type is contained in name e.g.
@@ -943,6 +964,7 @@ public class OsmAndFormatter {
 		public final String value;
 		public final String unit;
 		public final float valueSrc;
+		public final int unitId;
 
 		private final boolean separateWithSpace;
 
@@ -951,10 +973,15 @@ public class OsmAndFormatter {
 		}
 
 		public FormattedValue(float valueSrc, String value, String unit, boolean separateWithSpace) {
+			this(valueSrc, value, unit, -1, separateWithSpace);
+		}
+
+		public FormattedValue(float valueSrc, String value, String unit, @StringRes int unitId, boolean separateWithSpace) {
 			this.value = value;
 			this.valueSrc = valueSrc;
 			this.unit = unit;
 			this.separateWithSpace = separateWithSpace;
+			this.unitId = unitId;
 		}
 
 		@NonNull
@@ -995,5 +1022,10 @@ public class OsmAndFormatter {
 			DateFormat timeFormat = twelveHoursFormat ? amPmTimeFormat : simpleTimeFormat;
 			return timeFormat.format(date);
 		}
+	}
+
+	@NonNull
+	public static String formatFps(float fps) {
+		return fps > 0 ? String.format(Locale.US, "%.1f", fps) : "-";
 	}
 }

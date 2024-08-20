@@ -25,17 +25,17 @@ import androidx.core.app.NotificationCompat.Builder;
 
 import net.osmand.Location;
 import net.osmand.plus.NavigationService;
-import net.osmand.plus.utils.OsmAndFormatter;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
-import net.osmand.plus.helpers.TargetPointsHelper.TargetPoint;
 import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.auto.NavigationCarAppService;
 import net.osmand.plus.auto.NavigationSession;
+import net.osmand.plus.helpers.TargetPointsHelper.TargetPoint;
 import net.osmand.plus.routing.RouteCalculationResult;
 import net.osmand.plus.routing.RouteCalculationResult.NextDirectionInfo;
 import net.osmand.plus.routing.RouteDirectionInfo;
 import net.osmand.plus.routing.RoutingHelper;
+import net.osmand.plus.utils.OsmAndFormatter;
 import net.osmand.plus.views.mapwidgets.TurnDrawable;
 import net.osmand.router.TurnType;
 import net.osmand.util.Algorithms;
@@ -61,35 +61,41 @@ public class NavigationNotification extends OsmandNotification {
 	@Override
 	public void init() {
 		leftSide = app.getSettings().DRIVING_REGION.get().leftHandDriving;
-		app.registerReceiver(new BroadcastReceiver() {
-
+		BroadcastReceiver pauseReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				RoutingHelper routingHelper = app.getRoutingHelper();
-				routingHelper.setRoutePlanningMode(true);
-				routingHelper.setFollowingMode(false);
-				routingHelper.setPauseNavigation(true);
+				app.getRoutingHelper().pauseNavigation();
 			}
-		}, new IntentFilter(OSMAND_PAUSE_NAVIGATION_SERVICE_ACTION));
+		};
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+			app.registerReceiver(pauseReceiver, new IntentFilter(OSMAND_PAUSE_NAVIGATION_SERVICE_ACTION), Context.RECEIVER_EXPORTED);
+		} else {
+			app.registerReceiver(pauseReceiver, new IntentFilter(OSMAND_PAUSE_NAVIGATION_SERVICE_ACTION));
+		}
 
-		app.registerReceiver(new BroadcastReceiver() {
-
+		BroadcastReceiver resumeReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				RoutingHelper routingHelper = app.getRoutingHelper();
-				routingHelper.setRoutePlanningMode(false);
-				routingHelper.setFollowingMode(true);
-				routingHelper.setCurrentLocation(getLastKnownLocation(), false);
+				app.getRoutingHelper().resumeNavigation();
 			}
-		}, new IntentFilter(OSMAND_RESUME_NAVIGATION_SERVICE_ACTION));
+		};
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+			app.registerReceiver(resumeReceiver, new IntentFilter(OSMAND_RESUME_NAVIGATION_SERVICE_ACTION), Context.RECEIVER_EXPORTED);
+		} else {
+			app.registerReceiver(resumeReceiver, new IntentFilter(OSMAND_RESUME_NAVIGATION_SERVICE_ACTION));
+		}
 
-		app.registerReceiver(new BroadcastReceiver() {
-
+		BroadcastReceiver stopReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				app.stopNavigation();
 			}
-		}, new IntentFilter(OSMAND_STOP_NAVIGATION_SERVICE_ACTION));
+		};
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+			app.registerReceiver(stopReceiver, new IntentFilter(OSMAND_STOP_NAVIGATION_SERVICE_ACTION), Context.RECEIVER_EXPORTED);
+		} else {
+			app.registerReceiver(stopReceiver, new IntentFilter(OSMAND_STOP_NAVIGATION_SERVICE_ACTION));
+		}
 	}
 
 	@Override

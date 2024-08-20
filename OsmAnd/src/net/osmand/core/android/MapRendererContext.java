@@ -34,6 +34,7 @@ import net.osmand.core.jni.ObfsCollection;
 import net.osmand.core.jni.PointI;
 import net.osmand.core.jni.QListFloat;
 import net.osmand.core.jni.QListPointI;
+import net.osmand.core.jni.QStringList;
 import net.osmand.core.jni.QStringStringHash;
 import net.osmand.core.jni.ResolvedMapStyle;
 import net.osmand.core.jni.SqliteHeightmapTileProvider;
@@ -174,7 +175,9 @@ public class MapRendererContext {
 	}
 
 	protected int getRasterTileSize() {
-		return (int) (getReferenceTileSize() * app.getSettings().MAP_DENSITY.get());
+		float mapDensity = app.getSettings().MAP_DENSITY.get();
+		float mapDensityAligned = mapDensity > 2.0f ? 2.0f : Math.min(mapDensity, 1.0f);
+		return (int) (getReferenceTileSize() * mapDensityAligned);
 	}
 
 	private float getReferenceTileSize() {
@@ -217,8 +220,9 @@ public class MapRendererContext {
 		ResolvedMapStyle mapStyle = mapStyles.get(rendName);
 		float mapDensity = settings.MAP_DENSITY.get();
 		float textScale = settings.TEXT_SCALE.get();
+		QStringStringHash styleSettings = getMapStyleSettings();
 
-		CachedMapPresentation pres = new CachedMapPresentation(langId, langPref, mapStyle, density, mapDensity, textScale);
+		CachedMapPresentation pres = new CachedMapPresentation(langId, langPref, mapStyle, styleSettings, density, mapDensity, textScale);
 		boolean recreateMapPresentation = cachedMapPresentation == null
 				|| cachedMapPresentation.shouldRecreateMapPresentation(pres);
 		boolean languageParamsChanged = cachedMapPresentation != null
@@ -228,11 +232,9 @@ public class MapRendererContext {
 		if (recreateMapPresentation) {
 			mapPresentationEnvironment = new MapPresentationEnvironment(mapStyle, density, mapDensity, textScale);
 		}
-
 		mapPresentationEnvironment.setLocaleLanguageId(langId);
 		mapPresentationEnvironment.setLanguagePreference(langPref);
-		QStringStringHash convertedStyleSettings = getMapStyleSettings();
-		mapPresentationEnvironment.setSettings(convertedStyleSettings);
+		mapPresentationEnvironment.setSettings(styleSettings);
 
 		if (obfMapRasterLayerProvider != null || obfMapSymbolsProvider != null) {
 			if (recreateMapPresentation || forceUpdateProviders) {
@@ -323,14 +325,14 @@ public class MapRendererContext {
 			}
 		}
 
-		QStringStringHash convertedStyleSettings = new QStringStringHash();
+		QStringStringHash styleSettings = new QStringStringHash();
 		for (Entry<String, String> setting : properties.entrySet()) {
-			convertedStyleSettings.set(setting.getKey(), setting.getValue());
+			styleSettings.set(setting.getKey(), setting.getValue());
 		}
 		if (nightMode) {
-			convertedStyleSettings.set("nightMode", "true");
+			styleSettings.set("nightMode", "true");
 		}
-		return convertedStyleSettings;
+		return styleSettings;
 	}
 
 	public void removeDirectory(String dirPath) {
@@ -451,6 +453,7 @@ public class MapRendererContext {
 			mapRendererView.addSymbolsProvider(providerType.symbolsSectionIndex, obfMapSymbolsProvider);
 		}
 		recreateHeightmapProvider();
+		updateVerticalExaggerationScale();
 		setMapBackgroundColor();
 	}
 
@@ -467,6 +470,17 @@ public class MapRendererContext {
 			elevationConfiguration.setVisualizationStyle(VisualizationStyle.None);
 		}
 		mapRendererView.setElevationConfiguration(elevationConfiguration);
+	}
+
+	public void updateVerticalExaggerationScale() {
+		MapRendererView mapRendererView = this.mapRendererView;
+		if (mapRendererView == null) {
+			return;
+		}
+		SRTMPlugin plugin = PluginsHelper.getPlugin(SRTMPlugin.class);
+		if (plugin != null) {
+			mapRendererView.setElevationScaleFactor(plugin.getVerticalExaggerationScale());
+		}
 	}
 
 	public void updateCachedHeightmapTiles() {
@@ -541,6 +555,7 @@ public class MapRendererContext {
 		LanguagePreference langPref;
 		@Nullable
 		ResolvedMapStyle mapStyle;
+		QStringStringHash styleSettings;
 		float displayDensityFactor;
 		float mapScaleFactor;
 		float symbolsScaleFactor;
@@ -548,12 +563,14 @@ public class MapRendererContext {
 		public CachedMapPresentation(@NonNull String langId,
 		                             @NonNull LanguagePreference langPref,
 		                             @Nullable ResolvedMapStyle mapStyle,
+		                             QStringStringHash styleSettings,
 		                             float displayDensityFactor,
 		                             float mapScaleFactor,
 		                             float symbolsScaleFactor) {
 			this.langId = langId;
 			this.langPref = langPref;
 			this.mapStyle = mapStyle;
+			this.styleSettings = styleSettings;
 			this.displayDensityFactor = displayDensityFactor;
 			this.mapScaleFactor = mapScaleFactor;
 			this.symbolsScaleFactor = symbolsScaleFactor;
@@ -563,7 +580,22 @@ public class MapRendererContext {
 			return Double.compare(displayDensityFactor, other.displayDensityFactor) != 0
 					|| Double.compare(mapScaleFactor, other.mapScaleFactor) != 0
 					|| Double.compare(symbolsScaleFactor, other.symbolsScaleFactor) != 0
-					|| !Algorithms.objectEquals(mapStyle, other.mapStyle);
+					|| !Algorithms.objectEquals(mapStyle, other.mapStyle)
+					|| styleSettingsChanged(other);
+		}
+
+		public boolean styleSettingsChanged(@NonNull CachedMapPresentation other) {
+			QStringList names = other.styleSettings.keys();
+			for (int i = 0; i < names.size(); i++) {
+				String name = names.get(i);
+				if (name.equals("appMode") || name.equals("baseAppMode")) {
+					continue;
+				}
+				if (!styleSettings.has_key(name) || !Algorithms.objectEquals(other.styleSettings.get(name), styleSettings.get(name))) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		public boolean languageParamsChanged(@NonNull CachedMapPresentation other) {

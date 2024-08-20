@@ -370,7 +370,7 @@ public class TrackMenuFragment extends ContextMenuScrollFragment implements Card
 			displayHelper.setFile(file);
 			displayHelper.setGpxDataItem(app.getGpxDbHelper().getItem(file));
 		}
-		displayHelper.setGpx(selectedGpxFile.getGpxFile());
+		displayHelper.setGpx(selectedGpxFile.getGpxFileToDisplay());
 		displayHelper.setSelectedGpxFile(selectedGpxFile);
 		if (selectedGpxFile.getFilteredSelectedGpxFile() != null) {
 			displayHelper.setFilteredGpxFile(selectedGpxFile.getFilteredSelectedGpxFile().getGpxFile());
@@ -1157,12 +1157,7 @@ public class TrackMenuFragment extends ContextMenuScrollFragment implements Card
 					SplitSegmentDialogFragment.showInstance(fragmentManager, displayHelper, items.get(0), segment);
 				}
 			} else if (buttonIndex == SHARE_BUTTON_INDEX) {
-				OsmandApplication app = mapActivity.getMyApplication();
-				if (gpxFile.showCurrentTrack) {
-					GpxUiHelper.saveAndShareCurrentGpx(app, gpxFile);
-				} else if (!Algorithms.isEmpty(gpxFile.path)) {
-					GpxUiHelper.saveAndShareGpxWithAppearance(app, gpxFile);
-				}
+				GpxUiHelper.saveAndShareGpxWithAppearance(app, gpxFile);
 			} else if (buttonIndex == UPLOAD_OSM_BUTTON_INDEX) {
 				OsmEditingPlugin osmEditingPlugin = PluginsHelper.getActivePlugin(OsmEditingPlugin.class);
 				if (osmEditingPlugin != null) {
@@ -1613,7 +1608,7 @@ public class TrackMenuFragment extends ContextMenuScrollFragment implements Card
 			if (selectedGpxFile != null) {
 				List<GpxDisplayGroup> groups = displayHelper.getDisplayGroups(
 						new GpxDisplayItemType[] {GpxDisplayItemType.TRACK_SEGMENT});
-				selectedGpxFile.setDisplayGroups(groups, app);
+				selectedGpxFile.setSplitGroups(groups, app);
 				selectedGpxFile.processPoints(app);
 			}
 			updateContent();

@@ -1,17 +1,8 @@
 package net.osmand.plus.auto;
 
+import static androidx.car.app.navigation.model.TravelEstimate.REMAINING_TIME_UNKNOWN;
 import static net.osmand.plus.routing.data.AnnounceTimeDistances.STATE_TURN_IN;
 import static net.osmand.plus.routing.data.AnnounceTimeDistances.STATE_TURN_NOW;
-import static net.osmand.plus.settings.enums.MetricsConstants.KILOMETERS_AND_METERS;
-import static net.osmand.plus.settings.enums.MetricsConstants.MILES_AND_FEET;
-import static net.osmand.plus.settings.enums.MetricsConstants.MILES_AND_METERS;
-import static net.osmand.plus.settings.enums.MetricsConstants.MILES_AND_YARDS;
-import static net.osmand.plus.settings.enums.MetricsConstants.NAUTICAL_MILES_AND_METERS;
-import static net.osmand.plus.utils.OsmAndFormatter.FEET_IN_ONE_METER;
-import static net.osmand.plus.utils.OsmAndFormatter.METERS_IN_KILOMETER;
-import static net.osmand.plus.utils.OsmAndFormatter.METERS_IN_ONE_MILE;
-import static net.osmand.plus.utils.OsmAndFormatter.METERS_IN_ONE_NAUTICALMILE;
-import static net.osmand.plus.utils.OsmAndFormatter.YARDS_IN_ONE_METER;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -22,16 +13,11 @@ import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.car.app.model.CarIcon;
 import androidx.car.app.model.DateTimeWithZone;
 import androidx.car.app.model.Distance;
-import androidx.car.app.navigation.model.Destination;
-import androidx.car.app.navigation.model.Lane;
-import androidx.car.app.navigation.model.LaneDirection;
-import androidx.car.app.navigation.model.Maneuver;
-import androidx.car.app.navigation.model.Step;
-import androidx.car.app.navigation.model.TravelEstimate;
-import androidx.car.app.navigation.model.Trip;
+import androidx.car.app.navigation.model.*;
 import androidx.core.graphics.drawable.IconCompat;
 
 import net.osmand.Location;
@@ -45,6 +31,7 @@ import net.osmand.plus.routing.RoutingHelper;
 import net.osmand.plus.routing.data.AnnounceTimeDistances;
 import net.osmand.plus.settings.backend.OsmandSettings;
 import net.osmand.plus.settings.enums.MetricsConstants;
+import net.osmand.plus.utils.OsmAndFormatter;
 import net.osmand.plus.views.mapwidgets.LanesDrawable;
 import net.osmand.plus.views.mapwidgets.TurnDrawable;
 import net.osmand.router.TurnType;
@@ -158,7 +145,7 @@ public class TripHelper {
 					NextDirectionInfo nextNextDirInfo = routingHelper.getNextRouteDirectionInfoAfter(nextDirInfo, new NextDirectionInfo(), true);
 					if (nextNextDirInfo != null && nextNextDirInfo.directionInfo != null &&
 							(atd.isTurnStateActive(speed, nextNextDirInfo.distanceTo, STATE_TURN_NOW)
-							|| !atd.isTurnStateNotPassed(speed, nextNextDirInfo.distanceTo, STATE_TURN_IN))) {
+									|| !atd.isTurnStateNotPassed(speed, nextNextDirInfo.distanceTo, STATE_TURN_IN))) {
 						nextTurnType = nextNextDirInfo.directionInfo.getTurnType();
 					}
 				}
@@ -218,10 +205,10 @@ public class TripHelper {
 
 			int leftTurnTimeSec = routingHelper.getLeftTimeNextTurn();
 			long turnArrivalTime = System.currentTimeMillis() + leftTurnTimeSec * 1000L;
-			Distance stepDistance = getDistance(app, nextTurnDistance);
+			Distance stepDistance = getFormattedDistance(app, nextTurnDistance);
 			DateTimeWithZone stepDateTime = DateTimeWithZone.create(turnArrivalTime, TimeZone.getDefault());
 			TravelEstimate.Builder stepTravelEstimateBuilder = new TravelEstimate.Builder(stepDistance, stepDateTime);
-			stepTravelEstimateBuilder.setRemainingTimeSeconds(leftTurnTimeSec);
+			stepTravelEstimateBuilder.setRemainingTimeSeconds(leftTurnTimeSec >= 0 ? leftTurnTimeSec : REMAINING_TIME_UNKNOWN);
 			Step step = stepBuilder.build();
 			TravelEstimate stepTravelEstimate = stepTravelEstimateBuilder.build();
 			tripBuilder.addStep(step, stepTravelEstimate);
@@ -259,38 +246,38 @@ public class TripHelper {
 			} else if (shouldKeepRight(nextTurnType)) {
 				return ctx.getString(R.string.auto_25_chars_route_tu_kr);
 			} else {
-				return ctx.getString(R.string.route_tu);
+				return ctx.getString(R.string.auto_25_chars_route_tu);
 			}
 		} else if (type.getValue() == TurnType.C) {
 			return ctx.getString(R.string.route_head);
 		} else if (type.getValue() == TurnType.TSLL) {
-			return ctx.getString(R.string.route_tsll);
+			return ctx.getString(R.string.auto_25_chars_route_tsll);
 		} else if (type.getValue() == TurnType.TL) {
 			if (shouldKeepLeft(nextTurnType)) {
 				return ctx.getString(R.string.auto_25_chars_route_tl_kl);
 			} else if (shouldKeepRight(nextTurnType)) {
 				return ctx.getString(R.string.auto_25_chars_route_tl_kr);
 			} else {
-				return ctx.getString(R.string.route_tl);
+				return ctx.getString(R.string.auto_25_chars_route_tl);
 			}
 		} else if (type.getValue() == TurnType.TSHL) {
-			return ctx.getString(R.string.route_tshl);
+			return ctx.getString(R.string.auto_25_chars_route_tshl);
 		} else if (type.getValue() == TurnType.TSLR) {
-			return ctx.getString(R.string.route_tslr);
+			return ctx.getString(R.string.auto_25_chars_route_tslr);
 		} else if (type.getValue() == TurnType.TR) {
 			if (shouldKeepLeft(nextTurnType)) {
 				return ctx.getString(R.string.auto_25_chars_route_tr_kl);
 			} else if (shouldKeepRight(nextTurnType)) {
 				return ctx.getString(R.string.auto_25_chars_route_tr_kr);
 			} else {
-				return ctx.getString(R.string.route_tr);
+				return ctx.getString(R.string.auto_25_chars_route_tr);
 			}
 		} else if (type.getValue() == TurnType.TSHR) {
-			return ctx.getString(R.string.route_tshr);
+			return ctx.getString(R.string.auto_25_chars_route_tshr);
 		} else if (type.getValue() == TurnType.KL) {
-			return ctx.getString(R.string.route_kl);
+			return ctx.getString(R.string.auto_25_chars_route_kl);
 		} else if (type.getValue() == TurnType.KR) {
-			return ctx.getString(R.string.route_kr);
+			return ctx.getString(R.string.auto_25_chars_route_kr);
 		}
 		return "";
 	}
@@ -311,7 +298,7 @@ public class TripHelper {
 		int leftTimeSec = routingHelper.getLeftTime();
 		DateTimeWithZone dateTime = DateTimeWithZone.create(System.currentTimeMillis() + leftTimeSec * 1000L, TimeZone.getDefault());
 		TravelEstimate.Builder travelEstimateBuilder = new TravelEstimate.Builder(distance, dateTime);
-		travelEstimateBuilder.setRemainingTimeSeconds(leftTimeSec);
+		travelEstimateBuilder.setRemainingTimeSeconds(leftTimeSec >= 0 ? leftTimeSec : REMAINING_TIME_UNKNOWN);
 		Destination destination = destBuilder.build();
 		TravelEstimate travelEstimate = travelEstimateBuilder.build();
 		return new Pair<>(destination, travelEstimate);
@@ -327,46 +314,34 @@ public class TripHelper {
 		return bitmap;
 	}
 
+	private static Distance getFormattedDistance(@NonNull OsmandApplication app, double meters) {
+		MetricsConstants mc = app.getSettings().METRIC_SYSTEM.get();
+		OsmAndFormatter.FormattedValue formattedValue = OsmAndFormatter.getFormattedDistanceValue((float) meters, app, OsmAndFormatter.OsmAndFormatterParams.USE_LOWER_BOUNDS, mc);
+
+		return Distance.create(formattedValue.valueSrc, getDistanceUnit(formattedValue.unitId));
+	}
+
 	public static Distance getDistance(@NonNull OsmandApplication app, double meters) {
 		MetricsConstants mc = app.getSettings().METRIC_SYSTEM.get();
-		int displayUnit;
-		float mainUnitInMeters;
-		if (mc == KILOMETERS_AND_METERS) {
-			displayUnit = Distance.UNIT_KILOMETERS;
-			mainUnitInMeters = METERS_IN_KILOMETER;
-		} else if (mc == NAUTICAL_MILES_AND_METERS || mc == MetricsConstants.NAUTICAL_MILES_AND_FEET) {
-			displayUnit = Distance.UNIT_MILES;
-			mainUnitInMeters = METERS_IN_ONE_NAUTICALMILE;
-		} else {
-			displayUnit = Distance.UNIT_MILES;
-			mainUnitInMeters = METERS_IN_ONE_MILE;
+		OsmAndFormatter.FormattedValue formattedValue = OsmAndFormatter.getFormattedDistanceValue((float) meters, app, OsmAndFormatter.OsmAndFormatterParams.DEFAULT, mc);
+
+		return Distance.create(formattedValue.valueSrc, getDistanceUnit(formattedValue.unitId));
+	}
+
+	@Distance.Unit
+	private static int getDistanceUnit(@StringRes int unitId) {
+		if (unitId == R.string.m) {
+			return Distance.UNIT_METERS;
+		} else if (unitId == R.string.yard) {
+			return Distance.UNIT_YARDS;
+		} else if (unitId == R.string.foot) {
+			return Distance.UNIT_FEET;
+		} else if (unitId == R.string.mile || unitId == R.string.nm) {
+			return Distance.UNIT_MILES;
+		} else if (unitId == R.string.km) {
+			return Distance.UNIT_KILOMETERS;
 		}
-		if (meters >= 100 * mainUnitInMeters) {
-			return Distance.create(meters / mainUnitInMeters, displayUnit);
-		} else if (meters > 9.99f * mainUnitInMeters) {
-			return Distance.create(meters / mainUnitInMeters, displayUnit);
-		} else if (meters > 0.999f * mainUnitInMeters) {
-			return Distance.create(meters / mainUnitInMeters, displayUnit);
-		} else if (mc == MILES_AND_FEET && meters > 0.249f * mainUnitInMeters) {
-			return Distance.create(meters / mainUnitInMeters, displayUnit);
-		} else if (mc == MILES_AND_METERS && meters > 0.249f * mainUnitInMeters) {
-			return Distance.create(meters / mainUnitInMeters, displayUnit);
-		} else if (mc == MILES_AND_YARDS && meters > 0.249f * mainUnitInMeters) {
-			return Distance.create(meters / mainUnitInMeters, displayUnit);
-		} else if (mc == NAUTICAL_MILES_AND_METERS && meters > 0.99f * mainUnitInMeters) {
-			return Distance.create(meters / mainUnitInMeters, displayUnit);
-		} else if (mc == MetricsConstants.NAUTICAL_MILES_AND_FEET && meters > 0.99f * mainUnitInMeters) {
-			return Distance.create(meters / mainUnitInMeters, displayUnit);
-		} else {
-			if (mc == KILOMETERS_AND_METERS || mc == MILES_AND_METERS) {
-				return Distance.create(meters,  Distance.UNIT_METERS);
-			} else if (mc == MILES_AND_FEET || mc == MetricsConstants.NAUTICAL_MILES_AND_FEET) {
-				return Distance.create(meters * FEET_IN_ONE_METER, Distance.UNIT_FEET);
-			} else if (mc == MILES_AND_YARDS) {
-				return Distance.create(meters * YARDS_IN_ONE_METER, Distance.UNIT_YARDS);
-			}
-			return Distance.create(meters,  Distance.UNIT_METERS);
-		}
+		return Distance.UNIT_METERS;
 	}
 
 	private int getManeuverType(@NonNull TurnType turnType) {

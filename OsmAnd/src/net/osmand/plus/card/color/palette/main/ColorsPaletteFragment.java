@@ -1,7 +1,6 @@
 package net.osmand.plus.card.color.palette.main;
 
 import static net.osmand.plus.card.color.palette.main.IColorsPaletteController.ALL_COLORS_PROCESS_ID;
-import static net.osmand.plus.utils.ColorUtilities.getColor;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -18,7 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -34,7 +32,6 @@ import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.ColorUtilities;
 import net.osmand.plus.utils.UiUtilities;
 import net.osmand.plus.widgets.FlowLayout;
-import net.osmand.plus.widgets.FlowLayout.LayoutParams;
 
 public class ColorsPaletteFragment extends BaseOsmAndDialogFragment implements IColorsPalette {
 
@@ -66,7 +63,7 @@ public class ColorsPaletteFragment extends BaseOsmAndDialogFragment implements I
 			if (!settings.DO_NOT_USE_ANIMATIONS.get()) {
 				window.getAttributes().windowAnimations = R.style.Animations_Alpha;
 			}
-			window.setStatusBarColor(getColor(ctx, getStatusBarColorId()));
+			window.setStatusBarColor(getColor(getStatusBarColorId()));
 		}
 		return dialog;
 	}
@@ -75,7 +72,7 @@ public class ColorsPaletteFragment extends BaseOsmAndDialogFragment implements I
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		updateNightMode();
-		View view = themedInflater.inflate(R.layout.fragment_colors_palette, container, false);
+		View view = themedInflater.inflate(R.layout.fragment_palette, container, false);
 		setupToolbar(view);
 		setupColorsPalette(view);
 		return view;
@@ -100,15 +97,13 @@ public class ColorsPaletteFragment extends BaseOsmAndDialogFragment implements I
 	}
 
 	private void setupColorsPalette(@NonNull View view) {
-		FlowLayout flowLayout = view.findViewById(R.id.colors_palette);
+		FlowLayout flowLayout = view.findViewById(R.id.palette);
 		flowLayout.removeAllViews();
 		flowLayout.setHorizontalAutoSpacing(true);
-		int minimalPaddingBetweenIcon = getDimension(R.dimen.favorites_select_icon_button_right_padding);
-
 		for (PaletteColor paletteColor : controller.getColors(PaletteSortingMode.ORIGINAL)) {
-			flowLayout.addView(createColorItemView(paletteColor, flowLayout), new LayoutParams(minimalPaddingBetweenIcon, 0));
+			flowLayout.addView(createColorItemView(paletteColor, flowLayout));
 		}
-		flowLayout.addView(createAddCustomColorItemView(flowLayout), new LayoutParams(minimalPaddingBetweenIcon, 0));
+		flowLayout.addView(createAddCustomColorItemView(flowLayout));
 	}
 
 	@NonNull
@@ -119,7 +114,7 @@ public class ColorsPaletteFragment extends BaseOsmAndDialogFragment implements I
 
 		ImageView background = view.findViewById(R.id.background);
 		background.setOnClickListener(v -> {
-			controller.onSelectColorFromPalette(paletteColor);
+			controller.onSelectColorFromPalette(paletteColor, true);
 			dismiss();
 		});
 		background.setOnLongClickListener(v -> {
