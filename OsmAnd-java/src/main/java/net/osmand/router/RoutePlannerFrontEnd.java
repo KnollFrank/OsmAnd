@@ -26,8 +26,6 @@ import net.osmand.router.HHRouteDataStructure.HHRoutingConfig;
 import net.osmand.router.HHRouteDataStructure.NetworkDBPoint;
 import net.osmand.router.RouteCalculationProgress.HHIteration;
 import net.osmand.router.RouteResultPreparation.RouteCalcResult;
-import net.osmand.router.postman.PostmanTourPlanner;
-import org.labyrinth.common.MeasureUtils;
 import net.osmand.util.MapUtils;
 
 
@@ -375,7 +373,7 @@ public class RoutePlannerFrontEnd {
 	}
 
 	public RouteCalcResult searchRoute(final RoutingContext ctx, LatLon start, LatLon end, List<LatLon> intermediates,
-	                                            PrecalculatedRouteDirection routeDirection, final boolean postmanTour) throws IOException, InterruptedException {
+	                                            PrecalculatedRouteDirection routeDirection) throws IOException, InterruptedException {
 		long timeToCalculate = System.nanoTime();
 		if (ctx.calculationProgress == null) {
 			ctx.calculationProgress = new RouteCalculationProgress();
@@ -395,7 +393,7 @@ public class RoutePlannerFrontEnd {
 		if (needRequestPrivateAccessRouting(ctx, targets)) {
 			ctx.calculationProgress.requestPrivateAccessRouting = true;
 		}
-		if (!postmanTour && hhRoutingConfig != null && ctx.calculationMode != RouteCalculationMode.BASE) {
+		if (hhRoutingConfig != null && ctx.calculationMode != RouteCalculationMode.BASE) {
 			if (ctx.nativeLib == null || hhRoutingType == HHRoutingType.JAVA) {
 				HHNetworkRouteRes r = runHHRoute(ctx, start, targets);
 				if ((r != null && r.isCorrect()) || useOnlyHHRouting) {
@@ -427,7 +425,7 @@ public class RoutePlannerFrontEnd {
 			ctx.calculationProgress.totalIterations++;
 			RoutingContext nctx = buildRoutingContext(ctx.config, ctx.nativeLib, ctx.getMaps(), RouteCalculationMode.BASE);
 			nctx.calculationProgress = ctx.calculationProgress;
-			RouteCalcResult baseRes = searchRoute(nctx, start, end, intermediates, postmanTour);
+			RouteCalcResult baseRes = searchRoute(nctx, start, end, intermediates);
 			if (baseRes == null || !baseRes.isCorrect()) {
 				return baseRes;
 			}
@@ -643,7 +641,7 @@ public class RoutePlannerFrontEnd {
 		}
 	}
 
-	public RouteCalcResult searchRouteInternalPrepare(final RoutingContext ctx, RouteSegmentPoint start, RouteSegmentPoint end,
+	private RouteCalcResult searchRouteInternalPrepare(final RoutingContext ctx, RouteSegmentPoint start, RouteSegmentPoint end,
 	                                                            PrecalculatedRouteDirection routeDirection, final boolean postmanTour) throws IOException, InterruptedException {
 		RouteSegmentPoint recalculationEnd = getRecalculationEnd(ctx);
 		if (recalculationEnd != null) {
@@ -846,7 +844,7 @@ public class RoutePlannerFrontEnd {
 					local.previouslyCalculatedRoute = firstPartRecalculatedRoute;
 				}
 			}
-			RouteCalcResult res = searchRouteInternalPrepare(local, points.get(i), points.get(i + 1), routeDirection, postmanTour);
+			RouteCalcResult res = searchRouteInternalPrepare(local, points.get(i), points.get(i + 1), routeDirection);
 			makeStartEndPointsPrecise(local, res, points.get(i).getPreciseLatLon(), points.get(i + 1).getPreciseLatLon(), null);
 			results.detailed.addAll(res.detailed);
 			ctx.routingTime += local.routingTime;
