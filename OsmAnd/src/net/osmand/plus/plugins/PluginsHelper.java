@@ -4,13 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.AsyncTask;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 
 import com.github.mikephil.charting.charts.LineChart;
 
@@ -23,8 +16,8 @@ import net.osmand.data.MapObject;
 import net.osmand.gpx.GPXTrackAnalysis;
 import net.osmand.gpx.GPXTrackAnalysis.TrackPointsAnalyser;
 import net.osmand.map.WorldRegion;
-import net.osmand.plus.AppInitializeListener;
 import net.osmand.plus.AppInitializer;
+import net.osmand.plus.AppInitializer.AppInitializeListener;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.Version;
 import net.osmand.plus.activities.MapActivity;
@@ -35,22 +28,20 @@ import net.osmand.plus.charts.GPXDataSetType;
 import net.osmand.plus.charts.OrderedLineDataSet;
 import net.osmand.plus.configmap.tracks.TrackItem;
 import net.osmand.plus.dashboard.tools.DashFragmentData;
+import net.osmand.plus.plugins.custom.CustomRegion;
 import net.osmand.plus.download.IndexItem;
-import net.osmand.plus.keyevent.assignment.KeyAssignment;
 import net.osmand.plus.keyevent.commands.KeyEventCommand;
+import net.osmand.plus.keyevent.assignment.KeyAssignment;
 import net.osmand.plus.mapcontextmenu.builders.cards.ImageCard.GetImageCardsTask.GetImageCardsListener;
 import net.osmand.plus.mapcontextmenu.builders.cards.ImageCard.ImageCardsHolder;
 import net.osmand.plus.myplaces.MyPlacesActivity;
-import net.osmand.plus.plugins.OsmandPlugin.PluginInstallListener;
 import net.osmand.plus.plugins.accessibility.AccessibilityPlugin;
 import net.osmand.plus.plugins.audionotes.AudioVideoNotesPlugin;
 import net.osmand.plus.plugins.custom.CustomOsmandPlugin;
-import net.osmand.plus.plugins.custom.CustomRegion;
 import net.osmand.plus.plugins.development.OsmandDevelopmentPlugin;
 import net.osmand.plus.plugins.externalsensors.ExternalSensorsPlugin;
 import net.osmand.plus.plugins.mapillary.MapillaryPlugin;
 import net.osmand.plus.plugins.monitoring.OsmandMonitoringPlugin;
-import net.osmand.plus.plugins.online.OnlineOsmandPlugin;
 import net.osmand.plus.plugins.openseamaps.NauticalMapsPlugin;
 import net.osmand.plus.plugins.osmedit.OsmEditingPlugin;
 import net.osmand.plus.plugins.parking.ParkingPositionPlugin;
@@ -62,7 +53,6 @@ import net.osmand.plus.poi.PoiUIFilter;
 import net.osmand.plus.quickaction.QuickActionType;
 import net.osmand.plus.search.dialogs.QuickSearchDialogFragment;
 import net.osmand.plus.settings.backend.ApplicationMode;
-import net.osmand.plus.utils.AndroidNetworkUtils;
 import net.osmand.plus.views.MapLayers;
 import net.osmand.plus.views.layers.base.OsmandMapLayer;
 import net.osmand.plus.views.mapwidgets.MapWidgetInfo;
@@ -84,28 +74,26 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+
 public class PluginsHelper {
 
-	private static final Log LOG = PlatformUtil.getLog(PluginsHelper.class);
+	private static final Log log = PlatformUtil.getLog(PluginsHelper.class);
 
 	private static final String CUSTOM_PLUGINS_KEY = "custom_plugins";
 	private static final String PLUGINS_PREFERENCES_NAME = "net.osmand.plugins";
-	public static final String ONLINE_PLUGINS_URL = "https://osmand.net/api/plugins/list";
-	public static final String OSMAND_URL = "https://osmand.net";
 
 	private static final List<OsmandPlugin> allPlugins = new ArrayList<>();
-	private static List<OnlineOsmandPlugin> onlinePlugins = new ArrayList<>();
-
-	public interface OnlinePluginsCallback {
-		void onFetchComplete(@NonNull List<OnlineOsmandPlugin> plugins);
-	}
 
 	public static void initPlugins(@NonNull OsmandApplication app) {
 		Set<String> enabledPlugins = app.getSettings().getEnabledPlugins();
@@ -167,7 +155,7 @@ public class PluginsHelper {
 					allPlugins.add(plugin);
 				}
 			} catch (JSONException e) {
-				LOG.error(e);
+				log.error(e);
 			}
 		}
 	}
@@ -186,7 +174,7 @@ public class PluginsHelper {
 				plugin.writeDependentFilesJson(json);
 				itemsJson.put(json);
 			} catch (JSONException e) {
-				LOG.error(e);
+				log.error(e);
 			}
 		}
 		String jsonStr = itemsJson.toString();
@@ -221,7 +209,7 @@ public class PluginsHelper {
 				plugin.setEnabled(true);
 			}
 		} catch (Exception e) {
-			LOG.error("Plugin initialization failed " + plugin.getId(), e);
+			log.error("Plugin initialization failed " + plugin.getId(), e);
 		}
 	}
 
@@ -318,20 +306,14 @@ public class PluginsHelper {
 			}
 
 			if (plugin.isMarketPlugin() || plugin.isPaid()) {
-				if (plugin.shouldShowInstallDialog()) {
+				if (plugin.isActive()) {
 					plugin.showInstallDialog(activity);
-				} else if (plugin.shouldShowDisableDialog()) {
+				} else if (checkPluginPackage(app, plugin)) {
 					plugin.showDisableDialog(activity);
 				}
 			}
 		}
 		return true;
-	}
-
-	public static void installPlugin(@Nullable FragmentActivity activity,
-	                                 @NonNull OsmandPlugin plugin,
-	                                 @Nullable PluginInstallListener installListener) {
-		plugin.install(activity, installListener);
 	}
 
 	private static void registerAppInitializingDependedProperties(@NonNull OsmandApplication app) {
@@ -362,10 +344,6 @@ public class PluginsHelper {
 	@NonNull
 	public static List<OsmandPlugin> getAvailablePlugins() {
 		return new ArrayList<>(allPlugins);
-	}
-
-	public static List<OnlineOsmandPlugin> getOnlinePlugins() {
-		return new ArrayList<>(onlinePlugins);
 	}
 
 	@NonNull
@@ -478,15 +456,6 @@ public class PluginsHelper {
 		return null;
 	}
 
-	public static OsmandPlugin getOnlinePlugin(String id) {
-		for (OsmandPlugin plugin : getOnlinePlugins()) {
-			if (plugin.getId().equals(id)) {
-				return plugin;
-			}
-		}
-		return null;
-	}
-
 	public static <T extends OsmandPlugin> boolean isEnabled(Class<T> clz) {
 		return getEnabledPlugin(clz) != null;
 	}
@@ -531,7 +500,7 @@ public class PluginsHelper {
 				plugin.attachAdditionalInfoToRecordedTrack(location, json);
 			}
 		} catch (JSONException e) {
-			LOG.error(e);
+			log.error(e);
 		}
 	}
 
@@ -767,7 +736,7 @@ public class PluginsHelper {
 		try {
 			installed = ctx.getPackageManager().getPackageInfo(packageInfo, 0) != null;
 		} catch (NameNotFoundException e) {
-			LOG.info("Package not found: " + packageInfo);
+			log.info("Package not found: " + packageInfo);
 		}
 		return installed;
 	}
@@ -877,48 +846,5 @@ public class PluginsHelper {
 		for (OsmandPlugin plugin : getAvailablePlugins()) {
 			plugin.onIndexItemDownloaded(item, updatingFile);
 		}
-	}
-
-	public static void fetchOnlinePlugins(@NonNull OsmandApplication app, @Nullable OnlinePluginsCallback callback) {
-		Map<String, String> params = new HashMap<>();
-		params.put("nightly", Version.isDeveloperBuild(app) ? "true" : "false");
-		params.put("os", "android");
-		params.put("version", Version.getAppVersion(app));
-		params.put("lang", app.getLocaleHelper().getLanguage());
-		params.put("nd", String.valueOf(app.getAppInitializer().getFirstInstalledDays()));
-		params.put("ns", String.valueOf(app.getAppInitializer().getNumberOfStarts()));
-		if (app.isUserAndroidIdAllowed()) {
-			params.put("aid", app.getUserAndroidId());
-		}
-		AndroidNetworkUtils.sendRequestAsync(app, ONLINE_PLUGINS_URL, params, null,
-				false, false, (resultJson, error, resultCode) -> {
-					new AsyncTask<Void, Void, List<OnlineOsmandPlugin>>() {
-						@Override
-						protected List<OnlineOsmandPlugin> doInBackground(Void... voids) {
-							List<OnlineOsmandPlugin> plugins = new ArrayList<>();
-							if (!Algorithms.isEmpty(resultJson)) {
-								try {
-									JSONObject res = new JSONObject(resultJson);
-									JSONArray pluginsArray = res.getJSONArray("plugins");
-									for (int i = 0; i < pluginsArray.length(); i++) {
-										JSONObject pluginObj = pluginsArray.getJSONObject(i);
-										plugins.add(new OnlineOsmandPlugin(app, pluginObj));
-									}
-								} catch (JSONException e) {
-									LOG.error(e);
-								}
-							}
-							return plugins;
-						}
-
-						@Override
-						protected void onPostExecute(List<OnlineOsmandPlugin> plugins) {
-							onlinePlugins = plugins;
-							if (callback != null) {
-								callback.onFetchComplete(plugins);
-							}
-						}
-					}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void) null);
-				});
 	}
 }

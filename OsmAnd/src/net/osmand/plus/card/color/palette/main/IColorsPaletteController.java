@@ -29,9 +29,9 @@ public interface IColorsPaletteController extends IDialogController, ColorPicker
 
 	boolean isAccentColorCanBeChanged();
 
-	void onSelectColorFromPalette(@NonNull PaletteColor color, boolean renewLastUsedTime);
+	void onSelectColorFromPalette(@NonNull PaletteColor color);
 
-	void selectColor(@Nullable Integer color);
+	void selectColor(@ColorInt int colorInt);
 
 	void selectColor(@Nullable PaletteColor paletteColor);
 

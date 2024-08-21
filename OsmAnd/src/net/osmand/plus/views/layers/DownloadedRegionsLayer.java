@@ -1,7 +1,5 @@
 package net.osmand.plus.views.layers;
 
-import static net.osmand.plus.AppInitEvents.INDEX_REGION_BOUNDARIES;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -12,6 +10,7 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.text.TextPaint;
 import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,9 +28,8 @@ import net.osmand.data.QuadRect;
 import net.osmand.data.RotatedTileBox;
 import net.osmand.map.OsmandRegions;
 import net.osmand.map.WorldRegion;
-import net.osmand.plus.AppInitEvents;
-import net.osmand.plus.AppInitializeListener;
 import net.osmand.plus.AppInitializer;
+import net.osmand.plus.AppInitializer.InitEvents;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
@@ -47,7 +45,6 @@ import net.osmand.plus.mapcontextmenu.other.MapMultiSelectionMenu;
 import net.osmand.plus.plugins.PluginsHelper;
 import net.osmand.plus.resources.ResourceManager;
 import net.osmand.plus.resources.ResourceManager.ResourceListener;
-import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.NativeUtilities;
 import net.osmand.plus.views.OsmandMapTileView;
 import net.osmand.plus.views.layers.ContextMenuLayer.IContextMenuProvider;
@@ -174,9 +171,10 @@ public class DownloadedRegionsLayer extends OsmandMapLayer implements IContextMe
 		paintBackuped = getPaint(getColor(R.color.region_backuped));
 
 		textPaint = new TextPaint();
-		DisplayMetrics metrics = new DisplayMetrics();
-		AndroidUtils.getDisplay(app).getMetrics(metrics);
-		textPaint.setStrokeWidth(21 * metrics.scaledDensity);
+		WindowManager wmgr = (WindowManager) view.getApplication().getSystemService(Context.WINDOW_SERVICE);
+		DisplayMetrics dm = new DisplayMetrics();
+		wmgr.getDefaultDisplay().getMetrics(dm);
+		textPaint.setStrokeWidth(21 * dm.scaledDensity);
 		textPaint.setAntiAlias(true);
 		textPaint.setTextAlign(Paint.Align.CENTER);
 
@@ -603,7 +601,7 @@ public class DownloadedRegionsLayer extends OsmandMapLayer implements IContextMe
 			Iterator<BinaryMapDataObject> it = result.iterator();
 			while (it.hasNext()) {
 				BinaryMapDataObject o = it.next();
-				if (!osmandRegions.contain(o, point31x, point31y)) {
+				if (!osmandRegions.contain(o, point31x, point31y) ) {
 					it.remove();
 				}
 			}
@@ -794,10 +792,10 @@ public class DownloadedRegionsLayer extends OsmandMapLayer implements IContextMe
 	private void addMapsInitializedListener() {
 		OsmandApplication app = getApplication();
 		if (app.isApplicationInitializing()) {
-			app.getAppInitializer().addListener(new AppInitializeListener() {
+			app.getAppInitializer().addListener(new AppInitializer.AppInitializeListener() {
 				@Override
-				public void onProgress(@NonNull AppInitializer init, @NonNull AppInitEvents event) {
-					if (event == INDEX_REGION_BOUNDARIES) {
+				public void onProgress(@NonNull AppInitializer init, @NonNull InitEvents event) {
+					if (event == AppInitializer.InitEvents.INDEX_REGION_BOUNDARIES) {
 						indexRegionBoundaries = true;
 					}
 				}

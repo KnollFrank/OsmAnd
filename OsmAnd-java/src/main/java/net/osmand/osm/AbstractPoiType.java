@@ -48,14 +48,7 @@ public abstract class AbstractPoiType {
 	}
 
 	public String getIconKeyName() {
-		return getFormattedKeyName();
-	}
-
-	public String getFormattedKeyName() {
-		return formatKeyName(getKeyName());
-	}
-
-	protected String formatKeyName(String kn) {
+		String kn = getKeyName();
 		if (kn.startsWith("osmand_")) {
 			kn = kn.substring("osmand_".length());
 		}
@@ -75,21 +68,21 @@ public abstract class AbstractPoiType {
 	}
 
 	public String getTranslation() {
-		if (translation == null) {
+		if(translation == null) {
 			translation = registry.getTranslation(this);
 		}
 		return translation;
 	}
 
 	public String getSynonyms() {
-		if (synonyms == null) {
+		if(synonyms == null) {
 			synonyms = registry.getSynonyms(this);
 		}
 		return synonyms;
 	}
 
 	public String getEnTranslation() {
-		if (enTranslation == null) {
+		if(enTranslation == null) {
 			enTranslation = registry.getEnTranslation(this);
 		}
 		return enTranslation;

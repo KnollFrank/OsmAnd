@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.osmand.router.*;
 import org.apache.commons.logging.Log;
 
 import com.google.gson.JsonObject;
@@ -33,8 +32,17 @@ import net.osmand.data.MapObject;
 import net.osmand.data.QuadRect;
 import net.osmand.render.RenderingRuleSearchRequest;
 import net.osmand.render.RenderingRulesStorage;
+import net.osmand.router.GeneralRouter;
 import net.osmand.router.HHRouteDataStructure.HHRoutingConfig;
+import net.osmand.router.HHRoutePlanner;
+import net.osmand.router.NativeTransportRoutingResult;
+import net.osmand.router.RouteCalculationProgress;
 import net.osmand.router.RoutePlannerFrontEnd.GpxPoint;
+import net.osmand.router.RoutePlannerFrontEnd.GpxRouteApproximation;
+import net.osmand.router.RouteResultPreparation;
+import net.osmand.router.RouteSegmentResult;
+import net.osmand.router.RoutingContext;
+import net.osmand.router.TransportRoutingConfiguration;
 import net.osmand.util.Algorithms;
 import net.osmand.util.MapUtils;
 
@@ -135,7 +143,6 @@ public class NativeLibrary {
 		public double lat;
 		public double lon;
 		public double cumDist;
-		public int targetInd;
 		public List<RouteSegmentResult> routeToTarget;
 
 		NativeGpxPointApproximation(GpxPoint gpxPoint) {
@@ -144,12 +151,11 @@ public class NativeLibrary {
 			cumDist = gpxPoint.cumDist;
 		}
 
-		public NativeGpxPointApproximation(int ind, double lat, double lon, double cumDist, int targetInd) {
+		public NativeGpxPointApproximation(int ind, double lat, double lon, double cumDist) {
 			this.ind = ind;
 			this.lat = lat;
 			this.lon = lon;
 			this.cumDist = cumDist;
-			this.targetInd = targetInd;
 			routeToTarget = new ArrayList<>();
 		}
 
@@ -167,7 +173,6 @@ public class NativeLibrary {
 				fixStraightLineRegion();
 			}
 
-			point.targetInd = targetInd;
 			point.routeToTarget = new ArrayList<>(routeToTarget);
 			return point;
 		}
@@ -245,18 +250,15 @@ public class NativeLibrary {
 	public RouteSegmentResult[] runNativeRouting(RoutingContext c, HHRoutingConfig hhRoutingConfig, RouteRegion[] regions, boolean basemap) {
 		// if hhRoutingConfig == null - process old routing
 		if (hhRoutingConfig != null) {
-			setHHNativeFilterAndParameters(c);
+			setHHNativeFilter(c);
 		}
-		final float CPP_NO_DIRECTION = -2 * (float) Math.PI;
-		return nativeRouting(c, hhRoutingConfig, c.config.initialDirection == null ?
-				CPP_NO_DIRECTION : c.config.initialDirection.floatValue(),
+		return nativeRouting(c, hhRoutingConfig, c.config.initialDirection == null ? -2 * (float) Math.PI : c.config.initialDirection.floatValue(),
 				regions, basemap);
 	}
 
-	private void setHHNativeFilterAndParameters(RoutingContext ctx) {
+	private void setHHNativeFilter(RoutingContext ctx) {
 		GeneralRouter gr = (GeneralRouter) ctx.getRouter();
-
-		TreeMap<String, String> tags = HHRoutePlanner.getFilteredTags(gr);
+		TreeMap<String, String> tags =  HHRoutePlanner.getFilteredTags(gr);
 		String[] tm = new String[tags.size() * 2];
 		int index = 0;
 		for (Map.Entry<String, String> entry : tags.entrySet()) {
@@ -265,23 +267,16 @@ public class NativeLibrary {
 			index += 2;
 		}
 		gr.hhNativeFilter = tm;
-
-		int i = 0;
-		gr.hhNativeParameterValues = new String[gr.getParameterValues().size() * 2];
-		for (Map.Entry<String, String> entry : gr.getParameterValues().entrySet()) {
-			gr.hhNativeParameterValues[i++] = entry.getKey();
-			gr.hhNativeParameterValues[i++] = entry.getValue();
-		}
 	}
 
-	public GpxRouteApproximation runNativeSearchGpxRoute(GpxRouteApproximation gCtx, List<GpxPoint> gpxPoints, boolean useGeo) {
+	public GpxRouteApproximation runNativeSearchGpxRoute(GpxRouteApproximation gCtx, List<GpxPoint> gpxPoints) {
 		RouteRegion[] regions = gCtx.ctx.reverseMap.keySet().toArray(new RouteRegion[0]);
 		int pointsSize = gpxPoints.size();
 		NativeGpxPointApproximation[] nativePoints = new NativeGpxPointApproximation[pointsSize];
 		for (int i = 0; i < pointsSize; i++) {
 			nativePoints[i] = new NativeGpxPointApproximation(gpxPoints.get(i));
 		}
-		NativeGpxRouteApproximationResult nativeResult = nativeSearchGpxRoute(gCtx.ctx, nativePoints, regions, useGeo);
+		NativeGpxRouteApproximationResult nativeResult = nativeSearchGpxRoute(gCtx.ctx, nativePoints, regions);
 		for (NativeGpxPointApproximation point : nativeResult.finalPoints) {
 			gCtx.finalPoints.add(point.convertToGpxPoint());
 		}
@@ -289,26 +284,12 @@ public class NativeLibrary {
 		for (RouteSegmentResult rsr : results) {
 			initRouteRegion(gCtx, rsr);
 		}
-		gCtx.fullRoute.addAll(results);
+		gCtx.result.addAll(results);
 		return gCtx;
 	}
 
 	private void initRouteRegion(GpxRouteApproximation gCtx, RouteSegmentResult rsr) {
 		RouteRegion region = rsr.getObject().region;
-		if (region == null) {
-			// gCtx.finalPoints is fixed by fixStraightLineRegion
-			// gCtx.result null region(s) should be fixed here
-			RouteRegion reg = new RouteRegion();
-			reg.initRouteEncodingRule(0, "highway", RouteResultPreparation.UNMATCHED_HIGHWAY_TYPE);
-			RouteDataObject newRdo = new RouteDataObject(reg);
-			RouteDataObject rdo = rsr.getObject();
-			newRdo.pointsX = rdo.pointsX;
-			newRdo.pointsY = rdo.pointsY;
-			newRdo.types = rdo.getTypes();
-			newRdo.id = -1;
-			rsr.setObject(newRdo);
-			return;
-		}
 		BinaryMapIndexReader reader = gCtx.ctx.reverseMap.get(region);
 		if (reader != null) {
 			try {
@@ -337,7 +318,7 @@ public class NativeLibrary {
 	/**/
 	protected static native NativeGpxRouteApproximationResult nativeSearchGpxRoute(RoutingContext c,
 	                                                                               NativeGpxPointApproximation[] gpxPoints,
-	                                                                               RouteRegion[] regions, boolean useGeo);
+	                                                                               RouteRegion[] regions);
 
 	protected static native NativeRouteSearchResult loadRoutingData(RouteRegion reg, String regName, int regfp, RouteSubregion subreg,
 	                                                                boolean loadObjects);

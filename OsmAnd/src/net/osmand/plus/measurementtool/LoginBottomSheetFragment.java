@@ -15,13 +15,16 @@ import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.PlatformUtil;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
+import net.osmand.plus.widgets.dialogbutton.DialogButtonType;
 import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.base.MenuBottomSheetDialogFragment;
 import net.osmand.plus.base.bottomsheetmenu.SimpleBottomSheetItem;
 import net.osmand.plus.plugins.osmedit.oauth.OsmOAuthHelper;
+import net.osmand.plus.settings.bottomsheets.OsmLoginDataBottomSheet;
 
 import org.apache.commons.logging.Log;
 
+import static net.osmand.plus.plugins.osmedit.fragments.OsmEditingFragment.OSM_LOGIN_DATA;
 import static net.osmand.plus.plugins.osmedit.oauth.OsmOAuthHelper.OsmAuthorizationListener;
 
 public class LoginBottomSheetFragment extends MenuBottomSheetDialogFragment implements OsmAuthorizationListener {
@@ -50,18 +53,23 @@ public class LoginBottomSheetFragment extends MenuBottomSheetDialogFragment impl
 
 	@Override
 	protected int getRightBottomButtonTextId() {
-		return R.string.sign_in_with_open_street_map;
+		return R.string.use_login_password;
 	}
 
 	@Override
-	protected void setupRightButton() {
-		super.setupRightButton();
+	protected void setupThirdButton() {
+		super.setupThirdButton();
 		OsmandApplication app = getMyApplication();
 		if (app != null) {
-			Drawable icon = getIcon(R.drawable.ic_action_openstreetmap_logo, R.color.popup_text_color);
-			TextView buttonText = rightButton.findViewById(R.id.button_text);
+			Drawable icon = app.getUIUtilities().getIcon(R.drawable.ic_action_openstreetmap_logo, R.color.popup_text_color);
+			TextView buttonText = thirdButton.findViewById(R.id.button_text);
 			AndroidUtils.setCompoundDrawablesWithIntrinsicBounds(buttonText, icon, null, null, null);
 		}
+	}
+
+	@Override
+	protected int getThirdBottomButtonTextId() {
+		return R.string.sign_in_with_open_street_map;
 	}
 
 	@Override
@@ -71,6 +79,15 @@ public class LoginBottomSheetFragment extends MenuBottomSheetDialogFragment impl
 
 	@Override
 	protected void onRightBottomButtonClick() {
+		FragmentManager fragmentManager = getFragmentManager();
+		if (fragmentManager != null) {
+			OsmLoginDataBottomSheet.showInstance(fragmentManager, OSM_LOGIN_DATA, getTargetFragment(), usedOnMap, null);
+		}
+		dismiss();
+	}
+
+	@Override
+	protected void onThirdBottomButtonClick() {
 		View view = getView();
 		if (view != null) {
 			Fragment fragment = getTargetFragment();
@@ -79,6 +96,11 @@ public class LoginBottomSheetFragment extends MenuBottomSheetDialogFragment impl
 			}
 			osmOAuthHelper.startOAuth((ViewGroup) view, nightMode);
 		}
+	}
+
+	@Override
+	protected DialogButtonType getRightBottomButtonType() {
+		return (DialogButtonType.SECONDARY);
 	}
 
 	public static void showInstance(@NonNull FragmentManager fragmentManager, @Nullable Fragment targetFragment) {

@@ -24,8 +24,9 @@ import static net.osmand.gpx.GPXUtilities.RouteSegment.START_TRKPT_IDX_ATTR;
 
 
 public class RouteSegmentResult implements StringExternalizable<RouteDataBundle> {
-
+	// this should be bigger (50-80m) but tests need to be fixed first
 	public static final float DIST_BEARING_DETECT = 15;
+	
 	public static final float DIST_BEARING_DETECT_UNMATCHED = 50;
 	
 	private RouteDataObject object;
@@ -41,8 +42,6 @@ public class RouteSegmentResult implements StringExternalizable<RouteDataBundle>
 	// this make not possible to make turns in between segment result for now
 	private TurnType turnType;
 	private boolean leftside = false;
-
-	private int gpxPointIndex = -1; // used by approximation to reconstruct finalPoints.routeToTarget
 
 	// Evaluates street name that the route follows after turn within specified distance.
 	// It is useful to find names for short segments on intersections
@@ -70,8 +69,7 @@ public class RouteSegmentResult implements StringExternalizable<RouteDataBundle>
 
 	public RouteSegmentResult(RouteDataObject object, int startPointIndex, int endPointIndex,
 	                          RouteSegmentResult[][] preAttachedRoutes, float segmentTime,
-	                          float routingTime, float speed, float distance, int gpxPointIndex, TurnType turnType) {
-		// JNI-only method
+	                          float routingTime, float speed, float distance, TurnType turnType) {
 		this.object = object;
 		this.startPointIndex = startPointIndex;
 		this.endPointIndex = endPointIndex;
@@ -80,7 +78,6 @@ public class RouteSegmentResult implements StringExternalizable<RouteDataBundle>
 		this.routingTime = routingTime;
 		this.speed = speed;
 		this.distance = distance;
-		this.gpxPointIndex = gpxPointIndex;
 		this.turnType = turnType;
 		updateCapacity();
 	}
@@ -247,9 +244,6 @@ public class RouteSegmentResult implements StringExternalizable<RouteDataBundle>
 			int refTypeRule = region.getRefTypeRule();
 			object.names = new TIntObjectHashMap<>();
 			for (int nameId : object.nameIds) {
-				if (nameId >= region.quickGetEncodingRulesSize()) {
-					continue;
-				}
 				RouteTypeRule rule = region.quickGetEncodingRule(nameId);
 				if (rule != null) {
 					if (nameTypeRule != -1 && "name".equals(rule.getTag())) {
@@ -724,13 +718,5 @@ public class RouteSegmentResult implements StringExternalizable<RouteDataBundle>
 			}
 		}
 		return rdo;
-	}
-
-	public int getGpxPointIndex() {
-		return gpxPointIndex;
-	}
-
-	public void setGpxPointIndex(int gpxPointIndex) {
-		this.gpxPointIndex = gpxPointIndex;
 	}
 }

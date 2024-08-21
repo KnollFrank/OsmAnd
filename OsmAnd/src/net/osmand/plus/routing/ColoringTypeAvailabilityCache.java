@@ -27,22 +27,18 @@ public class ColoringTypeAvailabilityCache {
 	                                   @NonNull ColoringType routeColoringType,
 	                                   @Nullable String routeInfoAttribute) {
 		if (!route.equals(prevRoute)) {
-			resetCache();
+			cache.clear();
 			prevRoute = route;
 		}
 		String key = routeColoringType.getName(routeInfoAttribute);
 		Boolean available = cache.get(key);
-		if (available == null) {
+		if (available == null && routeInfoAttribute != null) {
 			ColoringStyle coloringStyle = new ColoringStyle(routeColoringType, routeInfoAttribute);
 			boolean drawing = isAvailableForDrawingRoute(app, coloringStyle, route);
 			boolean subscription = isAvailableInSubscription(app, coloringStyle, true);
 			available = drawing && subscription;
 			cache.put(key, available);
 		}
-		return available;
-	}
-
-	public void resetCache() {
-		cache.clear();
+		return available != null ? available : false;
 	}
 }

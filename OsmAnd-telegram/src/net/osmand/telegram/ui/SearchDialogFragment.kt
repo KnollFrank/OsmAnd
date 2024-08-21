@@ -28,7 +28,7 @@ import net.osmand.telegram.utils.OsmandFormatter
 import net.osmand.telegram.utils.OsmandLocationUtils
 import net.osmand.telegram.utils.UiUtils
 import net.osmand.util.MapUtils
-import org.drinkless.tdlib.TdApi
+import org.drinkless.td.libcore.telegram.TdApi
 
 class SearchDialogFragment : BaseDialogFragment(), TelegramHelper.TelegramSearchListener,
 	TelegramLocationListener, TelegramCompassListener {

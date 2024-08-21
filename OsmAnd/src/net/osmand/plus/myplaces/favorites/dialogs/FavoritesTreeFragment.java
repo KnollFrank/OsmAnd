@@ -22,7 +22,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.AbsListView;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.ExpandableListView;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -63,7 +72,14 @@ import net.osmand.plus.utils.UpdateLocationUtils.UpdateLocationViewCache;
 import net.osmand.plus.views.PointImageUtils;
 import net.osmand.util.MapUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -641,9 +657,7 @@ public class FavoritesTreeFragment extends OsmandExpandableListFragment implemen
 			if (bundle.getInt(TAB_ID) == FAV_TAB) {
 				selectedGroupPos = bundle.getInt(GROUP_POSITION, -1);
 				selectedChildPos = bundle.getInt(ITEM_POSITION, -1);
-				if (selectedGroupPos != -1 && selectedChildPos != -1
-						&& selectedGroupPos < adapter.getGroupCount()
-						&& selectedChildPos < adapter.getChildrenCount(selectedGroupPos)) {
+				if (selectedGroupPos != -1 && selectedChildPos != -1) {
 					listView.setSelectedChild(selectedGroupPos, selectedChildPos, true);
 				}
 			}

@@ -15,10 +15,11 @@ import com.google.gson.GsonBuilder;
 import net.osmand.StateChangedListener;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
+import net.osmand.plus.profiles.LocationIcon;
+import net.osmand.plus.profiles.NavigationIcon;
 import net.osmand.plus.profiles.ProfileIconColors;
 import net.osmand.plus.routing.RouteService;
 import net.osmand.plus.settings.backend.OsmAndAppCustomization.OsmAndAppCustomizationListener;
-import net.osmand.plus.settings.enums.MarkerDisplayOption;
 import net.osmand.util.Algorithms;
 
 import java.util.ArrayList;
@@ -131,17 +132,14 @@ public class ApplicationMode {
 		return cachedFilteredValues;
 	}
 
-	@NonNull
 	public static List<ApplicationMode> allPossibleValues() {
 		return values;
 	}
 
-	@NonNull
 	public static List<ApplicationMode> getDefaultValues() {
 		return defaultValues;
 	}
 
-	@NonNull
 	public static List<ApplicationMode> getCustomValues() {
 		List<ApplicationMode> customModes = new ArrayList<>();
 		for (ApplicationMode mode : values) {
@@ -161,22 +159,14 @@ public class ApplicationMode {
 		return def;
 	}
 
-	@NonNull
 	public static List<ApplicationMode> getModesDerivedFrom(ApplicationMode am) {
-		List<ApplicationMode> list = new ArrayList<>();
+		List<ApplicationMode> list = new ArrayList<ApplicationMode>();
 		for (ApplicationMode a : values) {
 			if (a == am || a.getParent() == am) {
 				list.add(a);
 			}
 		}
 		return list;
-	}
-
-	@NonNull
-	public static List<ApplicationMode> getModesForRouting(@NonNull OsmandApplication app) {
-		List<ApplicationMode> modes = new ArrayList<>(ApplicationMode.values(app));
-		modes.remove(DEFAULT);
-		return modes;
 	}
 
 	@NonNull
@@ -383,19 +373,17 @@ public class ApplicationMode {
 		}
 	}
 
-	@NonNull
-	public String getNavigationIcon() {
+	public NavigationIcon getNavigationIcon() {
 		return app.getSettings().NAVIGATION_ICON.getModeValue(this);
 	}
 
-	public void setNavigationIcon(@Nullable String navigationIcon) {
-		if (!Algorithms.isEmpty(navigationIcon)) {
+	public void setNavigationIcon(NavigationIcon navigationIcon) {
+		if (navigationIcon != null) {
 			app.getSettings().NAVIGATION_ICON.setModeValue(this, navigationIcon);
 		}
 	}
 
-	@NonNull
-	public String getLocationIcon() {
+	public LocationIcon getLocationIcon() {
 		return app.getSettings().LOCATION_ICON.getModeValue(this);
 	}
 
@@ -408,8 +396,8 @@ public class ApplicationMode {
 		return ContextCompat.getColor(app, getIconColorInfo().getColor(nightMode));
 	}
 
-	public void setLocationIcon(@Nullable String locationIcon) {
-		if (!Algorithms.isEmpty(locationIcon)) {
+	public void setLocationIcon(LocationIcon locationIcon) {
+		if (locationIcon != null) {
 			app.getSettings().LOCATION_ICON.setModeValue(this, locationIcon);
 		}
 	}
@@ -422,24 +410,6 @@ public class ApplicationMode {
 		if (iconColor != null) {
 			app.getSettings().ICON_COLOR.setModeValue(this, iconColor);
 		}
-	}
-
-	public void setViewAngleVisibility(@NonNull MarkerDisplayOption viewAngle) {
-		app.getSettings().VIEW_ANGLE_VISIBILITY.setModeValue(this, viewAngle);
-	}
-
-	@NonNull
-	public MarkerDisplayOption getViewAngleVisibility() {
-		return app.getSettings().VIEW_ANGLE_VISIBILITY.getModeValue(this);
-	}
-
-	public void setLocationRadius(@NonNull MarkerDisplayOption locationRadius) {
-		app.getSettings().LOCATION_RADIUS_VISIBILITY.setModeValue(this, locationRadius);
-	}
-
-	@NonNull
-	public MarkerDisplayOption getLocationRadiusVisibility() {
-		return app.getSettings().LOCATION_RADIUS_VISIBILITY.getModeValue(this);
 	}
 
 	public Integer getCustomIconColor() {
@@ -583,8 +553,6 @@ public class ApplicationMode {
 			mode.setNavigationIcon(builder.navigationIcon);
 			mode.setOrder(builder.order);
 			mode.setVersion(builder.version);
-			mode.setViewAngleVisibility(builder.viewAngle);
-			mode.setLocationRadius(builder.locationRadius);
 		} else {
 			mode = builder.customReg();
 			WidgetsAvailabilityHelper.initRegVisibility();
@@ -708,10 +676,8 @@ public class ApplicationMode {
 		private String iconResName;
 		private ProfileIconColors iconColor;
 		private Integer customIconColor;
-		private String locationIcon;
-		private String navigationIcon;
-		private MarkerDisplayOption viewAngle;
-		private MarkerDisplayOption locationRadius;
+		private LocationIcon locationIcon;
+		private NavigationIcon navigationIcon;
 		private int order = -1;
 		private int version = -1;
 
@@ -740,8 +706,6 @@ public class ApplicationMode {
 			applicationMode.setNavigationIcon(navigationIcon);
 			applicationMode.setOrder(order != -1 ? order : values.size());
 			applicationMode.setVersion(version);
-			applicationMode.setViewAngleVisibility(viewAngle);
-			applicationMode.setLocationRadius(locationRadius);
 
 			return applicationMode;
 		}
@@ -801,21 +765,13 @@ public class ApplicationMode {
 			return this;
 		}
 
-		public ApplicationModeBuilder setLocationIcon(String locIcon) {
+		public ApplicationModeBuilder setLocationIcon(LocationIcon locIcon) {
 			this.locationIcon = locIcon;
 			return this;
 		}
 
-		public ApplicationModeBuilder setNavigationIcon(String navIcon) {
+		public ApplicationModeBuilder setNavigationIcon(NavigationIcon navIcon) {
 			this.navigationIcon = navIcon;
-			return this;
-		}
-		public ApplicationModeBuilder setViewAngle(@NonNull MarkerDisplayOption viewAngle) {
-			this.viewAngle = viewAngle;
-			return this;
-		}
-		public ApplicationModeBuilder setLocationRadius(@NonNull MarkerDisplayOption locationRadius) {
-			this.locationRadius = locationRadius;
 			return this;
 		}
 	}

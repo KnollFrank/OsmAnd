@@ -4,9 +4,6 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 
-import net.osmand.plus.OsmandApplication;
-import net.osmand.plus.R;
-
 import java.lang.reflect.InvocationTargetException;
 
 public class QuickActionType {
@@ -16,8 +13,7 @@ public class QuickActionType {
 	public static final int NAVIGATION = 2;
 	public static final int CONFIGURE_SCREEN = 3;
 	public static final int SETTINGS = 4;
-	public static final int MAP_INTERACTIONS = 5;
-	public static final int MY_PLACES = 6;
+	public static final int OPEN = 5;
 
 	private final int id;
 	private final String stringId;
@@ -120,18 +116,5 @@ public class QuickActionType {
 
 	public int getCategory() {
 		return category;
-	}
-
-	@NonNull
-	public String getFullName(@NonNull OsmandApplication app) {
-		String quickActionTypeName;
-		if (getActionNameRes() != 0) {
-			String name = app.getString(getNameRes());
-			String actionName = app.getString(getActionNameRes());
-			quickActionTypeName = app.getString(R.string.ltr_or_rtl_combine_via_dash, actionName, name);
-		} else {
-			quickActionTypeName = app.getString(getNameRes());
-		}
-		return quickActionTypeName;
 	}
 }

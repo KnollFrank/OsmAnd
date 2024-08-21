@@ -11,9 +11,9 @@ import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.keyevent.listener.EventType;
 import net.osmand.plus.keyevent.listener.InputDevicesEventListener;
+import net.osmand.plus.keyevent.commands.KeyEventCommand;
 import net.osmand.plus.keyevent.commands.MapZoomCommand;
 import net.osmand.plus.keyevent.devices.InputDeviceProfile;
-import net.osmand.plus.quickaction.QuickAction;
 import net.osmand.plus.settings.backend.ApplicationMode;
 import net.osmand.plus.settings.backend.OsmandSettings;
 
@@ -27,7 +27,7 @@ public class KeyEventHelper implements KeyEvent.Callback, InputDevicesEventListe
 	private final InputDevicesHelper deviceHelper;
 	private MapActivity mapActivity;
 
-	private final Map<Integer, QuickAction> globalActions = new HashMap<>();
+	private final Map<Integer, KeyEventCommand> globalCommands = new HashMap<>();
 
 	private StateChangedListener<Boolean> volumeButtonsPrefListener;
 	private KeyEvent.Callback externalCallback;
@@ -45,7 +45,7 @@ public class KeyEventHelper implements KeyEvent.Callback, InputDevicesEventListe
 	}
 
 	public void updateGlobalCommands() {
-		globalActions.clear();
+		globalCommands.clear();
 		if (settings.USE_VOLUME_BUTTONS_AS_ZOOM.get()) {
 			bindCommand(KeyEvent.KEYCODE_VOLUME_DOWN, MapZoomCommand.CONTINUOUS_ZOOM_OUT_ID);
 			bindCommand(KeyEvent.KEYCODE_VOLUME_UP, MapZoomCommand.CONTINUOUS_ZOOM_IN_ID);
@@ -68,8 +68,8 @@ public class KeyEventHelper implements KeyEvent.Callback, InputDevicesEventListe
 		if (externalCallback != null) {
 			return externalCallback.onKeyDown(keyCode, event);
 		}
-		QuickAction action = findAction(keyCode);
-		if (action != null && action.onKeyDown(mapActivity, keyCode, event)) {
+		KeyEventCommand command = findCommand(keyCode);
+		if (command != null && command.onKeyDown(keyCode, event)) {
 			return true;
 		}
 		return app.getAidlApi().onKeyEvent(event);
@@ -80,8 +80,8 @@ public class KeyEventHelper implements KeyEvent.Callback, InputDevicesEventListe
 		if (externalCallback != null) {
 			return externalCallback.onKeyLongPress(keyCode, event);
 		}
-		QuickAction action = findAction(keyCode);
-		return action != null && action.onKeyLongPress(mapActivity, keyCode, event);
+		KeyEventCommand command = findCommand(keyCode);
+		return command != null && command.onKeyLongPress(keyCode, event);
 	}
 
 	@Override
@@ -92,8 +92,8 @@ public class KeyEventHelper implements KeyEvent.Callback, InputDevicesEventListe
 		if (externalCallback != null) {
 			return externalCallback.onKeyUp(keyCode, event);
 		}
-		QuickAction action = findAction(keyCode);
-		if (action != null && action.onKeyUp(mapActivity, keyCode, event)) {
+		KeyEventCommand command = findCommand(keyCode);
+		if (command != null && command.onKeyUp(keyCode, event)) {
 			return true;
 		}
 		return app.getAidlApi().onKeyEvent(event);
@@ -104,8 +104,8 @@ public class KeyEventHelper implements KeyEvent.Callback, InputDevicesEventListe
 		if (externalCallback != null) {
 			return externalCallback.onKeyMultiple(keyCode, count, event);
 		}
-		QuickAction action = findAction(keyCode);
-		return action != null && action.onKeyMultiple(mapActivity, keyCode, count, event);
+		KeyEventCommand command = findCommand(keyCode);
+		return command != null && command.onKeyMultiple(keyCode, count, event);
 	}
 
 	@Override
@@ -125,26 +125,26 @@ public class KeyEventHelper implements KeyEvent.Callback, InputDevicesEventListe
 	}
 
 	@Nullable
-	private QuickAction findAction(int keyCode) {
+	private KeyEventCommand findCommand(int keyCode) {
 		if (mapActivity == null || isLetterKeyCode(keyCode) && !mapActivity.isMapVisible()) {
 			// Reject using of letter keycodes when the focus isn't on the Activity
 			return null;
 		}
-		// Search action in global bound commands
-		QuickAction globalAction = globalActions.get(keyCode);
-		if (globalAction != null) {
-			return globalAction;
+		// Search command in global bound commands
+		KeyEventCommand globalCommand = globalCommands.get(keyCode);
+		if (globalCommand != null) {
+			return globalCommand;
 		}
-		// Search action for current input device profile
+		// Search command for current input device profile
 		ApplicationMode appMode = settings.getApplicationMode();
 		InputDeviceProfile device = deviceHelper.getFunctionalityDevice(appMode);
-		return device != null ? device.findAction(keyCode) : null;
+		return device != null ? device.findCommand(keyCode) : null;
 	}
 
 	private void bindCommand(int keyCode, @NonNull String commandId) {
-		QuickAction action = CommandToActionConverter.createQuickAction(commandId);
-		if (action != null) {
-			globalActions.put(keyCode, action);
+		KeyEventCommand command = KeyEventCommandsCache.getCommand(app, commandId);
+		if (command != null) {
+			globalCommands.put(keyCode, command);
 		}
 	}
 

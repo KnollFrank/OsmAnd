@@ -80,8 +80,9 @@ public class TextToggleButton extends MultiStateToggleButton<TextRadioItem> {
 	}
 
 	@Override
-	protected void updateItemView(@NonNull ViewGroup view, @NonNull TextRadioItem item,
-								  boolean selected, @ColorInt int color) {
+	protected void updateItemView(@NonNull ViewGroup view,
+	                              @NonNull TextRadioItem item,
+	                              @ColorInt int color) {
 		TextView tvTitle = view.findViewById(R.id.title);
 		tvTitle.setTextColor(color);
 	}

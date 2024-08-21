@@ -94,14 +94,8 @@ public class MapMarkerSideWidgetState extends WidgetState {
 
 	@Override
 	public void copyPrefs(@NonNull ApplicationMode appMode, @Nullable String customId) {
-		copyPrefsFromMode(appMode, appMode, customId);
-	}
-
-	@Override
-	public void copyPrefsFromMode(@NonNull ApplicationMode sourceAppMode, @NonNull ApplicationMode appMode, @Nullable String customId) {
-		registerModePref(customId).setModeValue(appMode, mapMarkerModePref.getModeValue(sourceAppMode));
-		registerAverageSpeedIntervalPref(customId).setModeValue(appMode, averageSpeedIntervalPref.getModeValue(sourceAppMode));
-		registerMarkerClickBehaviourPref(customId).setModeValue(appMode, markerClickBehaviourPref.getModeValue(sourceAppMode));
+		registerModePref(customId).setModeValue(appMode, mapMarkerModePref.getModeValue(appMode));
+		registerAverageSpeedIntervalPref(customId).setModeValue(appMode, averageSpeedIntervalPref.getModeValue(appMode));
 	}
 
 	public boolean isFirstMarker() {

@@ -9,7 +9,6 @@ import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 import static android.graphics.Paint.FILTER_BITMAP_FLAG;
 import static android.util.TypedValue.COMPLEX_UNIT_DIP;
 import static android.util.TypedValue.COMPLEX_UNIT_SP;
-import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -37,7 +36,6 @@ import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.VectorDrawable;
-import android.hardware.display.DisplayManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -55,7 +53,6 @@ import android.text.style.ImageSpan;
 import android.text.style.URLSpan;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.DisplayCutout;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -63,7 +60,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -91,7 +87,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import net.osmand.PlatformUtil;
-import net.osmand.osm.OsmRouteType;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
@@ -1206,21 +1201,7 @@ public class AndroidUtils {
 		return value != null ? value : propertyValue;
 	}
 
-	@DrawableRes
-	public static int getActivityTypeIcon(@NonNull Context ctx,  @NonNull OsmRouteType activityType) {
-		int iconId = ctx.getResources().getIdentifier("mx_" + activityType.getIcon(), "drawable", ctx.getPackageName());
-		return iconId != 0 ? iconId : R.drawable.mx_special_marker;
-	}
-
-	@NonNull
-	public static String getActivityTypeTitle(@NonNull Context ctx, @NonNull OsmRouteType activityType) {
-		return getActivityTypeStringPropertyName(ctx, activityType.getName(),
-				Algorithms.capitalizeFirstLetterAndLowercase(activityType.getName()));
-	}
-
-	@NonNull
-	public static String getActivityTypeStringPropertyName(@NonNull Context ctx, @NonNull String propertyName,
-	                                                       @NonNull String defValue) {
+	public static String getActivityTypeStringPropertyName(Context ctx, String propertyName, String defValue) {
 		String value = getStringByProperty(ctx, "activity_type_" + propertyName + "_name");
 		return value != null ? value : defValue;
 	}
@@ -1434,24 +1415,5 @@ public class AndroidUtils {
 		BluetoothManager bluetoothManager = context.getSystemService(BluetoothManager.class);
 		BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
 		return bluetoothAdapter != null && bluetoothAdapter.isEnabled();
-	}
-
-	public static Display getDisplay(@NonNull Context context) {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-			DisplayManager manager = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
-			return manager.getDisplay(Display.DEFAULT_DISPLAY);
-		} else {
-			WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-			return manager.getDefaultDisplay();
-		}
-	}
-
-	@NonNull
-	public static Context createDisplayContext(@NonNull Context context) {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-			return context.createDisplayContext(getDisplay(context))
-					.createWindowContext(TYPE_APPLICATION_OVERLAY, null);
-		}
-		return context;
 	}
 }

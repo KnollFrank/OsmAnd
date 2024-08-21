@@ -57,8 +57,7 @@ public enum ExportType {
 	TERRAIN_DATA(new TerrainDataExportType()),
 	TTS_VOICE(new TtsVoiceExportType()),
 	VOICE(new VoiceExportType()),
-	FAVORITES_BACKUP(new FavoritesBackupExportType()),
-	COLOR_PALETTE(new ColorPaletteExportType());
+	FAVORITES_BACKUP(new FavoritesBackupExportType());
 
 	@NonNull
 	private final IExportType instance;

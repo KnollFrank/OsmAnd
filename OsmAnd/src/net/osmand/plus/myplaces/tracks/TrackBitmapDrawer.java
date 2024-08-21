@@ -165,11 +165,11 @@ public class TrackBitmapDrawer extends MapBitmapDrawer {
 	}
 
 	private int getTrackColor(@NonNull SelectedGpxFile selectedGpxFile, @NonNull TrkSegment segment, @Nullable GpxDataItem dataItem) {
-		Integer color = dataItem != null ? dataItem.getParameter(COLOR) : 0;
+		int color = dataItem != null ? dataItem.getParameter(COLOR) : 0;
 		if (selectedGpxFile.isShowCurrentTrack()) {
 			color = currentTrackColor;
 		}
-		if (color == null) {
+		if (color == 0) {
 			color = segment.getColor(defaultTrackColor);
 		}
 		if (color == 0) {

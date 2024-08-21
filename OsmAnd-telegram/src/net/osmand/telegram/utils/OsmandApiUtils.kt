@@ -4,8 +4,7 @@ import net.osmand.PlatformUtil
 import net.osmand.telegram.SHARE_DEVICES_KEY
 import net.osmand.telegram.TelegramApplication
 import net.osmand.telegram.TelegramSettings
-import net.osmand.telegram.helpers.getName
-import org.drinkless.tdlib.TdApi
+import org.drinkless.td.libcore.telegram.TdApi
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -92,7 +91,7 @@ object OsmandApiUtils {
 			jsonUser.put("firstName", user.firstName)
 			jsonUser.put("isBot", isBot)
 			jsonUser.put("lastName", user.lastName)
-			jsonUser.put("userName", user.getName())
+			jsonUser.put("userName", user.username)
 			jsonUser.put("languageCode", user.languageCode)
 			json.put("user", jsonUser)
 		} catch (e: JSONException) {

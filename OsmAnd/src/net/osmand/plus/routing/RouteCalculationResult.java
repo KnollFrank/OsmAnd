@@ -15,12 +15,11 @@ import net.osmand.binary.RouteDataObject;
 import net.osmand.data.LatLon;
 import net.osmand.data.LocationPoint;
 import net.osmand.data.QuadRect;
-import net.osmand.gpx.GPXFile;
+import net.osmand.map.WorldRegion;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
 import net.osmand.plus.settings.backend.ApplicationMode;
 import net.osmand.router.ExitInfo;
-import net.osmand.router.MissingMapsCalculationResult;
 import net.osmand.router.RoutePlannerFrontEnd;
 import net.osmand.router.RouteSegmentResult;
 import net.osmand.router.RoutingContext;
@@ -60,7 +59,7 @@ public class RouteCalculationResult {
 	protected List<RouteDirectionInfo> cacheAgreggatedDirections;
 	protected List<LocationPoint> locationPoints = new ArrayList<>();
 
-	protected MissingMapsCalculationResult missingMapsCalculationResult;
+	protected List<WorldRegion> missingMaps;
 
 	// params
 	protected final ApplicationMode appMode;
@@ -68,7 +67,6 @@ public class RouteCalculationResult {
 	protected final double routeRecalcDistance;
 	protected final double routeVisibleAngle;
 	protected final boolean initialCalculation;
-	protected GPXFile gpxFile;
 
 	// Note always currentRoute > get(currentDirectionInfo).routeOffset, 
 	//         but currentRoute <= get(currentDirectionInfo+1).routeOffset 
@@ -140,17 +138,12 @@ public class RouteCalculationResult {
 			this.routeVisibleAngle = 0;
 		}
 		this.initialCalculation = params.initialCalculation;
-		this.gpxFile = params.gpxFile;
 	}
 
-	public RouteCalculationResult(List<RouteSegmentResult> list, RouteCalculationParams params, RoutingContext rctx,
-	                              List<LocationPoint> waypoints, boolean calculateFirstAndLastPoint) {
-		OsmandApplication ctx = params.ctx;
-		ApplicationMode mode = params.mode;
-		Location start = params.start;
-		LatLon end = params.end;
-		List <LatLon> intermediates = params.intermediates;
-
+	public RouteCalculationResult(List<RouteSegmentResult> list, Location start, LatLon end,
+	                              List<LatLon> intermediates, OsmandApplication ctx, boolean leftSide,
+	                              RoutingContext rctx, List<LocationPoint> waypoints, ApplicationMode mode,
+								  boolean calculateFirstAndLastPoint, boolean initialCalculation) {
 		if (rctx != null) {
 			this.routingTime = rctx.routingTime;
 			this.visitedSegments = rctx.getVisitedSegments();
@@ -192,8 +185,7 @@ public class RouteCalculationResult {
 		this.routeRecalcDistance = ctx.getSettings().ROUTE_RECALCULATION_DISTANCE.getModeValue(mode);
 		this.routeVisibleAngle = routeService == RouteService.STRAIGHT ?
 				ctx.getSettings().ROUTE_STRAIGHT_ANGLE.getModeValue(mode) : 0;
-		this.initialCalculation = params.initialCalculation;
-		this.gpxFile = params.gpxFile;
+		this.initialCalculation = initialCalculation;
 	}
 
 	public ApplicationMode getAppMode() {
@@ -208,16 +200,12 @@ public class RouteCalculationResult {
 		return alarmInfo;
 	}
 
-	public void setMissingMapsCalculationResult(MissingMapsCalculationResult missingMapsCalculationResult) {
-		this.missingMapsCalculationResult = missingMapsCalculationResult;
-	}
-
-	public MissingMapsCalculationResult getMissingMapsCalculationResult() {
-		return missingMapsCalculationResult;
+	public List<WorldRegion> getMissingMaps() {
+		return missingMaps;
 	}
 
 	public boolean hasMissingMaps() {
-		return missingMapsCalculationResult != null && missingMapsCalculationResult.hasMissingMaps();
+		return !Algorithms.isEmpty(missingMaps);
 	}
 
 	public boolean isInitialCalculation() {
@@ -260,9 +248,7 @@ public class RouteCalculationResult {
 					if (locationIndex > interLocations[currentIntermediate]
 							&& getDistanceToLocation(locations, intermediates.get(currentIntermediate), locationIndex) > 50) {
 						RouteDirectionInfo toSplit = localDirections.get(currentDirection);
-						// intermediate point should split using average speed from its actual (previous) segment
-						float currentAvgSpeed = localDirections.get(Math.max(0, currentDirection - 1)).getAverageSpeed();
-						RouteDirectionInfo info = new RouteDirectionInfo(currentAvgSpeed, TurnType.straight());
+						RouteDirectionInfo info = new RouteDirectionInfo(localDirections.get(currentDirection).getAverageSpeed(), TurnType.straight());
 						info.setRef(toSplit.getRef());
 						info.setStreetName(toSplit.getStreetName());
 						info.setRouteDataObject(toSplit.getRouteDataObject());
@@ -1459,10 +1445,6 @@ public class RouteCalculationResult {
 	public void updateNextVisiblePoint(int nextPoint, Location mp) {
 		currentStraightAnglePoint = mp;
 		currentStraightAngleRoute = nextPoint;
-	}
-
-	public GPXFile getGpxFile() {
-		return gpxFile;
 	}
 
 	public static class NextDirectionInfo {

@@ -20,8 +20,6 @@ import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.settings.datastorage.SharedStorageWarningFragment;
 import net.osmand.plus.utils.AndroidUtils;
 
-import java.lang.reflect.Field;
-
 
 public class WhatsNewDialogFragment extends DialogFragment {
 
@@ -33,26 +31,11 @@ public class WhatsNewDialogFragment extends DialogFragment {
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		OsmandApplication app = requireMyApplication();
-		Class<? extends R.string> cl = R.string.class;
-		String ver = Version.getAppVersion(app);
-		String message = "Release " + Version.getAppVersion(app);
-		if(ver.length() > 0 ) {
-			try {
-				Field f = R.string.class.getField("release_" + ver.charAt(0) + "_" + ver.charAt(2));
-				if (f != null) {
-					Integer in = (Integer) f.get(null);
-					if (in != null) {
-						message = getString(in);
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+
 		String appVersion = Version.getAppVersion(app);
 		AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
 		builder.setTitle(getString(R.string.whats_new) + " " + appVersion)
-				.setMessage(message)
+				.setMessage(getString(R.string.release_4_6))
 				.setNegativeButton(R.string.shared_string_close, (dialog, which) -> showSharedStorageWarningIfRequired());
 		builder.setPositiveButton(R.string.read_more, (dialog, which) -> {
 			showArticle();

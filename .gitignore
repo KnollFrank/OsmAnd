@@ -1,4 +1,3 @@
-*.test.txt
 *.render.xml
 *.render_template.xml
 poi_types.xml
@@ -20,7 +19,6 @@ OsmAndCore_*.aar
 **/.project
 **/.classpath
 out/
-.kotlin/
 
 # Huawei
 agconnect-services.json

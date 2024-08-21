@@ -1,7 +1,6 @@
 package net.osmand.plus.settings.purchase.data;
 
 
-import static net.osmand.plus.inapp.InAppPurchases.InAppPurchase.PurchaseOrigin.HUGEROCK_PROMO;
 import static net.osmand.plus.inapp.InAppPurchases.InAppPurchase.PurchaseOrigin.PROMO;
 import static net.osmand.plus.inapp.InAppPurchases.InAppPurchase.PurchaseOrigin.TRIPLTEK_PROMO;
 
@@ -103,6 +102,6 @@ public class PurchaseUiData {
 	}
 
 	public boolean isPromo() {
-		return CollectionUtils.equalsToAny(origin, PROMO, TRIPLTEK_PROMO, HUGEROCK_PROMO);
+		return CollectionUtils.equalsToAny(origin, PROMO, TRIPLTEK_PROMO);
 	}
 }

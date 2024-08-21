@@ -99,8 +99,7 @@ class ListFilterAdapter(
 						fragmentManager,
 						filter,
 						filterPropertiesClosed,
-						newSelectedItemsListener,
-						nightMode)
+						newSelectedItemsListener)
 				}
 			}
 

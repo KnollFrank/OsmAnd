@@ -70,7 +70,6 @@ public class WaypointsFragment extends BaseOsmAndFragment implements ObservableS
 
 	public static final String TAG = "WaypointsFragment";
 	public static final String USE_ROUTE_INFO_MENU_KEY = "use_route_info_menu_key";
-	public static final int DELAY_BEFORE_APPLY_MS = 5000;
 
 	private View view;
 	private View mainView;
@@ -620,10 +619,10 @@ public class WaypointsFragment extends BaseOsmAndFragment implements ObservableS
 	}
 
 	private void startTimer() {
-		cTimer = new CountDownTimer(DELAY_BEFORE_APPLY_MS, 200) {
+		cTimer = new CountDownTimer(10000, 200) {
 
 			public void onTick(long millisUntilFinished) {
-				updateRouteCalculationProgress((int) ((1 - ((float) millisUntilFinished / DELAY_BEFORE_APPLY_MS)) * 100));
+				updateRouteCalculationProgress((int) ((((10000 - millisUntilFinished) / 10000f)) * 100));
 			}
 
 			public void onFinish() {

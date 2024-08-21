@@ -48,8 +48,7 @@ public class FileSettingsHelper extends SettingsHelper {
 
 	public interface SettingsExportListener {
 		void onSettingsExportFinished(@NonNull File file, boolean succeed);
-		default void onSettingsExportProgressUpdate(int value) {
-		}
+		void onSettingsExportProgressUpdate(int value);
 	}
 
 	public FileSettingsHelper(@NonNull OsmandApplication app) {

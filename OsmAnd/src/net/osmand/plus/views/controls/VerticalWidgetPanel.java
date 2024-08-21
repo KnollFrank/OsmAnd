@@ -22,7 +22,6 @@ import net.osmand.plus.R;
 import net.osmand.plus.helpers.AndroidUiHelper;
 import net.osmand.plus.settings.backend.ApplicationMode;
 import net.osmand.plus.settings.backend.OsmandSettings;
-import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.UiUtilities;
 import net.osmand.plus.views.layers.MapInfoLayer.TextState;
 import net.osmand.plus.views.layers.base.OsmandMapLayer.DrawSettings;
@@ -45,7 +44,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public class VerticalWidgetPanel extends LinearLayout implements WidgetsContainer {
+public class VerticalWidgetPanel extends LinearLayout {
 
 	private final OsmandApplication app;
 	private final OsmandSettings settings;
@@ -238,16 +237,8 @@ public class VerticalWidgetPanel extends LinearLayout implements WidgetsContaine
 		}
 	}
 
-	private void updateFullRowState(List<MapWidgetInfo> widgetsInRow, int visibleViewsInRowCount) {
-		for (MapWidgetInfo widgetInfo : widgetsInRow) {
-			if (widgetInfo.widget instanceof SimpleWidget) {
-				((SimpleWidget) widgetInfo.widget).updateFullRowState(visibleViewsInRowCount <= 1);
-			}
-		}
-	}
-
 	@NonNull
-	protected List<Set<MapWidgetInfo>> getWidgetsToShow(ApplicationMode mode, List<MapWidget> widgetsToShow) {
+	private List<Set<MapWidgetInfo>> getWidgetsToShow(ApplicationMode mode, List<MapWidget> widgetsToShow) {
 		Set<MapWidgetInfo> allPanelWidget = widgetRegistry.getWidgetsForPanel(getWidgetsPanel());
 
 		Map<Integer, Set<MapWidgetInfo>> rowWidgetMap = new TreeMap<>();
@@ -331,13 +322,25 @@ public class VerticalWidgetPanel extends LinearLayout implements WidgetsContaine
 		public void updateRow(boolean lastRow) {
 			int visibleViewsInRowCount = 0;
 			boolean showBottomDivider = true;
-
+			int maxWidgetHeight = 0;
+			boolean needHeightCorrections = false;
+			int widgetMinHeight = 0;
 			for (int i = 0; i < enabledMapWidgets.size(); i++) {
 				MapWidget widget = enabledMapWidgets.get(i).widget;
 				if (widget.isViewVisible()) {
+					if (widget instanceof SimpleWidget && widgetMinHeight == 0) {
+						widgetMinHeight = ((SimpleWidget) widget).getWidgetMinHeight();
+					}
 					visibleViewsInRowCount++;
 					int nextWidgetIndex = i + 1;
 					showHideVerticalDivider(i, nextWidgetIndex < enabledMapWidgets.size() && enabledMapWidgets.get(nextWidgetIndex).widget.isViewVisible());
+					int height = widget.getView().getMeasuredHeight();
+					if (height > maxWidgetHeight) {
+						maxWidgetHeight = height;
+					}
+					if (height != maxWidgetHeight) {
+						needHeightCorrections = true;
+					}
 				} else {
 					showHideVerticalDivider(i, false);
 				}
@@ -345,7 +348,20 @@ public class VerticalWidgetPanel extends LinearLayout implements WidgetsContaine
 					showBottomDivider = false;
 				}
 			}
-			updateFullRowState(enabledMapWidgets, visibleViewsInRowCount);
+			if (maxWidgetHeight < widgetMinHeight) {
+				maxWidgetHeight = widgetMinHeight;
+				needHeightCorrections = true;
+			}
+			if (needHeightCorrections) {
+				for (int i = 0; i < enabledMapWidgets.size(); i++) {
+					MapWidget widget = enabledMapWidgets.get(i).widget;
+					if (widget.isViewVisible()) {
+						ViewGroup.LayoutParams lp = widget.getView().getLayoutParams();
+						lp.height = maxWidgetHeight;
+						widget.getView().setLayoutParams(lp);
+					}
+				}
+			}
 			updateValueAlign(enabledMapWidgets, visibleViewsInRowCount);
 			AndroidUiHelper.updateVisibility(bottomDivider, (visibleViewsInRowCount > 0 && showBottomDivider) && !lastRow);
 		}

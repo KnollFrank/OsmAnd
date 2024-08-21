@@ -42,7 +42,6 @@ import net.osmand.plus.views.OsmandMapTileView;
 import net.osmand.plus.views.layers.base.OsmandMapLayer;
 import net.osmand.plus.views.layers.geometry.GeometryWay;
 import net.osmand.plus.views.layers.geometry.GeometryWayDrawer;
-import net.osmand.plus.views.layers.geometry.GeometryWayPathAlgorithms;
 import net.osmand.util.Algorithms;
 import net.osmand.util.MapUtils;
 
@@ -459,7 +458,7 @@ public class DistanceRulerControlLayer extends OsmandMapLayer {
 		ty.add(end.y);
 
 		linePath.reset();
-		GeometryWayPathAlgorithms.calculatePath(tileBox, tx, ty, linePath);
+		GeometryWay.calculatePath(tileBox, tx, ty, linePath);
 	}
 
 	private void hideDistanceRulerOpenGl() {

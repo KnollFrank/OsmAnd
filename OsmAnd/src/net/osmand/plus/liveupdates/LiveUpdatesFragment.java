@@ -32,12 +32,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ExpandableListView;
-import android.widget.ImageButton;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
@@ -252,7 +253,7 @@ public class LiveUpdatesFragment extends BaseOsmAndDialogFragment implements OnL
 		}
 	}
 
-	protected void createToolbar(@NonNull ViewGroup appBar) {
+	protected void createToolbar(ViewGroup appBar) {
 		AppBarLayout appBarLayout = (AppBarLayout) UiUtilities.getInflater(getActivity(), nightMode)
 				.inflate(R.layout.global_preferences_toolbar_with_switch, appBar);
 
@@ -262,22 +263,28 @@ public class LiveUpdatesFragment extends BaseOsmAndDialogFragment implements OnL
 
 		ImageView closeButton = toolbar.findViewById(R.id.close_button);
 		UiUtilities.rotateImageByLayoutDirection(closeButton);
-		closeButton.setOnClickListener(v -> dismiss());
-
-		LayoutInflater inflater = UiUtilities.getInflater(toolbar.getContext(), nightMode);
-		ViewGroup container = toolbar.findViewById(R.id.actions_container);
-
-		int colorId = ColorUtilities.getActiveButtonsAndLinksTextColorId(nightMode);
-		ImageButton button = (ImageButton) inflater.inflate(R.layout.action_button, container, false);
-		button.setImageDrawable(getIcon(R.drawable.ic_action_help_online, colorId));
-		button.setOnClickListener(view -> {
-			Activity activity = getActivity();
-			if (activity != null) {
-				String docsUrl = getString(R.string.docs_osmand_live);
-				AndroidUtils.openUrl(activity, Uri.parse(docsUrl), nightMode);
+		closeButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dismiss();
 			}
 		});
-		container.addView(button);
+
+		FrameLayout iconHelpContainer = toolbar.findViewById(R.id.action_button);
+		int iconColorResId = ColorUtilities.getActiveButtonsAndLinksTextColorId(nightMode);
+		AppCompatImageButton iconHelp = toolbar.findViewById(R.id.action_button_icon);
+		Drawable helpDrawable = app.getUIUtilities().getIcon(R.drawable.ic_action_help_online, iconColorResId);
+		iconHelp.setImageDrawable(helpDrawable);
+		iconHelpContainer.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Activity activity = getActivity();
+				if (activity != null) {
+					String docsUrl = getString(R.string.docs_osmand_live);
+					AndroidUtils.openUrl(activity, Uri.parse(docsUrl), nightMode);
+				}
+			}
+		});
 
 		toolbarSwitchContainer = appBarLayout.findViewById(R.id.toolbar_switch_container);
 		updateToolbarSwitch(settings.IS_LIVE_UPDATES_ON.get());
@@ -292,27 +299,30 @@ public class LiveUpdatesFragment extends BaseOsmAndDialogFragment implements OnL
 		switchView.setChecked(isChecked);
 		UiUtilities.setupCompoundButton(switchView, nightMode, CompoundButtonType.TOOLBAR);
 
-		toolbarSwitchContainer.setOnClickListener(view -> {
-			boolean visible = !isChecked;
-			if (visible) {
-				if (InAppPurchaseUtils.isLiveUpdatesAvailable(app)) {
-					switchOnLiveUpdates();
-					updateToolbarSwitch(true);
-				} else {
-					updateToolbarSwitch(false);
-					app.showToastMessage(getString(R.string.osm_live_ask_for_purchase));
+		toolbarSwitchContainer.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				boolean visible = !isChecked;
+				if (visible) {
+					if (InAppPurchaseUtils.isLiveUpdatesAvailable(app)) {
+						switchOnLiveUpdates();
+						updateToolbarSwitch(true);
+					} else {
+						updateToolbarSwitch(false);
+						app.showToastMessage(getString(R.string.osm_live_ask_for_purchase));
 
-					FragmentActivity activity = getActivity();
-					if (activity != null) {
-						ChoosePlanFragment.showInstance(activity, OsmAndFeature.HOURLY_MAP_UPDATES);
+						FragmentActivity activity = getActivity();
+						if (activity != null) {
+							ChoosePlanFragment.showInstance(activity, OsmAndFeature.HOURLY_MAP_UPDATES);
+						}
 					}
+				} else {
+					settings.IS_LIVE_UPDATES_ON.set(false);
+					enableLiveUpdates(false);
+					updateToolbarSwitch(false);
 				}
-			} else {
-				settings.IS_LIVE_UPDATES_ON.set(false);
-				enableLiveUpdates(false);
-				updateToolbarSwitch(false);
+				updateList();
 			}
-			updateList();
 		});
 
 		TextView title = toolbarSwitchContainer.findViewById(R.id.switchButtonText);

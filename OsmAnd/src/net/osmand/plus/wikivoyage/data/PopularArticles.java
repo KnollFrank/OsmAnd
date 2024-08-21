@@ -2,8 +2,6 @@ package net.osmand.plus.wikivoyage.data;
 
 import androidx.annotation.NonNull;
 
-import net.osmand.util.Algorithms;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,9 +44,5 @@ public class PopularArticles {
 			}
 		}
 		return false;
-	}
-
-	public boolean isEmpty() {
-		return Algorithms.isEmpty(articles);
 	}
 }

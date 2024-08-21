@@ -14,5 +14,7 @@ public interface RouteCalculationProgressListener {
 
 	void onRequestPrivateAccessRouting();
 
+	void onUpdateMissingMaps(@Nullable List<WorldRegion> missingMaps, boolean onlineSearch);
+
 	void onCalculationFinish();
 }

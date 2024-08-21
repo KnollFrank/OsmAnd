@@ -1,7 +1,5 @@
 package net.osmand.plus.mapcontextmenu.builders.cards;
 
-import static net.osmand.plus.mapcontextmenu.builders.cards.ImageCard.ImageCardType.MAPILLARY_AMENITY;
-import static net.osmand.plus.mapcontextmenu.builders.cards.ImageCard.ImageCardType.WIKIMEDIA;
 import static net.osmand.plus.plugins.mapillary.MapillaryPlugin.TYPE_MAPILLARY_CONTRIBUTE;
 import static net.osmand.plus.plugins.mapillary.MapillaryPlugin.TYPE_MAPILLARY_PHOTO;
 
@@ -20,24 +18,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 
+import net.osmand.plus.utils.AndroidNetworkUtils;
+import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.Location;
 import net.osmand.PlatformUtil;
-import net.osmand.data.Amenity;
 import net.osmand.data.LatLon;
 import net.osmand.plus.OsmandApplication;
+import net.osmand.plus.plugins.PluginsHelper;
 import net.osmand.plus.R;
 import net.osmand.plus.Version;
 import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.mapcontextmenu.MenuBuilder;
-import net.osmand.plus.plugins.PluginsHelper;
-import net.osmand.plus.plugins.mapillary.MapillaryImageCard;
-import net.osmand.plus.plugins.mapillary.MapillaryOsmTagHelper;
-import net.osmand.plus.utils.AndroidNetworkUtils;
-import net.osmand.plus.utils.AndroidUtils;
-import net.osmand.plus.wikipedia.WikiImageCard;
 import net.osmand.util.Algorithms;
-import net.osmand.wiki.WikiCoreHelper;
-import net.osmand.wiki.WikiImage;
 
 import org.apache.commons.logging.Log;
 import org.json.JSONArray;
@@ -419,7 +411,7 @@ public abstract class ImageCard extends AbstractCard {
 		}
 
 		public GetImageCardsTask(@NonNull MapActivity mapActivity, LatLon latLon,
-		                         @Nullable Map<String, String> params, GetImageCardsListener listener) {
+								 @Nullable Map<String, String> params, GetImageCardsListener listener) {
 			this.mapActivity = mapActivity;
 			this.app = mapActivity.getMyApplication();
 			this.latLon = latLon;
@@ -432,38 +424,26 @@ public abstract class ImageCard extends AbstractCard {
 			TrafficStats.setThreadStatsTag(GET_IMAGE_CARD_THREAD_ID);
 			ImageCardsHolder holder = new ImageCardsHolder();
 			try {
-				Map<String, String> httpPms = new LinkedHashMap<>();
-				httpPms.put("lat", "" + (float) latLon.getLatitude());
-				httpPms.put("lon", "" + (float) latLon.getLongitude());
+				Map<String, String> pms = new LinkedHashMap<>();
+				pms.put("lat", "" + (float) latLon.getLatitude());
+				pms.put("lon", "" + (float) latLon.getLongitude());
 				Location myLocation = app.getLocationProvider().getLastKnownLocation();
 				if (myLocation != null) {
-					httpPms.put("mloc", "" + (float) myLocation.getLatitude() + "," + (float) myLocation.getLongitude());
+					pms.put("mloc", "" + (float) myLocation.getLatitude() + "," + (float) myLocation.getLongitude());
 				}
-				httpPms.put("app", Version.isPaidVersion(app) ? "paid" : "free");
+				pms.put("app", Version.isPaidVersion(app) ? "paid" : "free");
 				String preferredLang = app.getSettings().MAP_PREFERRED_LOCALE.get();
 				if (Algorithms.isEmpty(preferredLang)) {
 					preferredLang = app.getLanguage();
 				}
 				if (!Algorithms.isEmpty(preferredLang)) {
-					httpPms.put("lang", preferredLang);
+					pms.put("lang", preferredLang);
 				}
-				List<WikiImage> wikimediaImageList = WikiCoreHelper.getWikiImageList(params);
-				for (WikiImage wikiImage : wikimediaImageList) {
-					holder.add(WIKIMEDIA, new WikiImageCard(mapActivity, wikiImage));
-				}
+				PluginsHelper.populateContextMenuImageCards(holder, pms, params, listener);
 
-				if (!Algorithms.isEmpty(params.get(Amenity.MAPILLARY))) {
-					JSONObject imageObject = MapillaryOsmTagHelper.getImageByKey(params.get(Amenity.MAPILLARY));
-					if (imageObject != null) {
-						holder.add(MAPILLARY_AMENITY, new MapillaryImageCard(mapActivity, imageObject));
-					}
-				}
-				PluginsHelper.populateContextMenuImageCards(holder, httpPms, params, listener);
-				String response = "";
-				if (wikimediaImageList.size() < 3) {
-					response = AndroidNetworkUtils.sendRequest(app, "https://osmand.net/api/cm_place", httpPms,
-							"Requesting location images...", false, false);
-				}
+				String response = AndroidNetworkUtils.sendRequest(app, "https://osmand.net/api/cm_place", pms,
+						"Requesting location images...", false, false);
+
 				if (!Algorithms.isEmpty(response)) {
 					JSONObject obj = new JSONObject(response);
 					JSONArray images = obj.getJSONArray("features");

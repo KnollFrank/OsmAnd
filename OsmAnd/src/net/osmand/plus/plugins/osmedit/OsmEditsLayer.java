@@ -1,7 +1,6 @@
 package net.osmand.plus.plugins.osmedit;
 
 import static net.osmand.data.FavouritePoint.DEFAULT_BACKGROUND_TYPE;
-import static net.osmand.plus.AppInitEvents.POI_TYPES_INITIALIZED;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -26,9 +25,8 @@ import net.osmand.data.QuadRect;
 import net.osmand.data.RotatedTileBox;
 import net.osmand.osm.PoiType;
 import net.osmand.osm.edit.Entity;
-import net.osmand.plus.AppInitializeListener;
 import net.osmand.plus.AppInitializer;
-import net.osmand.plus.AppInitEvents;
+import net.osmand.plus.AppInitializer.InitEvents;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
 import net.osmand.plus.plugins.osmedit.asynctasks.SaveOsmChangeAsyncTask;
@@ -441,11 +439,11 @@ public class OsmEditsLayer extends OsmandMapLayer implements IContextMenuProvide
 
 	private void addInitPoiTypesListener() {
 		if (app.isApplicationInitializing()) {
-			app.getAppInitializer().addListener(new AppInitializeListener() {
+			app.getAppInitializer().addListener(new AppInitializer.AppInitializeListener() {
 
 				@Override
-				public void onProgress(@NonNull AppInitializer init, @NonNull AppInitEvents event) {
-					if (event == POI_TYPES_INITIALIZED) {
+				public void onProgress(@NonNull AppInitializer init, @NonNull InitEvents event) {
+					if (event == AppInitializer.InitEvents.POI_TYPES_INITIALIZED) {
 						poiTypesInitialized = true;
 					}
 				}

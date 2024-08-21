@@ -80,10 +80,6 @@ public class WidgetsSettingsHelper {
 		copyPrefFromAppMode(settings.TRANSPARENT_MAP_THEME, fromAppMode);
 		copyPrefFromAppMode(mapButtonsHelper.getCompassButtonState().getVisibilityPref(), fromAppMode);
 		copyPrefFromAppMode(settings.SHOW_DISTANCE_RULER, fromAppMode);
-		copyPrefFromAppMode(settings.POSITION_PLACEMENT_ON_MAP, fromAppMode);
-		copyPrefFromAppMode(settings.DISTANCE_BY_TAP_TEXT_SIZE, fromAppMode);
-		copyPrefFromAppMode(settings.SHOW_SPEEDOMETER, fromAppMode);
-		copyPrefFromAppMode(settings.SPEEDOMETER_SIZE, fromAppMode);
 		mapButtonsHelper.copyQuickActionsFromMode(settings.getApplicationMode(), fromAppMode);
 	}
 
@@ -119,9 +115,6 @@ public class WidgetsSettingsHelper {
 				}
 
 				if (!Algorithms.isEmpty(widgetIdToAdd)) {
-					String customId = !widgetIdToAdd.equals(defaultWidgetInfo.key) ? widgetIdToAdd : null;
-					widgetInfoToCopy.widget.copySettingsFromMode(fromAppMode, appMode, customId);
-
 					if (previousPage != widgetInfoToCopy.pageIndex || newPagedOrder.size() == 0) {
 						previousPage = widgetInfoToCopy.pageIndex;
 						newPagedOrder.add(new ArrayList<>());
@@ -170,14 +163,11 @@ public class WidgetsSettingsHelper {
 		MapWidget duplicateWidget = widgetsFactory.createMapWidget(duplicateWidgetId, widgetType, panel);
 		if (duplicateWidget != null) {
 			WidgetInfoCreator creator = new WidgetInfoCreator(app, appMode);
-			MapWidgetInfo duplicateWidgetInfo = creator.askCreateWidgetInfo(
-					duplicateWidgetId, duplicateWidget, widgetType, panel
-			);
-			if (duplicateWidgetInfo != null) {
-				settings.CUSTOM_WIDGETS_KEYS.addModeValue(appMode, duplicateWidgetId);
-				widgetRegistry.enableDisableWidgetForMode(appMode, duplicateWidgetInfo, true, false);
-				return duplicateWidgetInfo;
-			}
+			settings.CUSTOM_WIDGETS_KEYS.addModeValue(appMode, duplicateWidgetId);
+			MapWidgetInfo duplicateWidgetInfo = creator.createCustomWidgetInfo(
+					duplicateWidgetId, duplicateWidget, widgetType, panel);
+			widgetRegistry.enableDisableWidgetForMode(appMode, duplicateWidgetInfo, true, false);
+			return duplicateWidgetInfo;
 		}
 		return null;
 	}

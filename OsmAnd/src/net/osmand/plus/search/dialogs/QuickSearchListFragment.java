@@ -212,7 +212,7 @@ public abstract class QuickSearchListFragment extends OsmAndListFragment {
 		MapRouteInfoMenu routeInfoMenu = requireMapActivity().getMapRouteInfoMenu();
 		routeInfoMenu.selectTrack(gpxFile, true);
 
-		dialogFragment.dismissAllowingStateLoss();
+		dialogFragment.dismiss();
 	}
 
 	public static void showOnMap(MapActivity mapActivity, QuickSearchDialogFragment dialogFragment,
@@ -233,7 +233,7 @@ public abstract class QuickSearchListFragment extends OsmAndListFragment {
 				}
 				mapActivity.getMapLayers().getMapActionsHelper().selectAddress(name, latitude, longitude, searchType);
 
-				dialogFragment.dismissAllowingStateLoss();
+				dialogFragment.dismiss();
 				mapActivity.getMapLayers().getMapActionsHelper().showRouteInfoMenu();
 			} else {
 				app.getSettings().setMapLocationToShow(latitude, longitude, zoom, pointDescription, true, object);
@@ -249,7 +249,7 @@ public abstract class QuickSearchListFragment extends OsmAndListFragment {
 		File file = new File(app.getAppPath(IndexConstants.GPX_INDEX_DIR), gpxInfo.getFileName());
 		String path = file.getAbsolutePath();
 		TrackMenuFragment.showInstance(mapActivity, path, false, false, null, QuickSearchDialogFragment.TAG, null);
-		dialogFragment.dismissAllowingStateLoss();
+		dialogFragment.dismiss();
 	}
 
 	private void processIndexItemClick(@NonNull IndexItem indexItem) {

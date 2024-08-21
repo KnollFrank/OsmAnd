@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -206,7 +205,8 @@ public class ChooseRouteFragment extends BaseOsmAndFragment implements ContextMe
 								card.updateButtons();
 							}
 							if (fragment == current) {
-								updateElementsPosition(fragment);
+								updateZoomButtonsPos(fragment, fragment.getViewY(), true);
+								updatePagesViewPos(fragment, fragment.getViewY(), true);
 							}
 							Bundle args = fragment.getArguments();
 							if (args != null) {
@@ -222,21 +222,6 @@ public class ChooseRouteFragment extends BaseOsmAndFragment implements ContextMe
 		buildZoomButtons(view);
 		buildMenuButtons(view);
 		return view;
-	}
-
-	private void updateElementsPosition(@NonNull RouteDetailsFragment fragment) {
-		View fragmentView = fragment.getView();
-		if (fragmentView != null) {
-			fragmentView.getViewTreeObserver().addOnGlobalLayoutListener(
-					new ViewTreeObserver.OnGlobalLayoutListener() {
-						@Override
-						public void onGlobalLayout() {
-							fragmentView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-							updatePagesViewPos(fragment, fragment.getViewY(), true);
-							updateZoomButtonsPos(fragment, fragment.getViewY(), true);
-						}
-					});
-		}
 	}
 
 	@Override

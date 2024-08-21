@@ -72,12 +72,7 @@ public class SimpleWidgetState extends WidgetState {
 
 	@Override
 	public void copyPrefs(@NonNull ApplicationMode appMode, @Nullable String customId) {
-		copyPrefsFromMode(appMode, appMode, customId);
-	}
-
-	@Override
-	public void copyPrefsFromMode(@NonNull ApplicationMode sourceAppMode, @NonNull ApplicationMode appMode, @Nullable String customId){
-		registerWidgetSizePref(customId, widgetType).setModeValue(appMode, widgetSizePref.getModeValue(sourceAppMode));
-		registerShowIconPref(customId, widgetType).setModeValue(appMode, showIconPref.getModeValue(sourceAppMode));
+		registerWidgetSizePref(customId, widgetType).setModeValue(appMode, widgetSizePref.getModeValue(appMode));
+		registerShowIconPref(customId, widgetType).setModeValue(appMode, showIconPref.getModeValue(appMode));
 	}
 }

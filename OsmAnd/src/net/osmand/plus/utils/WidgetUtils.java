@@ -5,7 +5,6 @@ import static net.osmand.plus.views.mapwidgets.MapWidgetRegistry.ENABLED_MODE;
 import static net.osmand.plus.views.mapwidgets.MapWidgetRegistry.MATCHING_PANELS_MODE;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.activities.MapActivity;
@@ -39,7 +38,7 @@ public class WidgetUtils {
 		MapLayers mapLayers = app.getOsmandMap().getMapLayers();
 		MapWidgetRegistry widgetRegistry = mapLayers.getMapWidgetRegistry();
 		for (String widgetId : widgetsIds) {
-			MapWidgetInfo widgetInfo = createDuplicateWidget(activity, widgetId, panel, widgetsFactory, appMode);
+			MapWidgetInfo widgetInfo = createDuplicateWidget(app, widgetId, panel, widgetsFactory, appMode);
 			if (widgetInfo != null) {
 				addWidgetToEnd(activity, widgetInfo, panel, appMode);
 				widgetRegistry.enableDisableWidgetForMode(appMode, widgetInfo, true, false);
@@ -51,10 +50,8 @@ public class WidgetUtils {
 		}
 	}
 
-	@Nullable
-	public static MapWidgetInfo createDuplicateWidget(@NonNull MapActivity mapActivity, @NonNull String widgetId, @NonNull WidgetsPanel panel,
+	public static MapWidgetInfo createDuplicateWidget(@NonNull OsmandApplication app, @NonNull String widgetId, @NonNull WidgetsPanel panel,
 													  @NonNull MapWidgetsFactory widgetsFactory, @NonNull ApplicationMode selectedAppMode) {
-		OsmandApplication app = mapActivity.getMyApplication();
 		WidgetType widgetType = WidgetType.getById(widgetId);
 		if (widgetType != null) {
 			String id = widgetId.contains(DELIMITER) ? widgetId : WidgetType.getDuplicateWidgetId(widgetId);
@@ -62,7 +59,7 @@ public class WidgetUtils {
 			if (widget != null) {
 				app.getSettings().CUSTOM_WIDGETS_KEYS.addValue(id);
 				WidgetInfoCreator creator = new WidgetInfoCreator(app, selectedAppMode);
-				return creator.askCreateWidgetInfo(id, widget, widgetType, panel);
+				return creator.createCustomWidgetInfo(id, widget, widgetType, panel);
 			}
 		}
 		return null;

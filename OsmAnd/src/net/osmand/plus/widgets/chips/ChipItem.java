@@ -1,7 +1,6 @@
 package net.osmand.plus.widgets.chips;
 
 import android.graphics.drawable.Drawable;
-import android.view.View;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
@@ -52,7 +51,6 @@ public class ChipItem {
 	public Integer drawablePaddingPx;
 
 	public String contentDescription;
-	public View boundView;
 
 	public Object tag;
 

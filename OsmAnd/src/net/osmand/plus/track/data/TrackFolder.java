@@ -12,9 +12,7 @@ import net.osmand.plus.track.helpers.GpxUiHelper;
 import net.osmand.util.Algorithms;
 
 import java.io.File;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 
 public class TrackFolder implements TracksGroup, ComparableTracksGroup {
@@ -53,18 +51,6 @@ public class TrackFolder implements TracksGroup, ComparableTracksGroup {
 	@NonNull
 	public String getDirName() {
 		return dirFile.getName();
-	}
-
-	@NonNull
-	public String getRelativePath() {
-		String dirName = getDirName();
-		TrackFolder parentFolder = getParentFolder();
-		return parentFolder != null && !parentFolder.isRootFolder()
-				? parentFolder.getRelativePath() + "/" + dirName : dirName;
-	}
-
-	public boolean isRootFolder() {
-		return getParentFolder() == null;
 	}
 
 	@Nullable
@@ -106,17 +92,13 @@ public class TrackFolder implements TracksGroup, ComparableTracksGroup {
 
 	@NonNull
 	public List<TrackItem> getFlattenedTrackItems() {
-		if (flattenedTrackItems == null) {
-			flattenedTrackItems = new ArrayList<>();
-			Deque<TrackFolder> stack = new ArrayDeque<>();
-			stack.push(this);
-			while (!stack.isEmpty()) {
-				TrackFolder current = stack.pop();
-				flattenedTrackItems.addAll(current.getTrackItems());
-				for (TrackFolder folder : current.getSubFolders()) {
-					stack.push(folder);
-				}
+		if (this.flattenedTrackItems == null) {
+			List<TrackItem> flattenedTrackItems = new ArrayList<>();
+			flattenedTrackItems.addAll(getTrackItems());
+			for (TrackFolder folder : getSubFolders()) {
+				flattenedTrackItems.addAll(folder.getFlattenedTrackItems());
 			}
+			this.flattenedTrackItems = flattenedTrackItems;
 		}
 		return flattenedTrackItems;
 	}
@@ -124,28 +106,24 @@ public class TrackFolder implements TracksGroup, ComparableTracksGroup {
 	@NonNull
 	public List<TrackFolder> getFlattenedSubFolders() {
 		if (flattenedSubFolders == null) {
-			flattenedSubFolders = new ArrayList<>();
-			Deque<TrackFolder> stack = new ArrayDeque<>();
-			stack.push(this);
-			while (!stack.isEmpty()) {
-				TrackFolder current = stack.pop();
-				flattenedSubFolders.addAll(current.getSubFolders());
-				for (TrackFolder folder : current.getSubFolders()) {
-					stack.push(folder);
-				}
+			List<TrackFolder> flattenedSubFolders = new ArrayList<>();
+			List<TrackFolder> sub = getSubFolders();
+			flattenedSubFolders.addAll(sub);
+			for (TrackFolder folder : sub) {
+				flattenedSubFolders.addAll(folder.getFlattenedSubFolders());
 			}
+			this.flattenedSubFolders = flattenedSubFolders;
+
 		}
 		return flattenedSubFolders;
 	}
 
 	@NonNull
 	public TrackFolderAnalysis getFolderAnalysis() {
-		TrackFolderAnalysis analysis = folderAnalysis;
-		if (analysis == null) {
-			analysis = new TrackFolderAnalysis(this);
-			folderAnalysis = analysis;
+		if (folderAnalysis == null) {
+			folderAnalysis = new TrackFolderAnalysis(this);
 		}
-		return analysis;
+		return folderAnalysis;
 	}
 
 	public long getLastModified() {

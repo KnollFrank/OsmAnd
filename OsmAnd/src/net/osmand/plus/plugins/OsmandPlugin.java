@@ -1,20 +1,11 @@
 package net.osmand.plus.plugins;
 
 
-import static net.osmand.plus.plugins.PluginsHelper.checkPluginPackage;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.view.View;
-
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 
 import com.github.mikephil.charting.charts.LineChart;
 
@@ -42,8 +33,8 @@ import net.osmand.plus.download.DownloadActivityType;
 import net.osmand.plus.download.DownloadOsmandIndexesHelper.IndexFileList;
 import net.osmand.plus.download.DownloadResources;
 import net.osmand.plus.download.IndexItem;
-import net.osmand.plus.keyevent.assignment.KeyAssignment;
 import net.osmand.plus.keyevent.commands.KeyEventCommand;
+import net.osmand.plus.keyevent.assignment.KeyAssignment;
 import net.osmand.plus.mapcontextmenu.MenuBuilder;
 import net.osmand.plus.mapcontextmenu.MenuController;
 import net.osmand.plus.mapcontextmenu.builders.cards.ImageCard.GetImageCardsTask.GetImageCardsListener;
@@ -67,7 +58,6 @@ import net.osmand.plus.widgets.ctxmenu.ContextMenuAdapter;
 import net.osmand.plus.widgets.popup.PopUpMenuItem;
 import net.osmand.render.RenderingRuleProperty;
 import net.osmand.search.core.SearchPhrase;
-import net.osmand.util.Algorithms;
 
 import org.apache.commons.logging.Log;
 import org.json.JSONException;
@@ -80,6 +70,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+
 public abstract class OsmandPlugin {
 
 	private static final Log LOG = PlatformUtil.getLog(PluginsHelper.class);
@@ -91,10 +88,6 @@ public abstract class OsmandPlugin {
 
 	private boolean enabled;
 	private String installURL;
-
-	public interface PluginInstallListener {
-		void onPluginInstalled();
-	}
 
 	public OsmandPlugin(@NonNull OsmandApplication app) {
 		this.app = app;
@@ -139,13 +132,6 @@ public abstract class OsmandPlugin {
 		return -1;
 	}
 
-	public boolean isOnline() {
-		return false;
-	}
-
-	public void install(@Nullable FragmentActivity activity, @Nullable PluginInstallListener installListener) {
-	}
-
 	/**
 	 * Initialize plugin runs just after creation
 	 */
@@ -173,14 +159,6 @@ public abstract class OsmandPlugin {
 
 	public boolean isActive() {
 		return isEnabled() && !isLocked();
-	}
-
-	public boolean shouldShowInstallDialog() {
-		return isActive() && (!Algorithms.isEmpty(getAddedAppModes()) || !Algorithms.isEmpty(getSuggestedMaps()));
-	}
-
-	public boolean shouldShowDisableDialog() {
-		return !isActive() && checkPluginPackage(app, this);
 	}
 
 	public boolean isEnableByDefault() {
@@ -320,7 +298,7 @@ public abstract class OsmandPlugin {
 	}
 
 	protected boolean isAvailable(OsmandApplication app) {
-		return checkPluginPackage(app, this) || !isPaid();
+		return PluginsHelper.checkPluginPackage(app, this) || !isPaid();
 	}
 
 	protected List<IndexItem> getMapsForType(@NonNull LatLon latLon, @NonNull DownloadActivityType type) {

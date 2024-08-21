@@ -3,8 +3,9 @@ package net.osmand.plus.settings.backend.backup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import net.osmand.plus.settings.backend.backup.items.OsmandSettingsItem;
 import net.osmand.plus.settings.backend.preferences.OsmandPreference;
+import net.osmand.plus.settings.backend.OsmandSettings;
+import net.osmand.plus.settings.backend.backup.items.OsmandSettingsItem;
 import net.osmand.util.Algorithms;
 
 import org.json.JSONException;
@@ -16,11 +17,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.Map;
 
 public abstract class OsmandSettingsItemReader<T extends OsmandSettingsItem> extends SettingsItemReader<T> {
 
-	public OsmandSettingsItemReader(@NonNull T item) {
+	private final OsmandSettings settings;
+
+	public OsmandSettingsItemReader(@NonNull T item, @NonNull OsmandSettings settings) {
 		super(item);
+		this.settings = settings;
 	}
 
 	protected abstract void readPreferenceFromJson(@NonNull OsmandPreference<?> preference,
@@ -52,5 +58,23 @@ public abstract class OsmandSettingsItemReader<T extends OsmandSettingsItem> ext
 		readPreferencesFromJson(json);
 	}
 
-	public abstract void readPreferencesFromJson(JSONObject json);
+	public void readPreferencesFromJson(JSONObject json) {
+		settings.getContext().runInUIThread(() -> {
+			Map<String, OsmandPreference<?>> prefs = settings.getRegisteredPreferences();
+			Iterator<String> iterator = json.keys();
+			while (iterator.hasNext()) {
+				String key = iterator.next();
+				OsmandPreference<?> p = prefs.get(key);
+				if (p != null) {
+					try {
+						readPreferenceFromJson(p, json);
+					} catch (Exception e) {
+						SettingsHelper.LOG.error("Failed to read preference: " + key, e);
+					}
+				} else {
+					SettingsHelper.LOG.warn("No preference while importing settings: " + key);
+				}
+			}
+		});
+	}
 }

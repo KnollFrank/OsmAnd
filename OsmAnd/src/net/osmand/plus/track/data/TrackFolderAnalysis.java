@@ -39,7 +39,7 @@ public class TrackFolderAnalysis {
 				diffElevationDown += analysis.getDiffElevationDown();
 
 				File file = trackItem.getFile();
-				if (file != null) {
+				if (file != null && file.exists()) {
 					fileSize += file.length();
 				}
 				if (analysis.isTimeSpecified()) {

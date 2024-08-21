@@ -146,9 +146,6 @@ public abstract class MapWidgetInfo implements Comparable<MapWidgetInfo> {
 		return messageId;
 	}
 
-	public void setExternalProviderPackage(@NonNull String externalProviderPackage) {
-	}
-
 	@Nullable
 	public String getExternalProviderPackage() {
 		return null;

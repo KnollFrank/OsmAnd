@@ -209,7 +209,15 @@ public class AmenityMenuController extends MenuController {
 	}
 
 	public static String getTypeStr(Amenity amenity) {
-		return amenity.getSubTypeStr();
+		PoiCategory pc = amenity.getType();
+		PoiType pt = pc.getPoiTypeByKeyName(amenity.getSubType());
+		String typeStr = amenity.getSubType();
+		if (pt != null) {
+			typeStr = pt.getTranslation();
+		} else if (typeStr != null) {
+			typeStr = Algorithms.capitalizeFirstLetterAndLowercase(typeStr.replace('_', ' '));
+		}
+		return typeStr;
 	}
 
 	@NonNull

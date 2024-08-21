@@ -11,18 +11,20 @@ import net.osmand.plus.R;
 import net.osmand.plus.helpers.AndroidUiHelper;
 import net.osmand.plus.routepreparationmenu.cards.BaseCard;
 
-public class MultiStateCard extends BaseCard implements IMultiStateCard {
+public class MultiStateCard extends BaseCard {
 
 	protected final IMultiStateCardController controller;
 
-	public MultiStateCard(@NonNull FragmentActivity activity, @NonNull IMultiStateCardController controller) {
-		this(activity, controller, true);
+	public MultiStateCard(@NonNull FragmentActivity activity,
+	                      @NonNull IMultiStateCardController cardController) {
+		this(activity, cardController, true);
 	}
 
-	public MultiStateCard(@NonNull FragmentActivity activity, @NonNull IMultiStateCardController controller, boolean usedOnMap) {
+	public MultiStateCard(@NonNull FragmentActivity activity,
+	                      @NonNull IMultiStateCardController controller, boolean usedOnMap) {
 		super(activity, usedOnMap);
 		this.controller = controller;
-		controller.bindComponent(this);
+		controller.bindCard(this);
 	}
 
 	@Override
@@ -32,7 +34,7 @@ public class MultiStateCard extends BaseCard implements IMultiStateCard {
 
 	@Override
 	protected void updateContent() {
-		if (controller.shouldShowCardHeader()) {
+		if(controller.shouldShowMultiStateCardHeader()) {
 			updateCardTitle();
 			updateStateSelector();
 		} else {
@@ -42,9 +44,8 @@ public class MultiStateCard extends BaseCard implements IMultiStateCard {
 		bindSelectedStateContent();
 	}
 
-	@Override
 	public void updateSelectedCardState() {
-		if (controller.shouldShowCardHeader()) {
+		if (controller.shouldShowMultiStateCardHeader()) {
 			updateStateSelector();
 		}
 		bindSelectedStateContent();
@@ -52,33 +53,28 @@ public class MultiStateCard extends BaseCard implements IMultiStateCard {
 
 	private void updateCardTitle() {
 		TextView tvTitle = view.findViewById(R.id.card_title);
-		tvTitle.setText(controller.getCardTitle());
+		tvTitle.setText(controller.getMultiStateCardTitle());
 	}
 
 	private void updateStateSelector() {
 		View selector = view.findViewById(R.id.card_selector);
-		selector.setOnClickListener(v -> controller.onSelectorButtonClicked(selector));
+		selector.setOnClickListener(v -> showPopUpMenu());
 		updateStateSelectorTitle();
 	}
 
 	private void updateStateSelectorTitle() {
 		View selector = view.findViewById(R.id.card_selector);
 		TextView tvTitle = selector.findViewById(R.id.title);
-		tvTitle.setText(controller.getCardStateSelectorTitle());
+		tvTitle.setText(controller.getMultiStateSelectorTitle());
 	}
 
 	private void bindSelectedStateContent() {
 		ViewGroup contentContainer = view.findViewById(R.id.content);
-		controller.onBindCardContent(activity, contentContainer, nightMode);
+		controller.onBindMultiStateCardContent(activity, contentContainer, nightMode);
 	}
 
-	@Override
-	public View getSelectorView() {
-		return view.findViewById(R.id.card_selector);
-	}
-
-	@Override
-	public FragmentActivity getActivity() {
-		return activity;
+	private void showPopUpMenu() {
+		View selector = view.findViewById(R.id.card_selector);
+		controller.showPopUpMenu(activity, selector, nightMode);
 	}
 }

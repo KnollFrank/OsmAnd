@@ -11,11 +11,9 @@ public class PoiFilter extends AbstractPoiType {
 	private PoiCategory pc;
 	private List<PoiType> poiTypes = new ArrayList<PoiType>();
 	private Map<String, PoiType> map = new LinkedHashMap<String, PoiType>();
-	private final String iconKeyName;
 
-	public PoiFilter(MapPoiTypes registry, PoiCategory pc, String keyName, String iconKeyName) {
+	public PoiFilter(MapPoiTypes registry, PoiCategory pc, String keyName) {
 		super(keyName, registry);
-		this.iconKeyName = iconKeyName;
 		this.pc = pc;
 	}
 
@@ -92,11 +90,9 @@ public class PoiFilter extends AbstractPoiType {
 		}
 	}
 
-	public String getIconKeyName() {
-		return formatKeyName(iconKeyName != null ? iconKeyName : getKeyName());
-	}
-
 	public List<PoiType> getPoiTypes() {
 		return poiTypes;
 	}
+
+
 }

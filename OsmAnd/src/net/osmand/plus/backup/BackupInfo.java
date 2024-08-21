@@ -10,7 +10,6 @@ import net.osmand.plus.settings.backend.backup.exporttype.ExportType;
 import net.osmand.plus.settings.backend.backup.items.SettingsItem;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +49,7 @@ public class BackupInfo {
 				items.add(item);
 			}
 		}
-		itemsToUpload = getSortedItems(items);
+		itemsToUpload = new ArrayList<>(items);
 	}
 
 	private void createItemsToDelete() {
@@ -61,7 +60,7 @@ public class BackupInfo {
 				items.add(item);
 			}
 		}
-		itemsToDelete = getSortedItems(items);
+		itemsToDelete = new ArrayList<>(items);
 	}
 
 	private void createLocalItemsToDelete() {
@@ -72,14 +71,7 @@ public class BackupInfo {
 				items.add(item);
 			}
 		}
-		itemsToLocalDelete = getSortedItems(items);
-	}
-
-	@NonNull
-	private List<SettingsItem> getSortedItems(@NonNull Set<SettingsItem> settingsItems) {
-		List<SettingsItem> items = new ArrayList<>(settingsItems);
-		Collections.sort(items, (o1, o2) -> -Long.compare(o1.getLastModifiedTime(), o2.getLastModifiedTime()));
-		return items;
+		itemsToLocalDelete = new ArrayList<>(items);
 	}
 
 	private void createFilteredFilesToDownload(@NonNull OsmandApplication app) {

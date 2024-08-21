@@ -186,7 +186,7 @@ public class BackupExporter extends Exporter {
 			itemsProgress.add(item);
 			if (listener != null) {
 				int p = dataProgress.addAndGet(APPROXIMATE_FILE_SIZE_BYTES / 1024);
-				String fileName = BackupUtils.getItemFileName(item);
+				String fileName = BackupHelper.getItemFileName(item);
 				listener.itemExportDone(item.getType().name(), fileName);
 				listener.updateGeneralProgress(itemsProgress.size(), p);
 			}

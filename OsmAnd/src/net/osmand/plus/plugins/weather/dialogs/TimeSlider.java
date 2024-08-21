@@ -118,12 +118,4 @@ public class TimeSlider extends Slider {
 		}
 		return coordinates;
 	}
-
-	public void hideLabel(){
-		setActiveThumbIndex(-1);
-	}
-
-	public void showLabel(){
-		setActiveThumbIndex(0);
-	}
 }

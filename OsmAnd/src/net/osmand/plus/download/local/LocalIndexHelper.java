@@ -2,7 +2,6 @@ package net.osmand.plus.download.local;
 
 
 import static net.osmand.IndexConstants.*;
-import static net.osmand.plus.download.local.LocalItemType.COLOR_DATA;
 import static net.osmand.plus.download.local.LocalItemType.DEPTH_DATA;
 import static net.osmand.plus.download.local.LocalItemType.FONT_DATA;
 import static net.osmand.plus.download.local.LocalItemType.LIVE_UPDATES;
@@ -217,6 +216,7 @@ public class LocalIndexHelper {
 					break;
 				case TILES_DATA:
 					loadTilesData(app.getAppPath(TILES_INDEX_DIR), items, shouldUpdate, task);
+					loadTilesData(app.getAppPath(HEIGHTMAP_INDEX_DIR), items, shouldUpdate, task);
 					break;
 				case TTS_VOICE_DATA:
 				case VOICE_DATA:
@@ -240,10 +240,6 @@ public class LocalIndexHelper {
 					loadDataImpl(app.getAppPath(GEOTIFF_DIR), TERRAIN_DATA, TIF_EXT,
 							readFiles, shouldUpdate, items, indexFiles, task);
 					loadDataImpl(app.getAppPath(SRTM_INDEX_DIR), TERRAIN_DATA, BINARY_MAP_INDEX_EXT,
-							readFiles, shouldUpdate, items, indexFiles, task);
-					break;
-				case COLOR_DATA:
-					loadDataImpl(app.getAppPath(COLOR_PALETTE_DIR), COLOR_DATA, TXT_EXT,
 							readFiles, shouldUpdate, items, indexFiles, task);
 					break;
 			}
@@ -319,7 +315,7 @@ public class LocalIndexHelper {
 			for (File file : listFilesSorted(dir)) {
 				if (file.isFile()) {
 					String fileName = file.getName();
-					boolean tilesData = CollectionUtils.endsWithAny(fileName, SQLiteTileSource.EXT);
+					boolean tilesData = CollectionUtils.endsWithAny(fileName, SQLiteTileSource.EXT, HEIGHTMAP_SQLITE_EXT);
 					if (tilesData) {
 						loadLocalData(file, TILES_DATA, items, shouldUpdate, task);
 					}

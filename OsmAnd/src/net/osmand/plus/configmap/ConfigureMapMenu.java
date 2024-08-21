@@ -552,12 +552,12 @@ public class ConfigureMapMenu {
 				}));
 
 		String description = "";
-		DayNightMode dayNightMode = settings.DAYNIGHT_MODE.get();
 		SunriseSunset sunriseSunset = app.getDaynightHelper().getSunriseSunset();
-		if (!dayNightMode.isAppTheme() && sunriseSunset != null && sunriseSunset.getSunrise() != null && sunriseSunset.getSunset() != null) {
+		if (sunriseSunset != null && sunriseSunset.getSunrise() != null && sunriseSunset.getSunset() != null) {
 			DateFormat dateFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
 			String sunriseTime = dateFormat.format(sunriseSunset.getSunrise());
 			String sunsetTime = dateFormat.format(sunriseSunset.getSunset());
+			DayNightMode dayNightMode = settings.DAYNIGHT_MODE.get();
 			if (dayNightMode.isDay() || dayNightMode.isNight()) {
 				if (sunriseSunset.isDaytime()) {
 					description = String.format(app.getString(R.string.sunset_at), sunsetTime);
@@ -577,9 +577,9 @@ public class ConfigureMapMenu {
 				.setIcon(ConfigureMapUtils.getDayNightIcon(activity))
 				.setListener((uiAdapter, view, item, isChecked) -> {
 					if (AndroidUtils.isActivityNotDestroyed(activity)) {
-						MapModeController.showDialog(activity);
+						ConfigureMapDialogs.showMapModeDialog(activity, nightMode);
 					}
-					return true;
+					return false;
 				})
 				.setItemDeleteAction(settings.DAYNIGHT_MODE));
 

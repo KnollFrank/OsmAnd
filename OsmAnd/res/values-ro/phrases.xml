@@ -351,7 +351,7 @@
     <string name="poi_rugby_union">Uniune de rugby</string>
     <string name="poi_rowing">Canotaj</string>
     <string name="poi_roller_skating">Patinaj pe role</string>
-    <string name="poi_racquet">Rachetă</string>
+    <string name="poi_racquet">Racquet</string>
     <string name="poi_pelota">Pelotă</string>
     <string name="poi_paragliding">Parapantă</string>
     <string name="poi_paddle_tennis">Padel</string>
@@ -2287,7 +2287,7 @@
     <string name="poi_protection_object_historic">Obiect de protecție: istoric</string>
     <string name="poi_protection_title">Titlu de protecție</string>
     <string name="poi_protected_area">Zonă protejată</string>
-    <string name="poi_bandy">Bandaj</string>
+    <string name="poi_bandy">Bandy</string>
     <string name="poi_fair_trade_only">Numai produse din comerț echitabil</string>
     <string name="poi_fair_trade_no">Comerț echitabil: nu</string>
     <string name="poi_fair_trade_yes">Comerț echitabil: da</string>
@@ -3203,13 +3203,13 @@
     <string name="poi_cuisine_fried_chicken">Pui prăjit</string>
     <string name="poi_cuisine_couscous">Cușcuș</string>
     <string name="poi_cuisine_bakery">Brutărie</string>
-    <string name="poi_cuisine_bistro">Bistrou</string>
+    <string name="poi_cuisine_bistro">Bistro</string>
     <string name="poi_cuisine_savory_pancakes">Clătite savuroase</string>
     <string name="poi_cuisine_fried_food">Mâncare prăjită</string>
     <string name="poi_cuisine_frozen_yogurt">Iaurt înghețat</string>
     <string name="poi_cuisine_salad">Salată</string>
     <string name="poi_cuisine_deli">Delicatese</string>
-    <string name="poi_cuisine_hotdog">Hot dog</string>
+    <string name="poi_cuisine_hotdog">Hotdog</string>
     <string name="poi_cuisine_pie">Plăcinte</string>
     <string name="poi_cuisine_soup">Supă</string>
     <string name="poi_cuisine_tea_shop">Magazin de ceai</string>
@@ -3225,7 +3225,7 @@
     <string name="poi_cuisine_diner">Diner</string>
     <string name="poi_cuisine_bagel">Covrigi</string>
     <string name="poi_cuisine_grill">Grătar</string>
-    <string name="poi_cuisine_buschenschank">Lanț de autobuz</string>
+    <string name="poi_cuisine_buschenschank">Buschenschank</string>
     <string name="poi_cuisine_curry">Curry</string>
     <string name="poi_cuisine_heuriger">Heuriger</string>
     <string name="poi_cuisine_gastropub">Gastropub</string>
@@ -4362,7 +4362,7 @@
     <string name="poi_playground_seesaw">Balansoar</string>
     <string name="poi_playground_springy">Elastic</string>
     <string name="poi_playground_trampoline">Trambulină</string>
-    <string name="poi_playground_roundabout">Carusel</string>
+    <string name="poi_playground_roundabout">Sens giratoriu</string>
     <string name="poi_playground_zipwire">Tiroliană</string>
     <string name="poi_playground_water">Apă</string>
     <string name="poi_playground_activitypanel">Panou de activitate</string>
@@ -4860,12 +4860,6 @@
     <string name="poi_us_maps_recreation_area_facility_horse_stanchion">Stâlp de cai</string>
     <string name="poi_music_venue">Loc de concerte</string>
     <string name="poi_live_music_yes">Da</string>
-    <string name="poi_shop_general">Magazin general</string>
+    <string name="poi_shop_general">Magazin universal</string>
     <string name="poi_cuisine_fish">Pește</string>
-    <string name="poi_indoor_seating_yes">Locuri în interior: da</string>
-    <string name="poi_indoor_seating_no">Nu există locuri în interior</string>
-    <string name="poi_indoor_seating_bar_table">Locuri în interior: masă de bar</string>
-    <string name="poi_property_management">Birou de administrare proprietăți</string>
-    <string name="poi_engineer">Birou de inginer</string>
-    <string name="poi_mcdonalds">McDonald\'s</string>
 </resources>

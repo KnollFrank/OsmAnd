@@ -48,7 +48,6 @@ import net.osmand.plus.backup.BackupListeners.OnCheckCodeListener;
 import net.osmand.plus.backup.BackupListeners.OnRegisterDeviceListener;
 import net.osmand.plus.backup.BackupListeners.OnRegisterUserListener;
 import net.osmand.plus.backup.BackupListeners.OnSendCodeListener;
-import net.osmand.plus.backup.BackupUtils;
 import net.osmand.plus.backup.UserNotRegisteredException;
 import net.osmand.plus.base.BaseOsmAndFragment;
 import net.osmand.plus.chooseplan.ChoosePlanFragment;
@@ -387,7 +386,7 @@ public class AuthorizeFragment extends BaseOsmAndFragment implements OnRegisterU
 	}
 
 	private void performActionWithToken(@NonNull String token, @NonNull CallbackWithObject<Void> callback) {
-		if (!Algorithms.isEmpty(token) && BackupUtils.isTokenValid(token)) {
+		if (!Algorithms.isEmpty(token) && BackupHelper.isTokenValid(token)) {
 			progressBar.setVisibility(View.VISIBLE);
 
 			callback.processResult(null);

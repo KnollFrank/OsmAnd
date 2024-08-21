@@ -196,7 +196,7 @@ public class GpsFilterHelper {
 			if (successfulFinish && !isCancelled()) {
 				filteredSelectedGpxFile.updateGpxFile(app, filteredGpxFile);
 				filteredSelectedGpxFile.setTrackAnalysis(trackAnalysis);
-				filteredSelectedGpxFile.setSplitGroups(displayGroups);
+				filteredSelectedGpxFile.setDisplayGroups(displayGroups);
 				for (GpsFilterListener listener : listeners) {
 					listener.onFinishFiltering(filteredGpxFile);
 				}

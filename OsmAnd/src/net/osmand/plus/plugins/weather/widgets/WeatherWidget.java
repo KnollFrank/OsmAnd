@@ -17,9 +17,7 @@ import net.osmand.plus.plugins.PluginsHelper;
 import net.osmand.plus.plugins.development.OsmandDevelopmentPlugin;
 import net.osmand.plus.plugins.weather.WeatherBand;
 import net.osmand.plus.plugins.weather.WeatherHelper;
-import net.osmand.plus.plugins.weather.WeatherPlugin;
 import net.osmand.plus.plugins.weather.WeatherUtils;
-import net.osmand.plus.plugins.weather.enums.WeatherSource;
 import net.osmand.plus.utils.NativeUtilities;
 import net.osmand.plus.views.layers.base.OsmandMapLayer;
 import net.osmand.plus.views.mapwidgets.WidgetType;
@@ -33,7 +31,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -67,11 +64,9 @@ public class WeatherWidget extends SimpleWidget {
 	private boolean lastObtainingFailed;
 	private PointI lastDisplayedForecastPoint31;
 	private long lastDisplayedForecastTime;
-	private WeatherPlugin plugin;
 
 	public WeatherWidget(@NonNull MapActivity mapActivity, @NonNull WidgetType widgetType, @Nullable String customId, short band) {
 		super(mapActivity, widgetType, customId, null);
-		plugin = PluginsHelper.getPlugin(WeatherPlugin.class);
 		this.band = band;
 		this.hideOldDataMessageId = OsmAndConstants.UI_HANDLER_WEATHER_WIDGET + band;
 		this.weatherHelper = app.getWeatherHelper();
@@ -122,18 +117,11 @@ public class WeatherWidget extends SimpleWidget {
 	public void updateContent(@Nullable String formattedValue) {
 		app.removeMessagesInUiThread(hideOldDataMessageId);
 		if (!Algorithms.isEmpty(formattedValue)) {
-			WeatherSource weatherSource = plugin.getWeatherSource();
-			if (weatherSource == WeatherSource.ECMWF &&
-					(widgetType == WidgetType.WEATHER_CLOUDS_WIDGET || widgetType == WidgetType.WEATHER_WIND_WIDGET) &&
-					"0".equals(formattedValue)) {
-				setText(NO_VALUE, weatherBand.getBandUnit().getUnit(app));
-			} else {
-				setText(formattedValue, weatherBand.getBandUnit().getUnit(app));
-			}
+			setText(formattedValue, weatherBand.getBandUnit().getSymbol());
 		} else {
 			setText(NO_VALUE, null);
 		}
-		mapActivity.getMapLayers().getMapInfoLayer().updateSideWidgets();
+		mapActivity.getMapLayers().getMapInfoLayer().updateSideWidgets();;
 	}
 
 	public void setDateTime(@Nullable Date date) {

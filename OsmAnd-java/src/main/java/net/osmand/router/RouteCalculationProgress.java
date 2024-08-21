@@ -1,6 +1,9 @@
 package net.osmand.router;
 
+import net.osmand.map.WorldRegion;
+
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -46,7 +49,7 @@ public class RouteCalculationProgress {
 	public boolean requestPrivateAccessRouting;
 
 	public long routeCalculationStartTime;
-	public MissingMapsCalculationResult missingMapsCalculationResult;
+	public List<WorldRegion> missingMaps;
 
 	private int hhIterationStep = HHIteration.HH_NOT_STARTED.ordinal();
 	private int hhTargetsDone, hhTargetsTotal;

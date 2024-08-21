@@ -2,11 +2,20 @@ package net.osmand.plus.views.layers.base;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
 import android.graphics.Paint.Cap;
 import android.graphics.Paint.Join;
 import android.graphics.Paint.Style;
+import android.graphics.Path;
+import android.graphics.PointF;
 import android.graphics.PorterDuff.Mode;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.view.MotionEvent;
@@ -45,7 +54,13 @@ import net.osmand.util.MapUtils;
 import org.apache.commons.logging.Log;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
 public abstract class OsmandMapLayer implements MapRendererViewListener {
 	private static final Log LOG = PlatformUtil.getLog(OsmandMapLayer.class);
@@ -83,7 +98,7 @@ public abstract class OsmandMapLayer implements MapRendererViewListener {
 		}
 
 		public void setCustomMapObjects(List<T> customMapObjects) {
-			if (this.customMapObjects != customMapObjects) {
+			if(this.customMapObjects != customMapObjects){
 				isChanged = true;
 			}
 			this.customMapObjects = customMapObjects;
@@ -111,7 +126,7 @@ public abstract class OsmandMapLayer implements MapRendererViewListener {
 	}
 
 	public int getBaseOrder() {
-		return (int) ((view != null ? view.getZorder(this) : 10f) * -100000f);
+		return (int)((view != null ? view.getZorder(this) : 10f) * -100000f);
 	}
 
 	public int getPointsOrder() {
@@ -119,7 +134,7 @@ public abstract class OsmandMapLayer implements MapRendererViewListener {
 	}
 
 	public void setPointsOrder(float pointsZorder) {
-		this.pointsOrder = (int) (pointsZorder * -100000f);
+		this.pointsOrder = (int)(pointsZorder * -100000f);
 	}
 
 	@NonNull
@@ -815,8 +830,7 @@ public abstract class OsmandMapLayer implements MapRendererViewListener {
 					if (queriedBoxContains(queriedBox, extendedBox)) {
 						return null;
 					}
-					QuadRect bounds = extendedBox.getLatLonBounds();
-					return bounds != null ? calculateResult(bounds, extendedBox.getZoom()) : null;
+					return calculateResult(extendedBox.getLatLonBounds(), extendedBox.getZoom());
 				}
 			}
 

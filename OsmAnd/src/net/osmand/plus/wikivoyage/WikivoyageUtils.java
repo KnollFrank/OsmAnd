@@ -36,7 +36,6 @@ public class WikivoyageUtils {
 	private static final String GEO_PARAMS = "?lat=";
 	public static final String ARTICLE_TITLE = "article_title";
 	public static final String ARTICLE_LANG = "article_lang";
-	public static final String EN_LANG_PREFIX = "en:";
 
 	public static void setupNetworkPolicy(OsmandSettings settings, RequestCreator rc) {
 		switch (settings.WIKI_ARTICLE_SHOW_IMAGES.get()) {
@@ -119,11 +118,6 @@ public class WikivoyageUtils {
 			}
 		}
 		return null;
-	}
-
-	@NonNull
-	public static String getTitleWithoutPrefix(@NonNull String title) {
-		return title.startsWith(EN_LANG_PREFIX) ? title.substring(EN_LANG_PREFIX.length()) : title;
 	}
 
 }

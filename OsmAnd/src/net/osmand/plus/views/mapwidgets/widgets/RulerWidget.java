@@ -53,7 +53,7 @@ public class RulerWidget {
 		OsmandMapTileView view = osmandMap.getMapView();
 		float mapDensity = osmandMap.getMapDensity();
 		// update cache
-		if (view.isZooming() || osmandMap.getMapView().isCarView()) {
+		if (view.isZooming()) {
 			visible = false;
 		} else if ((tb.getZoom() + tb.getZoomFloatPart() != cacheRulerZoom
 				|| Math.abs(tb.getCenterTileX() - cacheRulerTileX) > 1

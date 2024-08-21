@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import net.osmand.PlatformUtil;
-import net.osmand.plus.backup.BackupUtils;
+import net.osmand.plus.backup.BackupHelper;
 import net.osmand.plus.plugins.osmedit.data.OsmNotesPoint;
 import net.osmand.plus.plugins.osmedit.data.OsmPoint;
 import net.osmand.plus.utils.AndroidDbUtils;
@@ -61,21 +61,21 @@ public class OsmBugsDbHelper extends SQLiteOpenHelper {
 	}
 
 	public long getLastModifiedTime() {
-		long lastModifiedTime = BackupUtils.getLastModifiedTime(context, OSMBUGS_DB_LAST_MODIFIED_NAME);
+		long lastModifiedTime = BackupHelper.getLastModifiedTime(context, OSMBUGS_DB_LAST_MODIFIED_NAME);
 		if (lastModifiedTime == 0) {
 			File dbFile = context.getDatabasePath(OSMBUGS_DB_NAME);
 			lastModifiedTime = dbFile.exists() ? dbFile.lastModified() : 0;
-			BackupUtils.setLastModifiedTime(context, OSMBUGS_DB_LAST_MODIFIED_NAME, lastModifiedTime);
+			BackupHelper.setLastModifiedTime(context, OSMBUGS_DB_LAST_MODIFIED_NAME, lastModifiedTime);
 		}
 		return lastModifiedTime;
 	}
 
 	public void setLastModifiedTime(long lastModifiedTime) {
-		BackupUtils.setLastModifiedTime(context, OSMBUGS_DB_LAST_MODIFIED_NAME, lastModifiedTime);
+		BackupHelper.setLastModifiedTime(context, OSMBUGS_DB_LAST_MODIFIED_NAME, lastModifiedTime);
 	}
 
 	private void updateLastModifiedTime() {
-		BackupUtils.setLastModifiedTime(context, OSMBUGS_DB_LAST_MODIFIED_NAME);
+		BackupHelper.setLastModifiedTime(context, OSMBUGS_DB_LAST_MODIFIED_NAME);
 	}
 
 	public List<OsmNotesPoint> getOsmBugsPoints() {

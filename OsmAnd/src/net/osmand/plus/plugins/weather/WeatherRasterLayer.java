@@ -2,7 +2,6 @@ package net.osmand.plus.plugins.weather;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -25,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WeatherRasterLayer extends BaseMapLayer {
-	public static final int FORECAST_ANIMATION_DURATION_HOURS = 6;
-	private static final long MINUTE_IN_MILLISECONDS = 60 * 1000;
 	private static final long HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
 	private static final long DAY_IN_MILLISECONDS = 24 * HOUR_IN_MILLISECONDS;
 	private final WeatherHelper weatherHelper;
@@ -60,7 +57,7 @@ public class WeatherRasterLayer extends BaseMapLayer {
 		this.weatherSettings = weatherHelper.getWeatherSettings();
 		this.weatherLayer = weatherLayer;
 		this.plugin = PluginsHelper.getPlugin(WeatherPlugin.class);
-		setDateTime(System.currentTimeMillis(), false, false);
+		setDateTime(System.currentTimeMillis());
 	}
 
 	@Override
@@ -81,46 +78,30 @@ public class WeatherRasterLayer extends BaseMapLayer {
 		return dateTime;
 	}
 
-	public void setDateTime(long dateTime, boolean goForward, boolean resetPeriod) {
-		long dayStart = OsmAndFormatter.getStartOfDayForTime(timePeriodStart);
+	public void setDateTime(long dateTime) {
+		long dayStart = OsmAndFormatter.getStartOfToday();
 		long dayEnd = dayStart + DAY_IN_MILLISECONDS;
+		long step = timePeriodStep;
+		if (dateTime > dayEnd)
+			step = HOUR_IN_MILLISECONDS * 3;
+		else if (dateTime < dayEnd || step < HOUR_IN_MILLISECONDS)
+			step = HOUR_IN_MILLISECONDS;
+		dayStart = OsmAndFormatter.getStartOfDayForTime(timePeriodStart);
+		dayEnd = dayStart + DAY_IN_MILLISECONDS;
 		if (dateTime < dayStart || dateTime > dayEnd) {
 			dayStart = OsmAndFormatter.getStartOfDayForTime(dateTime);
 			dayEnd = dayStart + DAY_IN_MILLISECONDS;
 		}
-		long todayStep = HOUR_IN_MILLISECONDS;
-		long nextStep = todayStep * 3;
-		long startOfToday = OsmAndFormatter.getStartOfToday();
-		long step = dayStart == startOfToday ? todayStep : nextStep;
-		long switchStepTime = (System.currentTimeMillis() + DAY_IN_MILLISECONDS) / nextStep * nextStep;
-		if (switchStepTime > startOfToday && switchStepTime >= dayStart + todayStep && switchStepTime <= dayEnd - nextStep) {
-			if (dateTime < switchStepTime) {
-				dayEnd = switchStepTime;
-				step = todayStep;
-			} else
-				dayStart = switchStepTime;
-		}
 		long prevTime = (dateTime - dayStart) / step * step + dayStart;
 		long nextTime = prevTime + step;
-		if (goForward) {
-			if (resetPeriod || timePeriodStep != step
-					|| (timePeriodStart > dayStart && prevTime < timePeriodStart)
-					|| (timePeriodEnd < dayEnd && nextTime > timePeriodEnd)) {
-				timePeriodStart = Math.max(prevTime, dayStart);
-				timePeriodEnd = Math.min(nextTime + FORECAST_ANIMATION_DURATION_HOURS * HOUR_IN_MILLISECONDS, dayEnd);
-				timePeriodStep = step;
-				requireTimePeriodChange = true;
-			}
-		} else {
-			long nearestTime = dateTime - prevTime < nextTime - dateTime ? prevTime : nextTime;
-			if (resetPeriod || timePeriodStep != step
-					|| (timePeriodStart > dayStart && nearestTime <= timePeriodStart)
-					|| (timePeriodEnd < dayEnd && nearestTime >= timePeriodEnd)) {
-				timePeriodStart = Math.max(nearestTime - step, dayStart);
-				timePeriodEnd = Math.min(nearestTime + step, dayEnd);
-				timePeriodStep = step;
-				requireTimePeriodChange = true;
-			}
+		long nearestTime = dateTime - prevTime < nextTime - dateTime ? prevTime : nextTime;
+		if (timePeriodStep != step
+				|| (timePeriodStart > dayStart && nearestTime <= timePeriodStart)
+				|| (timePeriodEnd < dayEnd && nearestTime >= timePeriodEnd)) {
+			timePeriodStart = Math.max(nearestTime - step * 2, dayStart);
+			timePeriodEnd = Math.min(nearestTime + step * 2, dayEnd);
+			timePeriodStep = step;
+			requireTimePeriodChange = true;
 		}
 		this.dateTime = dateTime;
 	}
@@ -168,7 +149,7 @@ public class WeatherRasterLayer extends BaseMapLayer {
 		BandIndexList bands = new BandIndexList();
 		for (WeatherBand weatherBand : enabledBandsCached) {
 			short bandIndex = weatherBand.getBandIndex();
-			if (bandIndex != WeatherBand.WEATHER_BAND_NOTHING) {
+			if (bandIndex != WeatherBand.WEATHER_BAND_UNDEFINED) {
 				bands.add(bandIndex);
 			}
 		}
@@ -246,7 +227,7 @@ public class WeatherRasterLayer extends BaseMapLayer {
 		cachedDateTime = dateTime;
 
 		if (weatherEnabledChanged || layersChanged || bandsSettingsChanged)
-			resetLayerProvider();
+			requireTimePeriodChange = true;
 
 		return weatherEnabledChanged || layersChanged || bandsSettingsChanged || dateTimeChanged;
 	}

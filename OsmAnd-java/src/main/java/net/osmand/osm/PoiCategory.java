@@ -16,7 +16,7 @@ public class PoiCategory extends PoiFilter {
 	private String defaultTag;
 
 	public PoiCategory(MapPoiTypes registry, String keyName, int regId) {
-		super(registry, null, keyName, null);
+		super(registry, null, keyName);
 		this.regId = regId;
 	}
 

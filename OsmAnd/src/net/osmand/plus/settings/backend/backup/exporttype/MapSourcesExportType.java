@@ -26,9 +26,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class MapSourcesExportType extends AbstractExportType {
+class MapSourcesExportType extends AbstractExportType {
 
-	private static final List<TileSourceTemplate> DEFAULT_TEMPLATES = TileSourceManager.getKnownSourceTemplates();
+	private final List<TileSourceTemplate> defaultTemplates = TileSourceManager.getKnownSourceTemplates();
 
 	@Override
 	public int getTitleId() {
@@ -110,10 +110,10 @@ public class MapSourcesExportType extends AbstractExportType {
 		return null;
 	}
 
-	public static boolean shouldSkipMapSource(@NonNull ITileSource source) {
+	private boolean shouldSkipMapSource(@NonNull ITileSource source) {
 		if (source instanceof TileSourceTemplate) {
 			TileSourceTemplate sourceTemplate = (TileSourceTemplate) source;
-			for (TileSourceTemplate template : DEFAULT_TEMPLATES) {
+			for (TileSourceTemplate template : defaultTemplates) {
 				if (Algorithms.objectEquals(template.getProperties(), sourceTemplate.getProperties())) {
 					return true;
 				}

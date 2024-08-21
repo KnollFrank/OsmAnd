@@ -57,9 +57,6 @@ public class MapPoiTypes {
 	Map<String, String> poiAdditionalCategoryIconNames = new LinkedHashMap<String, String>();
 	List<PoiType> textPoiAdditionals = new ArrayList<PoiType>();
 
-	public Map<String, PoiType> topIndexPoiAdditional = new LinkedHashMap<String, PoiType>();
-	public static final String TOP_INDEX_ADDITIONAL_PREFIX = "top_index_";
-
 
 	public MapPoiTypes(String fileName) {
 		this.resourceName = fileName;
@@ -335,10 +332,6 @@ public class MapPoiTypes {
 		categories.add(category);
 		this.categories = categories;
 	}
-	
-	public List<PoiCategory> getCategories() {
-		return categories;
-	}
 
 	public PoiTranslator getPoiTranslator() {
 		return poiTranslator;
@@ -421,9 +414,7 @@ public class MapPoiTypes {
 						}
 						categoriesList.add(lastCategory);
 					} else if (name.equals("poi_filter")) {
-						String keyName = parser.getAttributeValue("", "name");
-						String iconName = parser.getAttributeValue("", "icon");
-						PoiFilter tp = new PoiFilter(this, lastCategory, keyName, iconName);
+						PoiFilter tp = new PoiFilter(this, lastCategory, parser.getAttributeValue("", "name"));
 						tp.setTopVisible(Boolean.parseBoolean(parser.getAttributeValue("", "top")));
 						lastFilter = tp;
 						lastFilterPoiAdditionalsCategories.addAll(lastCategoryPoiAdditionalsCategories);
@@ -453,15 +444,9 @@ public class MapPoiTypes {
 							for (String lng : MapRenderingTypes.langs) {
 								parsePoiAdditional(parser, lastCategory, lastFilter, lastType, lng, baseType,
 										lastPoiAdditionalCategory, textPoiAdditionals);
-								if (baseType.isTopIndex()) {
-									topIndexPoiAdditional.put(TOP_INDEX_ADDITIONAL_PREFIX + baseType.getKeyName() + ":" + lng, baseType);
-								}
 							}
 							parsePoiAdditional(parser, lastCategory, lastFilter, lastType, "en", baseType,
 									lastPoiAdditionalCategory, textPoiAdditionals);
-							if (baseType.isTopIndex()) {
-								topIndexPoiAdditional.put(TOP_INDEX_ADDITIONAL_PREFIX + baseType.getKeyName() + ":en", baseType);
-							}
 						}
 						if (lastPoiAdditionalCategory != null) {
 							List<PoiType> categoryAdditionals = categoryPoiAdditionalMap.get(lastPoiAdditionalCategory);
@@ -471,9 +456,7 @@ public class MapPoiTypes {
 							}
 							categoryAdditionals.add(baseType);
 						}
-						if (baseType.isTopIndex()) {
-							topIndexPoiAdditional.put(TOP_INDEX_ADDITIONAL_PREFIX + baseType.getKeyName(), baseType);
-						}
+
 					} else if (name.equals("poi_additional_category")) {
 						if (lastPoiAdditionalCategory == null) {
 							lastPoiAdditionalCategory = parser.getAttributeValue("", "name");
@@ -659,15 +642,6 @@ public class MapPoiTypes {
 		tp.setOsmValue2(parser.getAttributeValue("", "value2"));
 		tp.setPoiAdditionalCategory(poiAdditionalCategory);
 		tp.setFilterOnly(Boolean.parseBoolean(parser.getAttributeValue("", "filter_only")));
-		tp.setTopIndex(Boolean.parseBoolean(parser.getAttributeValue("", "top_index")));
-		String maxPerMap = parser.getAttributeValue("", "max_per_map");
-		if (!Algorithms.isEmpty(maxPerMap)) {
-			tp.setMaxPerMap(Integer.parseInt(maxPerMap));
-		}
-		String minCount = parser.getAttributeValue("", "min_count");
-		if (!Algorithms.isEmpty(minCount)) {
-			tp.setMinCount(Integer.parseInt(minCount));
-		}
 		if (lastType != null) {
 			lastType.addPoiAdditional(tp);
 		} else if (lastFilter != null) {
@@ -974,7 +948,7 @@ public class MapPoiTypes {
 					}
 					pat = poiTypesByTag.get(otag);
 				}
-				if (pat != null) {
+				if (pat != null && pat.isAdditional()) {
 					a.setAdditionalInfo(pat.getKeyName(), e.getValue());
 				}
 			}

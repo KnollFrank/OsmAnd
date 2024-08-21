@@ -58,13 +58,8 @@ public class SunriseSunsetWidgetState extends WidgetState {
 
 	@Override
 	public void copyPrefs(@NonNull ApplicationMode appMode, @Nullable String customId) {
-		copyPrefsFromMode(appMode, appMode, customId);
-	}
-
-	@Override
-	public void copyPrefsFromMode(@NonNull ApplicationMode sourceAppMode, @NonNull ApplicationMode appMode, @Nullable String customId){
-		registerPreference(customId).setModeValue(appMode, preference.getModeValue(sourceAppMode));
-		registerSunPositionPreference(customId).setModeValue(appMode, sunPositionPreference.getModeValue(sourceAppMode));
+		registerPreference(customId).setModeValue(appMode, preference.getModeValue(appMode));
+		registerSunPositionPreference(customId).setModeValue(appMode, sunPositionPreference.getModeValue(appMode));
 	}
 
 	@NonNull

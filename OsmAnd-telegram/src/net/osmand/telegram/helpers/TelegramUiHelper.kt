@@ -9,7 +9,7 @@ import net.osmand.telegram.TelegramApplication
 import net.osmand.telegram.utils.OsmandLocationUtils
 import net.osmand.telegram.utils.OsmandLocationUtils.MessageOsmAndBotLocation
 import net.osmand.telegram.utils.OsmandLocationUtils.MessageUserLocation
-import org.drinkless.tdlib.TdApi
+import org.drinkless.td.libcore.telegram.TdApi
 
 object TelegramUiHelper {
 
@@ -96,7 +96,14 @@ object TelegramUiHelper {
 	}
 
 	fun getUserName(user: TdApi.User): String {
-		return user.getName()
+		var name = "${user.firstName} ${user.lastName}".trim()
+		if (name.isEmpty()) {
+			name = user.username
+		}
+		if (name.isEmpty()) {
+			name = user.phoneNumber
+		}
+		return name
 	}
 
 	fun messageToLocationItem(

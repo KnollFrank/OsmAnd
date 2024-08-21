@@ -79,14 +79,8 @@ public class AverageSpeedWidget extends SimpleWidget {
 
 	@Override
 	public void copySettings(@NonNull ApplicationMode appMode, @Nullable String customId) {
-		copySettingsFromMode(appMode, appMode, customId);
-	}
-
-	@Override
-	public void copySettingsFromMode(@NonNull ApplicationMode sourceAppMode, @NonNull ApplicationMode appMode, @Nullable String customId) {
-		super.copySettingsFromMode(sourceAppMode, appMode, customId);
-		registerMeasuredIntervalPref(customId).setModeValue(appMode, measuredIntervalPref.getModeValue(sourceAppMode));
-		registerSkipStopsPref(customId).setModeValue(appMode, skipStopsPref.getModeValue(sourceAppMode));
+		registerMeasuredIntervalPref(customId).setModeValue(appMode, measuredIntervalPref.getModeValue(appMode));
+		registerSkipStopsPref(customId).setModeValue(appMode, skipStopsPref.getModeValue(appMode));
 	}
 
 	@NonNull

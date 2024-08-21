@@ -6,8 +6,6 @@ import static net.osmand.gpx.GpxParameter.SPLIT_TYPE;
 
 import androidx.annotation.NonNull;
 
-import net.osmand.plus.OsmandApplication;
-import net.osmand.plus.track.helpers.GpxAppearanceHelper;
 import net.osmand.plus.track.helpers.GpxDataItem;
 import net.osmand.util.Algorithms;
 
@@ -23,11 +21,10 @@ public class GpxSplitParams {
 		this.joinSegments = joinSegments;
 	}
 
-	public GpxSplitParams(@NonNull OsmandApplication app, @NonNull GpxDataItem item) {
-		GpxAppearanceHelper helper = new GpxAppearanceHelper(app);
-		splitType = GpxSplitType.getSplitTypeByTypeId(helper.getParameter(item, SPLIT_TYPE));
-		splitInterval = helper.getParameter(item, SPLIT_INTERVAL);
-		joinSegments = helper.getParameter(item, JOIN_SEGMENTS);
+	public GpxSplitParams(@NonNull GpxDataItem dataItem) {
+		splitType = GpxSplitType.getSplitTypeByTypeId(dataItem.getParameter(SPLIT_TYPE));
+		splitInterval = dataItem.getParameter(SPLIT_INTERVAL);
+		joinSegments = dataItem.getParameter(JOIN_SEGMENTS);
 	}
 
 	@Override

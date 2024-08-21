@@ -4,8 +4,6 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import net.osmand.plus.OsmandApplication;
-
 public enum CloudUnit implements WeatherUnit {
 
 	PERCENT("%");
@@ -14,12 +12,6 @@ public enum CloudUnit implements WeatherUnit {
 
 	CloudUnit(@NonNull String symbol) {
 		this.symbol = symbol;
-	}
-
-	@NonNull
-	@Override
-	public String getUnit(@NonNull OsmandApplication app) {
-		return symbol;
 	}
 
 	@NonNull

@@ -14,9 +14,7 @@ import net.osmand.core.android.MapRendererContext;
 import net.osmand.core.android.MapRendererView;
 import net.osmand.core.android.TileSourceProxyProvider;
 import net.osmand.core.jni.GeoTiffCollection;
-import net.osmand.core.jni.HeightRasterMapLayerProvider;
 import net.osmand.core.jni.HillshadeRasterMapLayerProvider;
-import net.osmand.core.jni.IRasterMapLayerProvider;
 import net.osmand.core.jni.SlopeRasterMapLayerProvider;
 import net.osmand.core.jni.ZoomLevel;
 import net.osmand.data.QuadRect;
@@ -45,12 +43,19 @@ import java.util.Map;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import static net.osmand.IndexConstants.HEIGHTMAP_INDEX_DIR;
+import static net.osmand.plus.plugins.srtm.SRTMPlugin.HILLSHADE_MAIN_COLOR_FILENAME;
+import static net.osmand.plus.plugins.srtm.SRTMPlugin.SLOPE_MAIN_COLOR_FILENAME;
+import static net.osmand.plus.plugins.srtm.SRTMPlugin.SLOPE_SECONDARY_COLOR_FILENAME;
+import static net.osmand.plus.plugins.srtm.TerrainMode.HILLSHADE;
+import static net.osmand.plus.plugins.srtm.TerrainMode.SLOPE;
 
 public class TerrainLayer extends MapTileLayer {
 
 	private static final Log log = PlatformUtil.getLog(TerrainLayer.class);
 	private Map<String, SQLiteTileSource> resources = new LinkedHashMap<>();
-
+	private static final String HILLSHADE_CACHE = "hillshade.cache";
+	private static final String SLOPE_CACHE = "slope.cache";
 	private static final int ZOOM_BOUNDARY = 15;
 	private static final int DEFAULT_ALPHA = 100;
 	private final SRTMPlugin srtmPlugin;
@@ -58,7 +63,9 @@ public class TerrainLayer extends MapTileLayer {
 
 	private final QuadTree<String> indexedResources = new QuadTree<>(new QuadRect(0, 0, 1 << (ZOOM_BOUNDARY+1), 1 << (ZOOM_BOUNDARY+1)), 8, 0.55f);
 
-	private IRasterMapLayerProvider layerProvider;
+	private SlopeRasterMapLayerProvider slopeLayerProvider;
+	private HillshadeRasterMapLayerProvider hillshadeLayerProvider;
+
 	private int cachedMinVisibleZoom = -1;
 	private int cachedMaxVisibleZoom = -1;
 
@@ -82,7 +89,8 @@ public class TerrainLayer extends MapTileLayer {
 		int layerIndex = view.getLayerIndex(this);
 		if (map == null) {
 			mapRenderer.resetMapLayerProvider(layerIndex);
-			layerProvider = null;
+			slopeLayerProvider = null;
+			hillshadeLayerProvider = null;
 			return true;
 		}
 
@@ -94,47 +102,47 @@ public class TerrainLayer extends MapTileLayer {
 				? mapRendererContext.getGeoTiffCollection()
 				: null;
 
-		if (terrainFromHeightmap && geoTiffCollection != null) {
-			layerProvider = createGeoTiffLayerProvider(mode, geoTiffCollection);
-			if (layerProvider != null) {
-				mapRenderer.setMapLayerProvider(layerIndex, layerProvider);
-			}
+		if (mode == SLOPE && terrainFromHeightmap && geoTiffCollection != null) {
+			slopeLayerProvider = createSlopeLayerProvider(geoTiffCollection);
+			mapRenderer.setMapLayerProvider(layerIndex, slopeLayerProvider);
+			hillshadeLayerProvider = null;
+		} else if (mode == HILLSHADE && terrainFromHeightmap && geoTiffCollection != null) {
+			hillshadeLayerProvider = createHillshadeLayerProvider(geoTiffCollection);
+			mapRenderer.setMapLayerProvider(layerIndex, hillshadeLayerProvider);
+			slopeLayerProvider = null;
 		} else {
 			TileSourceProxyProvider prov = new TerrainTilesProvider(getApplication(), map, srtmPlugin);
 			mapRenderer.setMapLayerProvider(layerIndex, prov.instantiateProxy(true));
 			prov.swigReleaseOwnership();
-			layerProvider = null;
+			slopeLayerProvider = null;
+			hillshadeLayerProvider = null;
 		}
 
 		return true;
 	}
 
 	@NonNull
-	private IRasterMapLayerProvider createGeoTiffLayerProvider(TerrainMode mode, @NonNull GeoTiffCollection geoTiffCollection) {
+	private SlopeRasterMapLayerProvider createSlopeLayerProvider(@NonNull GeoTiffCollection geoTiffCollection) {
 		OsmandApplication app = getApplication();
-		File heightmapDir = app.getAppPath(IndexConstants.CLR_PALETTE_DIR);
-		String mainColorFilename = new File(heightmapDir, mode.getMainFile()).getAbsolutePath();
-		IRasterMapLayerProvider provider = null;
-		if (mode.getType() == TerrainMode.TerrainType.HILLSHADE) {
-			String slopeSecondaryColorFilename = new File(heightmapDir, mode.getSecondFile()).getAbsolutePath();
-			provider =
-					new HillshadeRasterMapLayerProvider(geoTiffCollection, mainColorFilename, slopeSecondaryColorFilename);
-			((HillshadeRasterMapLayerProvider) provider).setMinVisibleZoom(ZoomLevel.swigToEnum(srtmPlugin.getTerrainMinZoom()));
-			((HillshadeRasterMapLayerProvider) provider).setMaxVisibleZoom(ZoomLevel.swigToEnum(srtmPlugin.getTerrainMaxZoom()));
-		} else if (mode.getType() == TerrainMode.TerrainType.SLOPE) {
-			provider = new SlopeRasterMapLayerProvider(geoTiffCollection, mainColorFilename);
-			((SlopeRasterMapLayerProvider) provider).setMinVisibleZoom(ZoomLevel.swigToEnum(srtmPlugin.getTerrainMinZoom()));
-			((SlopeRasterMapLayerProvider) provider).setMaxVisibleZoom(ZoomLevel.swigToEnum(srtmPlugin.getTerrainMaxZoom()));
-		} else if (mode.getType() == TerrainMode.TerrainType.HEIGHT) {
-			provider = new HeightRasterMapLayerProvider(geoTiffCollection, mainColorFilename);
-			((HeightRasterMapLayerProvider) provider).setMinVisibleZoom(ZoomLevel.swigToEnum(srtmPlugin.getTerrainMinZoom()));
-			((HeightRasterMapLayerProvider) provider).setMaxVisibleZoom(ZoomLevel.swigToEnum(srtmPlugin.getTerrainMaxZoom()));
-		}
-		// provider.setKey(mode.getKey()); // opengl binding (cache should be key +'.cache')
-
+		String slopeColorFilename = app.getAppPath(HEIGHTMAP_INDEX_DIR + SLOPE_MAIN_COLOR_FILENAME).getAbsolutePath();
+		SlopeRasterMapLayerProvider provider = new SlopeRasterMapLayerProvider(geoTiffCollection, slopeColorFilename);
+		provider.setMinVisibleZoom(ZoomLevel.swigToEnum(srtmPlugin.getTerrainMinZoom()));
+		provider.setMaxVisibleZoom(ZoomLevel.swigToEnum(srtmPlugin.getTerrainMaxZoom()));
 		return provider;
 	}
 
+	@NonNull
+	private HillshadeRasterMapLayerProvider createHillshadeLayerProvider(@NonNull GeoTiffCollection geoTiffCollection) {
+		OsmandApplication app = getApplication();
+		File heightmapDir = app.getAppPath(HEIGHTMAP_INDEX_DIR);
+		String hillshadeColorFilename = new File(heightmapDir, HILLSHADE_MAIN_COLOR_FILENAME).getAbsolutePath();
+		String slopeSecondaryColorFilename = new File(heightmapDir, SLOPE_SECONDARY_COLOR_FILENAME).getAbsolutePath();
+		HillshadeRasterMapLayerProvider provider =
+				new HillshadeRasterMapLayerProvider(geoTiffCollection, hillshadeColorFilename, slopeSecondaryColorFilename);
+		provider.setMinVisibleZoom(ZoomLevel.swigToEnum(srtmPlugin.getTerrainMinZoom()));
+		provider.setMaxVisibleZoom(ZoomLevel.swigToEnum(srtmPlugin.getTerrainMaxZoom()));
+		return provider;
+	}
 
 	@Override
 	public void onPrepareBufferImage(Canvas canvas, RotatedTileBox tileBox, DrawSettings drawSettings) {
@@ -153,12 +161,12 @@ public class TerrainLayer extends MapTileLayer {
 			if (mapRenderer != null) {
 				ZoomLevel minVisibleZoomLevel = ZoomLevel.swigToEnum(newMinVisibleZoom);
 				ZoomLevel maxVisibleZoomLevel = ZoomLevel.swigToEnum(newMaxVisibleZoom);
-				if (layerProvider instanceof  HillshadeRasterMapLayerProvider) {
-					((HillshadeRasterMapLayerProvider) layerProvider).setMinVisibleZoom(minVisibleZoomLevel);
-					((HillshadeRasterMapLayerProvider) layerProvider).setMaxVisibleZoom(maxVisibleZoomLevel);
-				} else if (layerProvider instanceof  SlopeRasterMapLayerProvider) {
-					((SlopeRasterMapLayerProvider) layerProvider).setMinVisibleZoom(minVisibleZoomLevel);
-					((SlopeRasterMapLayerProvider) layerProvider).setMaxVisibleZoom(maxVisibleZoomLevel);
+				if (slopeLayerProvider != null) {
+					slopeLayerProvider.setMinVisibleZoom(minVisibleZoomLevel);
+					slopeLayerProvider.setMaxVisibleZoom(maxVisibleZoomLevel);
+				} else if (hillshadeLayerProvider != null) {
+					hillshadeLayerProvider.setMinVisibleZoom(minVisibleZoomLevel);
+					hillshadeLayerProvider.setMaxVisibleZoom(maxVisibleZoomLevel);
 				}
 				if (clearTilesForCurrentZoom) {
 					mapRenderer.reloadEverything();
@@ -175,6 +183,7 @@ public class TerrainLayer extends MapTileLayer {
 	private void indexTerrainFiles(OsmandApplication app) {
 		@SuppressLint("StaticFieldLeak") AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
 			private SQLiteDatabase sqliteDb;
+			private final String type = mode.name().toLowerCase();
 			@Override
 			protected Void doInBackground(Void... params) {
 				File tilesDir = app.getAppPath(IndexConstants.TILES_INDEX_DIR);
@@ -182,7 +191,7 @@ public class TerrainLayer extends MapTileLayer {
 				// fix http://stackoverflow.com/questions/26937152/workaround-for-nexus-9-sqlite-file-write-operations-on-external-dirs
 				try {
 					sqliteDb = SQLiteDatabase.openDatabase(
-							new File(cacheDir, mode.getCacheFileName()).getPath(),
+							new File(cacheDir, mode == HILLSHADE ? HILLSHADE_CACHE : SLOPE_CACHE).getPath(),
 							null, SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING
 									| SQLiteDatabase.CREATE_IF_NECESSARY);
 				} catch (RuntimeException e) {
@@ -200,11 +209,10 @@ public class TerrainLayer extends MapTileLayer {
 						Map<String, SQLiteTileSource> rs = readFiles(app, tilesDir, fileModified);
 						indexCachedResources(fileModified, rs);
 						indexNonCachedResources(fileModified, rs);
+						sqliteDb.close();
 						resources = rs;
 					} catch (RuntimeException e) {
 						log.error(e.getMessage(), e);
-					} finally {
-						sqliteDb.close();
 					}
 				}
 				return null;
@@ -219,7 +227,7 @@ public class TerrainLayer extends MapTileLayer {
 				for(Map.Entry<String, Long> entry : fileModified.entrySet()) {
 					String filename = entry.getKey();
 					try {
-						log.info("Indexing " + mode.getMainFile() + " file " + filename);
+						log.info("Indexing " + type + " file " + filename);
 						ContentValues cv = new ContentValues();
 						cv.put("filename", filename);
 						cv.put("date_modified", entry.getValue());
@@ -267,7 +275,7 @@ public class TerrainLayer extends MapTileLayer {
 					for(File f : files) {
 						if (f != null
 								&& f.getName().endsWith(IndexConstants.SQLITE_EXT)
-								&& f.getName().toLowerCase().startsWith(mode.getKeyName())) {
+								&& f.getName().toLowerCase().startsWith(type)) {
 							SQLiteTileSource ts = new SQLiteTileSource(app, f, new ArrayList<>());
 							rs.put(f.getName(), ts);
 							fileModified.put(f.getName(), f.lastModified());
@@ -353,7 +361,7 @@ public class TerrainLayer extends MapTileLayer {
 			
 			@Override
 			public String getName() {
-				return Algorithms.capitalizeFirstLetter(mode.getKeyName().toLowerCase());
+				return Algorithms.capitalizeFirstLetter(mode.name().toLowerCase());
 			}
 			
 			@Override

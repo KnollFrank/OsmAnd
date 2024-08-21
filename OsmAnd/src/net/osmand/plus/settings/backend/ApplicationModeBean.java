@@ -8,6 +8,8 @@ import androidx.annotation.NonNull;
 import com.google.gson.annotations.Expose;
 
 import net.osmand.plus.OsmandApplication;
+import net.osmand.plus.profiles.LocationIcon;
+import net.osmand.plus.profiles.NavigationIcon;
 import net.osmand.plus.profiles.ProfileIconColors;
 import net.osmand.plus.routing.RouteService;
 import net.osmand.plus.utils.AndroidUtils;
@@ -31,9 +33,9 @@ public class ApplicationModeBean {
 	@Expose
 	public RouteService routeService = RouteService.OSMAND;
 	@Expose
-	public String locIcon;
+	public LocationIcon locIcon;
 	@Expose
-	public String navIcon;
+	public NavigationIcon navIcon;
 	@Expose
 	public int order = -1;
 	@Expose

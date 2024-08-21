@@ -40,7 +40,7 @@ import net.osmand.util.Algorithms;
 
 import java.util.List;
 
-public class SideWidgetsPanel extends FrameLayout implements WidgetsContainer {
+public class SideWidgetsPanel extends FrameLayout {
 
 	private static final int BORDER_WIDTH_DP = 2;
 	private static final int BORDER_RADIUS_DP = 5;
@@ -142,7 +142,7 @@ public class SideWidgetsPanel extends FrameLayout implements WidgetsContainer {
 		return new WidgetsPagerAdapter(getMyApplication(), panel);
 	}
 
-	public void update(@Nullable DrawSettings drawSettings) {
+	public void update(DrawSettings drawSettings) {
 		adapter.updateIfNeeded();
 		boolean show = hasVisibleWidgets() && selfShowAllowed;
 		selfVisibilityChanging = true;

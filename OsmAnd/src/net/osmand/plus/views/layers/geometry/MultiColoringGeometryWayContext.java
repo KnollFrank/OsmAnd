@@ -59,7 +59,6 @@ public abstract class MultiColoringGeometryWayContext extends GeometryWayContext
 
 	@NonNull
 	protected abstract ColoringType getDefaultColoringType();
-	protected abstract String getDefaultGradientPalette();
 
 	@NonNull
 	public Paint getBorderPaint() {

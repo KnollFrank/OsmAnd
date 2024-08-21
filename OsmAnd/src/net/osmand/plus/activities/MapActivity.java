@@ -2,7 +2,6 @@ package net.osmand.plus.activities;
 
 import static net.osmand.aidlapi.OsmAndCustomizationConstants.FRAGMENT_DRAWER_ID;
 import static net.osmand.aidlapi.OsmAndCustomizationConstants.MAP_STYLE_ID;
-import static net.osmand.plus.chooseplan.OsmAndFeature.UNLIMITED_MAP_DOWNLOADS;
 import static net.osmand.plus.firstusage.FirstUsageWizardFragment.FIRST_USAGE;
 import static net.osmand.plus.measurementtool.MeasurementToolFragment.PLAN_ROUTE_MODE;
 import static net.osmand.plus.views.AnimateDraggingMapThread.TARGET_NO_ROTATION;
@@ -50,7 +49,7 @@ import net.osmand.data.QuadRect;
 import net.osmand.data.RotatedTileBox;
 import net.osmand.data.ValueHolder;
 import net.osmand.gpx.GPXFile;
-import net.osmand.plus.AppInitializeListener;
+import net.osmand.plus.AppInitializer.AppInitializeListener;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
 import net.osmand.plus.Version;
@@ -58,22 +57,31 @@ import net.osmand.plus.auto.NavigationSession;
 import net.osmand.plus.auto.SurfaceRenderer;
 import net.osmand.plus.base.ContextMenuFragment;
 import net.osmand.plus.base.MapViewTrackingUtilities;
-import net.osmand.plus.chooseplan.HugerockPromoFragment;
-import net.osmand.plus.chooseplan.ChoosePlanFragment;
 import net.osmand.plus.chooseplan.TripltekPromoFragment;
 import net.osmand.plus.configmap.ConfigureMapFragment;
 import net.osmand.plus.dashboard.DashboardOnMap;
 import net.osmand.plus.dialogs.WhatsNewDialogFragment;
 import net.osmand.plus.download.DownloadActivity;
 import net.osmand.plus.download.DownloadIndexesThread.DownloadEvents;
-import net.osmand.plus.download.DownloadValidationManager;
 import net.osmand.plus.feedback.CrashBottomSheetDialogFragment;
 import net.osmand.plus.feedback.RateUsHelper;
 import net.osmand.plus.feedback.RenderInitErrorBottomSheet;
 import net.osmand.plus.feedback.SendAnalyticsBottomSheetDialogFragment;
 import net.osmand.plus.firstusage.FirstUsageWizardFragment;
-import net.osmand.plus.helpers.*;
+import net.osmand.plus.helpers.AndroidUiHelper;
+import net.osmand.plus.helpers.DayNightHelper;
+import net.osmand.plus.helpers.DiscountHelper;
+import net.osmand.plus.helpers.IntentHelper;
+import net.osmand.plus.helpers.LockHelper;
 import net.osmand.plus.helpers.LockHelper.LockUIAdapter;
+import net.osmand.plus.helpers.MapAppInitializeListener;
+import net.osmand.plus.helpers.MapDisplayPositionManager;
+import net.osmand.plus.helpers.MapFragmentsHelper;
+import net.osmand.plus.helpers.MapPermissionsResultCallback;
+import net.osmand.plus.helpers.MapRouteCalculationProgressListener;
+import net.osmand.plus.helpers.MapScrollHelper;
+import net.osmand.plus.helpers.RestoreNavigationHelper;
+import net.osmand.plus.helpers.TargetPointsHelper;
 import net.osmand.plus.helpers.TargetPointsHelper.TargetPoint;
 import net.osmand.plus.importfiles.ImportHelper;
 import net.osmand.plus.importfiles.ui.ImportGpxBottomSheetDialogFragment;
@@ -89,14 +97,12 @@ import net.osmand.plus.mapmarkers.PlanRouteFragment;
 import net.osmand.plus.measurementtool.GpxData;
 import net.osmand.plus.measurementtool.MeasurementEditingContext;
 import net.osmand.plus.measurementtool.MeasurementToolFragment;
-import net.osmand.plus.onlinerouting.engine.OnlineRoutingEngine;
 import net.osmand.plus.plugins.PluginsHelper;
 import net.osmand.plus.plugins.accessibility.MapAccessibilityActions;
 import net.osmand.plus.render.UpdateVectorRendererAsyncTask;
 import net.osmand.plus.routepreparationmenu.MapRouteInfoMenu;
 import net.osmand.plus.routing.IRouteInformationListener;
 import net.osmand.plus.routing.RouteCalculationProgressListener;
-import net.osmand.plus.routing.RouteService;
 import net.osmand.plus.routing.RoutingHelper;
 import net.osmand.plus.routing.TransportRoutingHelper.TransportRouteCalculationProgressCallback;
 import net.osmand.plus.search.ShowQuickSearchMode;
@@ -370,23 +376,17 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 		transportRouteCalculationProgressCallback = new TransportRouteCalculationProgressCallback() {
 			@Override
 			public void start() {
-				if (routeCalculationProgressCallback != null) {
-					routeCalculationProgressCallback.onCalculationStart();
-				}
+				routeCalculationProgressCallback.onCalculationStart();
 			}
 
 			@Override
 			public void updateProgress(int progress) {
-				if (routeCalculationProgressCallback != null) {
-					routeCalculationProgressCallback.onUpdateCalculationProgress(progress);
-				}
+				routeCalculationProgressCallback.onUpdateCalculationProgress(progress);
 			}
 
 			@Override
 			public void finish() {
-				if (routeCalculationProgressCallback != null) {
-					routeCalculationProgressCallback.onCalculationFinish();
-				}
+				routeCalculationProgressCallback.onCalculationFinish();
 			}
 		};
 		app.getTransportRoutingHelper().setProgressBar(transportRouteCalculationProgressCallback);
@@ -430,7 +430,7 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 	public void updateProgress(int progress) {
 		ProgressBar progressBar = findViewById(R.id.map_horizontal_progress);
 		if (findViewById(R.id.MapHudButtonsOverlay).getVisibility() == View.VISIBLE) {
-			if (mapRouteInfoMenu.isVisible() || dashboardOnMap.isVisible() || isOnlineRoutingWithApproximation()) {
+			if (mapRouteInfoMenu.isVisible() || dashboardOnMap.isVisible()) {
 				AndroidUiHelper.updateVisibility(progressBar, false);
 				return;
 			}
@@ -441,17 +441,6 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 			progressBar.invalidate();
 			progressBar.requestLayout();
 		}
-	}
-
-	public boolean isOnlineRoutingWithApproximation() {
-		ApplicationMode mode = getRoutingHelper().getAppMode();
-		if (mode != null && mode.getRouteService() == RouteService.ONLINE) {
-			OnlineRoutingEngine engine = app.getOnlineRoutingHelper().getEngineByKey(mode.getRoutingProfile());
-			return engine != null
-					? engine.isOnlineEngineWithApproximation()
-					: app.getOnlineRoutingHelper().wasOnlineEngineWithApproximationUsed();
-		}
-		return false;
 	}
 
 	private boolean isRouteBeingCalculated() {
@@ -587,9 +576,6 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 			} else if (TripltekPromoFragment.shouldShow(app)) {
 				SecondSplashScreenFragment.SHOW = false;
 				TripltekPromoFragment.showInstance(fragmentManager);
-			} else if (HugerockPromoFragment.shouldShow(app)) {
-				SecondSplashScreenFragment.SHOW = false;
-				HugerockPromoFragment.showInstance(fragmentManager);
 			}
 		}
 
@@ -622,7 +608,7 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 			}
 		});
 		settings.APPLICATION_MODE.addListener(applicationModeListener);
-		updateApplicationModeSettings(!app.getPoiFilters().isShowingAnyPoi());
+		updateApplicationModeSettings();
 
 
 		// if destination point was changed try to recalculate route
@@ -1068,15 +1054,9 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 	}
 
 	public void updateApplicationModeSettings() {
-		updateApplicationModeSettings(true);
-	}
-
-	public void updateApplicationModeSettings(boolean forceUpdatePoiFilters) {
 		changeKeyguardFlags();
 		updateMapSettings(false);
-		if (forceUpdatePoiFilters) {
-			app.getPoiFilters().loadSelectedPoiFilters();
-		}
+		app.getPoiFilters().loadSelectedPoiFilters();
 		app.getSearchUICore().refreshCustomPoiFilters();
 		app.getMapButtonsHelper().updateActiveActions();
 		getMapViewTrackingUtilities().appModeChanged();
@@ -1429,13 +1409,6 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 	}
 
 	@Override
-	public void downloadingError(@NonNull String error) {
-		if (Algorithms.stringsEqual(error, DownloadValidationManager.getFreeVersionMessage(app))) {
-			ChoosePlanFragment.showInstance(this, UNLIMITED_MAP_DOWNLOADS);
-		}
-	}
-
-	@Override
 	public void downloadHasFinished() {
 		for (Fragment fragment : getSupportFragmentManager().getFragments()) {
 			if (fragment instanceof DownloadEvents && fragment.isAdded()) {
@@ -1652,10 +1625,5 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 	@Override
 	public void onInAppPurchaseGetItems() {
 		DiscountHelper.checkAndDisplay(this);
-	}
-
-	@Override
-	public void onInAppPurchaseItemPurchased(String sku) {
-		getMapLayers().getRouteLayer().resetColorAvailabilityCache();
 	}
 }

@@ -26,8 +26,6 @@ public class Version {
 	private static final Log log = PlatformUtil.getLog(Version.class);
 
 	public static final String TRIPLTEK_NAME = "TRIPLTEK";
-	public static final String HUGEROCK_BRAND_NAME = "alps";
-	public static final String HUGEROCK_MANUFACTURER_NAME = "SOTEN";
 	public static final String FULL_VERSION_NAME = "net.osmand.plus";
 	private static final String FREE_VERSION_NAME = "net.osmand";
 	private static final String FREE_DEV_VERSION_NAME = "net.osmand.dev";
@@ -158,8 +156,7 @@ public class Version {
 				|| InAppPurchaseUtils.isLiveUpdatesAvailable(app)
 				|| InAppPurchaseUtils.isMapsPlusAvailable(app)
 				|| InAppPurchaseUtils.isOsmAndProAvailable(app)
-				|| InAppPurchaseUtils.isTripltekPromoAvailable(app)
-				|| InAppPurchaseUtils.isHugerockPromoAvailable(app);
+				|| InAppPurchaseUtils.isTripltekPromoAvailable(app);
 	}
 
 	public static boolean isDeveloperVersion(@NonNull OsmandApplication app) {
@@ -171,12 +168,7 @@ public class Version {
 	}
 
 	public static boolean isTripltekBuild() {
-		return TRIPLTEK_NAME.equalsIgnoreCase(Build.BRAND) || TRIPLTEK_NAME.equalsIgnoreCase(Build.MANUFACTURER);
-	}
-
-	public static boolean isHugerockBuild() {
-		return HUGEROCK_BRAND_NAME.equalsIgnoreCase(Build.BRAND)
-				&& HUGEROCK_MANUFACTURER_NAME.equalsIgnoreCase(Build.MANUFACTURER);
+		return CollectionUtils.equalsToAny(TRIPLTEK_NAME, Build.BRAND, Build.MANUFACTURER);
 	}
 
 	public static String getVersionForTracker(@NonNull OsmandApplication app) {

@@ -4,7 +4,6 @@ import java.util.Map;
 
 import net.osmand.binary.RouteDataObject;
 import net.osmand.router.BinaryRoutePlanner.RouteSegment;
-import net.osmand.router.GeneralRouter.GeneralRouterProfile;
 
 public interface VehicleRouter {
 
@@ -103,6 +102,8 @@ public interface VehicleRouter {
 		
 	public VehicleRouter build(Map<String, String> params);
 
-	public GeneralRouterProfile getProfile();
+	
+
+	
 	
 }

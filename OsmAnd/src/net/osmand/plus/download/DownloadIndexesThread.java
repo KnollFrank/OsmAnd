@@ -29,6 +29,8 @@ import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
 import net.osmand.plus.Version;
 import net.osmand.plus.base.BasicProgressAsyncTask;
+import net.osmand.plus.chooseplan.ChoosePlanFragment;
+import net.osmand.plus.chooseplan.OsmAndFeature;
 import net.osmand.plus.download.DatabaseHelper.HistoryDownloadEntry;
 import net.osmand.plus.download.DownloadFileHelper.DownloadFileShowWarning;
 import net.osmand.plus.download.IndexItem.DownloadEntry;
@@ -44,7 +46,13 @@ import org.apache.commons.logging.Log;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @SuppressLint({"NewApi", "DefaultLocale"})
@@ -71,9 +79,6 @@ public class DownloadIndexesThread {
 		}
 
 		default void downloadInProgress() {
-		}
-
-		default void downloadingError(@NonNull String error) {
 		}
 
 		default void downloadHasFinished() {
@@ -133,13 +138,6 @@ public class DownloadIndexesThread {
 			uiActivity.downloadInProgress();
 		}
 		updateNotification();
-	}
-
-	@UiThread
-	protected void downloadingError(@NonNull String error) {
-		if (uiActivity != null) {
-			uiActivity.downloadingError(error);
-		}
 	}
 
 	@UiThread
@@ -435,6 +433,7 @@ public class DownloadIndexesThread {
 
 
 	private class DownloadIndexesAsyncTask extends BasicProgressAsyncTask<IndexItem, IndexItem, Object, String> implements DownloadFileShowWarning {
+		private static final int OPEN_CHOOSE_PLAN_FRAGMENT = 1;
 
 		private final OsmandPreference<Integer> downloads;
 
@@ -468,13 +467,13 @@ public class DownloadIndexesThread {
 					}
 				} else if (o instanceof String) {
 					String message = (String) o;
-					boolean success = message.equals(app.getString(R.string.shared_string_download_successful));
-					if (!success) {
-						if (!message.toLowerCase().contains("interrupted")
-								&& !message.equals(DownloadValidationManager.getFreeVersionMessage(app))) {
-							app.showToastMessage(message);
-						}
-						downloadingError(message);
+					if (!message.toLowerCase().contains("interrupted") && !message.equals(app.getString(R.string.shared_string_download_successful))) {
+						app.showToastMessage(message);
+					}
+				} else if (o instanceof Integer) {
+					Integer value = (Integer) o;
+					if (OPEN_CHOOSE_PLAN_FRAGMENT == value) {
+						openChoosePlanFragment();
 					}
 				}
 			}
@@ -595,9 +594,16 @@ public class DownloadIndexesThread {
 					&& DownloadActivityType.isCountedInDownloads(item)
 					&& downloads.get() >= MAXIMUM_AVAILABLE_FREE_DOWNLOADS;
 			if (exceed) {
-				publishProgress(DownloadValidationManager.getFreeVersionMessage(app));
+				publishProgress(OPEN_CHOOSE_PLAN_FRAGMENT);
 			}
 			return !exceed;
+		}
+
+		private void openChoosePlanFragment() {
+			if (uiActivity instanceof FragmentActivity) {
+				FragmentActivity activity = (FragmentActivity) uiActivity;
+				ChoosePlanFragment.showInstance(activity, OsmAndFeature.UNLIMITED_MAP_DOWNLOADS);
+			}
 		}
 
 		private String reindexFiles(List<File> filesToReindex) {
@@ -612,6 +618,7 @@ public class DownloadIndexesThread {
 			List<String> warnings = new ArrayList<>();
 			manager.indexVoiceFiles(this);
 			manager.indexFontFiles(this);
+			manager.indexWeatherFiles(this);
 			if (vectorMapsToReindex) {
 				warnings = manager.indexingMaps(this, filesToReindex);
 			}
@@ -658,13 +665,13 @@ public class DownloadIndexesThread {
 				long time = System.currentTimeMillis() - start;
 				if (result) {
 					app.logMapDownloadEvent("done", item, time);
-					if (item.isHidden()) {
+					if(item.isHidden()) {
 						File nonHiddenFile = item.getDefaultTargetFile(app);
-						if (nonHiddenFile.exists()) {
+						if(nonHiddenFile.exists()) {
 							nonHiddenFile.delete();
 						}
 					}
-					checkDownload(item, time);
+					checkDownload(item);
 				} else {
 					app.logMapDownloadEvent("failed", item, time);
 				}
@@ -683,14 +690,10 @@ public class DownloadIndexesThread {
 		}
 	}
 
-	private void checkDownload(IndexItem item, long downloadTime) {
+	private void checkDownload(IndexItem item) {
 		Map<String, String> params = new HashMap<>();
 		params.put("file_name", item.fileName);
 		params.put("file_size", item.size);
-		int downloadTimeSec = (int) (downloadTime / 1000L);
-		params.put("download_time", String.valueOf(downloadTimeSec));
-
-		String url = AndroidNetworkUtils.getHttpProtocol() + "osmand.net/api/check_download";
-		AndroidNetworkUtils.sendRequestAsync(app, url, params, "Check download", false, false, null);
+		AndroidNetworkUtils.sendRequestAsync(app, "https://osmand.net/api/check_download", params, "Check download", false, false, null);
 	}
 }

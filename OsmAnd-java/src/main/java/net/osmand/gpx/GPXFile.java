@@ -29,7 +29,7 @@ public class GPXFile extends GPXUtilities.GPXExtensions {
 
 	final List<GPXUtilities.WptPt> points = new ArrayList<>();
 	Map<String, GPXUtilities.PointsGroup> pointsGroups = new LinkedHashMap<>();
-	final Map<String, String> networkRouteKeyTags = new LinkedHashMap<>();
+	private final Map<String, String> networkRouteKeyTags = new LinkedHashMap<>();
 
 	public Exception error = null;
 	public String path = "";
@@ -47,7 +47,7 @@ public class GPXFile extends GPXUtilities.GPXExtensions {
 
 	public GPXFile(String title, String lang, String description) {
 		if (description != null) {
-			metadata.desc = description;
+			metadata.getExtensionsToWrite().put("desc", description);
 		}
 		if (lang != null) {
 			metadata.getExtensionsToWrite().put("article_lang", lang);
@@ -650,19 +650,6 @@ public class GPXFile extends GPXUtilities.GPXExtensions {
 		return pointsGroups;
 	}
 
-	public List<Route> getRoutes() {
-		return routes;
-	}
-
-	public Route getRouteByName(String name) {
-		for (Route route : getRoutes()) {
-			if (Algorithms.stringsEqual(route.name, name)) {
-				return route;
-			}
-		}
-		return null;
-	}
-
 	public QuadRect getRect() {
 		return getBounds(0, 0);
 	}
@@ -699,17 +686,6 @@ public class GPXFile extends GPXUtilities.GPXExtensions {
 			return extensions.get("gradient_scale_type");
 		}
 		return null;
-	}
-
-	public String getGradientColorPalette() {
-		if (extensions != null) {
-			return extensions.get("color_palette");
-		}
-		return null;
-	}
-
-	public void setGradientColorPalette(String gradientColorPaletteName) {
-		getExtensionsToWrite().put("color_palette", gradientColorPaletteName);
 	}
 
 	public void setColoringType(String coloringType) {
@@ -777,48 +753,6 @@ public class GPXFile extends GPXUtilities.GPXExtensions {
 		getExtensionsToWrite().put("show_arrows", String.valueOf(showArrows));
 	}
 
-	public String get3DVisualizationType() {
-		return extensions == null ? null : extensions.get("line_3d_visualization_by_type");
-	}
-
-	public void set3DVisualizationType(String visualizationType) {
-		getExtensionsToWrite().put("line_3d_visualization_by_type", String.valueOf(visualizationType));
-	}
-
-	public String get3DWallColoringType() {
-		return extensions == null ? null : extensions.get("line_3d_visualization_wall_color_type");
-	}
-
-	public void set3DWallColoringType(String trackWallColoringType) {
-		getExtensionsToWrite().put("line_3d_visualization_wall_color_type", String.valueOf(trackWallColoringType));
-	}
-
-	public String get3DLinePositionType() {
-		return extensions == null ? null : extensions.get("line_3d_visualization_position_type");
-	}
-
-	public void set3DLinePositionType(String trackLinePositionType) {
-		getExtensionsToWrite().put("line_3d_visualization_position_type", String.valueOf(trackLinePositionType));
-	}
-
-	public void setAdditionalExaggeration(float additionalExaggeration) {
-		getExtensionsToWrite().put("vertical_exaggeration_scale", String.valueOf(additionalExaggeration));
-	}
-
-	public float getAdditionalExaggeration() {
-		String exaggeration = getExtensionsToRead().get("vertical_exaggeration_scale");
-		return Algorithms.parseFloatSilently(exaggeration, 1f);
-	}
-
-	public void setElevationMeters(float elevation) {
-		getExtensionsToWrite().put("elevation_meters", String.valueOf(elevation));
-	}
-
-	public float getElevationMeters() {
-		String elevation = getExtensionsToRead().get("elevation_meters");
-		return Algorithms.parseFloatSilently(elevation, 1000f);
-	}
-
 	public boolean isShowStartFinishSet() {
 		return extensions != null && extensions.containsKey("show_start_finish");
 	}
@@ -836,6 +770,7 @@ public class GPXFile extends GPXUtilities.GPXExtensions {
 
 	public void addRouteKeyTags(Map<String, String> routeKey) {
 		networkRouteKeyTags.putAll(routeKey);
+		setExtensionsWriter(Algorithms.isEmpty(networkRouteKeyTags) ? null : GPXUtilities.createNetworkRouteExtensionWriter(networkRouteKeyTags));
 	}
 
 	public Map<String, String> getRouteKeyTags() {
@@ -884,9 +819,10 @@ public class GPXFile extends GPXUtilities.GPXExtensions {
 		if (metadata.bounds != null) {
 			size++;
 		}
-		size += getExtensionsToWrite().size();
-		size += getExtensionsWriters().size();
 
+		if (!getExtensionsToWrite().isEmpty() || getExtensionsWriter() != null) {
+			size++;
+		}
 		return size;
 	}
 

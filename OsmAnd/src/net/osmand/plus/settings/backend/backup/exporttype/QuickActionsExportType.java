@@ -1,5 +1,7 @@
 package net.osmand.plus.settings.backend.backup.exporttype;
 
+import static net.osmand.plus.views.mapwidgets.configure.buttons.QuickActionButtonState.DEFAULT_BUTTON_ID;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -39,7 +41,7 @@ class QuickActionsExportType extends AbstractExportType {
 		List<QuickActionButtonState> buttonStates = new ArrayList<>(buttonsHelper.getButtonsStates());
 		if (buttonStates.size() == 1) {
 			QuickActionButtonState state = buttonStates.get(0);
-			if (state.isDefaultButton() && Algorithms.isEmpty(state.getQuickActions())) {
+			if (DEFAULT_BUTTON_ID.equals(state.getId()) && Algorithms.isEmpty(state.getQuickActions())) {
 				return Collections.emptyList();
 			}
 		}

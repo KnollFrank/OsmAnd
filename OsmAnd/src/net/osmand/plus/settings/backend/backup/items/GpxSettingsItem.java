@@ -2,7 +2,6 @@ package net.osmand.plus.settings.backend.backup.items;
 
 import static net.osmand.gpx.GpxParameter.COLOR;
 import static net.osmand.gpx.GpxParameter.COLORING_TYPE;
-import static net.osmand.gpx.GpxParameter.COLOR_PALETTE;
 import static net.osmand.gpx.GpxParameter.SHOW_ARROWS;
 import static net.osmand.gpx.GpxParameter.SHOW_START_FINISH;
 import static net.osmand.gpx.GpxParameter.SPLIT_INTERVAL;
@@ -93,7 +92,7 @@ public class GpxSettingsItem extends FileSettingsItem {
 			}
 			if (savedFile != null) {
 				GpxDbHelper gpxDbHelper = app.getGpxDbHelper();
-				boolean readItem = gpxDbHelper.hasGpxDataItem(savedFile);
+				boolean readItem = gpxDbHelper.hasItem(savedFile);
 				GpxDataItem dataItem = null;
 				if (!readItem) {
 					dataItem = new GpxDataItem(app, savedFile);
@@ -129,14 +128,13 @@ public class GpxSettingsItem extends FileSettingsItem {
 		dataItem.setParameter(SPLIT_TYPE, GpxSplitType.getSplitTypeByTypeId(appearanceInfo.splitType).getType());
 		dataItem.setParameter(SPLIT_INTERVAL, appearanceInfo.splitInterval);
 		dataItem.setParameter(COLORING_TYPE, appearanceInfo.coloringType);
-		dataItem.setParameter(COLOR_PALETTE, appearanceInfo.gradientPaletteName);
 		app.getGpxDbHelper().updateDataItem(dataItem);
 	}
 
 	private void createGpxAppearanceInfo() {
-		GpxDataItem dataItem = app.getGpxDbHelper().getItem(file, item -> appearanceInfo = new GpxAppearanceInfo(app, item));
+		GpxDataItem dataItem = app.getGpxDbHelper().getItem(file, item -> appearanceInfo = new GpxAppearanceInfo(item));
 		if (dataItem != null) {
-			appearanceInfo = new GpxAppearanceInfo(app, dataItem);
+			appearanceInfo = new GpxAppearanceInfo(dataItem);
 		}
 	}
 
@@ -165,7 +163,7 @@ public class GpxSettingsItem extends FileSettingsItem {
 					gpxHelper.selectGpxFile(gpxFile, params);
 				}
 				GpxDbHelper gpxDbHelper = app.getGpxDbHelper();
-				if (!gpxDbHelper.hasGpxDataItem(file)) {
+				if (!gpxDbHelper.hasItem(file)) {
 					gpxDbHelper.add(new GpxDataItem(app, file));
 				}
 			}

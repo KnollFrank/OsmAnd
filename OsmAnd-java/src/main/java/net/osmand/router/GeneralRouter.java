@@ -50,8 +50,6 @@ public class GeneralRouter implements VehicleRouter {
 	public static final String VEHICLE_WIDTH = "width";
 	public static final String VEHICLE_LENGTH = "length";
 	public static final String MOTOR_TYPE = "motor_type";
-	public static final String MAX_AXLE_LOAD = "maxaxleload";
-	public static final String WEIGHT_RATING = "weightrating";
 	public static final String ALLOW_VIA_FERRATA = "allow_via_ferrata";
 	public static final String CHECK_ALLOW_PRIVATE_NEEDED = "check_allow_private_needed";
 
@@ -94,9 +92,9 @@ public class GeneralRouter implements VehicleRouter {
 	
 	Map<RouteRegion, Map<IntHolder, Float>>[] evalCache;
 
-	public String[] hhNativeFilter = new String[0]; // getFilteredTags() as flat Array (JNI)
-	public String[] hhNativeParameterValues = new String[0]; // parameterValues as flat Array (JNI)
-	private final GeneralRouter root;
+  // "parameters" and "parameterValues" that using in HH isn't parse in JNI
+	public String[] hhNativeFilter = new String[0];
+	private final GeneralRouter root; 
 		
 	
 	public enum RouteDataObjectAttribute {
@@ -134,11 +132,7 @@ public class GeneralRouter implements VehicleRouter {
 		MOPED,
 		TRAIN,
 		PUBLIC_TRANSPORT,
-		HORSEBACKRIDING;
-		
-		public String getBaseProfile() {
-			return this.toString().toLowerCase();
-		}
+		HORSEBACKRIDING
 	}
 	
 	public enum RoutingParameterType {
@@ -267,11 +261,12 @@ public class GeneralRouter implements VehicleRouter {
 	public List<String> serializeParameterValues(Map<String, String> vls) {
 		List<String> ls = new ArrayList<String>();
 		for (Entry<String, String> e : vls.entrySet()) {
-			String val = e.getValue();
-			if (val.isEmpty() || "true".equals(val) || "false".equals(val)) {
-				ls.add(e.getKey());
-			} else {
-				ls.add(e.getKey() + "=" + val);
+			if (parameters.containsKey(e.getKey())) {
+				if (parameters.get(e.getKey()).type == RoutingParameterType.BOOLEAN) {
+					ls.add(e.getKey());
+				} else {
+					ls.add(e.getKey() + "=" + e.getValue());
+				}
 			}
 		}
 		return ls;

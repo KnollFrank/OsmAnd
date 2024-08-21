@@ -39,9 +39,7 @@ class FilterAllVariantsListFragment : BaseOsmAndDialogFragment(), SmartFolderUpd
 			manager: FragmentManager,
 			filter: ListTrackFilter,
 			dialogClosedListener: DialogClosedListener?,
-			selectedItemsListener: NewSelectedItemsListener,
-			nightMode: Boolean
-		) {
+			selectedItemsListener: NewSelectedItemsListener) {
 			if (AndroidUtils.isFragmentCanBeAdded(manager, TAG)) {
 				val initialFilter =
 					TrackFiltersHelper.createFilter(app, filter.trackFilterType, null)
@@ -49,6 +47,7 @@ class FilterAllVariantsListFragment : BaseOsmAndDialogFragment(), SmartFolderUpd
 					throw IllegalArgumentException("Filter should be subclass from ListTrackFilter")
 				}
 				initialFilter.initWithValue(filter)
+				val nightMode = app.daynightHelper.isNightMode(true)
 				val currentFilter =
 					TrackFiltersHelper.createFilter(
 						app,
@@ -73,7 +72,7 @@ class FilterAllVariantsListFragment : BaseOsmAndDialogFragment(), SmartFolderUpd
 	}
 
 	lateinit var initialFilter: ListTrackFilter
-	lateinit var adapter: ListFilterAdapter
+	lateinit var adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>
 
 	var progressBar: ProgressBar? = null
 	private var showButton: DialogButton? = null
@@ -194,7 +193,6 @@ class FilterAllVariantsListFragment : BaseOsmAndDialogFragment(), SmartFolderUpd
 	}
 
 	private fun setupList(view: View) {
-		adapter.nightMode = nightMode;
 		val recyclerView = view.findViewById<RecyclerView>(R.id.filters_list)
 		recyclerView.layoutManager = LinearLayoutManager(app)
 		recyclerView.itemAnimator = null

@@ -22,7 +22,7 @@ public class ZoomInButton extends MapButton {
 			if (mapActivity.getContextMenu().zoomInPressed()) {
 				return;
 			}
-			mapActivity.getMapView().zoomInAndAdjustTiltAngle();
+			mapActivity.getMapView().zoomIn();
 		});
 		setOnLongClickListener(notUseCouldBeNull -> {
 			ConfigureMapDialogs.showMapMagnifierDialog(mapActivity.getMapView());

@@ -33,7 +33,6 @@ import net.osmand.plus.myplaces.tracks.TrackFoldersHelper;
 import net.osmand.plus.plugins.osmedit.asynctasks.UploadGPXFilesTask.UploadGpxListener;
 import net.osmand.plus.track.data.SmartFolder;
 import net.osmand.plus.track.data.TrackFolder;
-import net.osmand.plus.track.data.TrackFolderAnalysis;
 import net.osmand.plus.track.data.TracksGroup;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.ColorUtilities;
@@ -150,8 +149,10 @@ public class TracksSelectionFragment extends BaseTrackFolderFragment implements 
 				}
 			}
 			return items;
+
+		} else {
+			return super.getAdapterItems();
 		}
-		return super.getAdapterItems();
 	}
 
 	@Override
@@ -239,11 +240,7 @@ public class TracksSelectionFragment extends BaseTrackFolderFragment implements 
 			int items = tracks.size() + groups.size();
 			int total = tracks.size();
 			for (TracksGroup group : groups) {
-				if (group instanceof TrackFolder) {
-					total += ((TrackFolder) group).getFlattenedTrackItems().size();
-				} else {
-					total += group.getTrackItems().size();
-				}
+				total += group.getTrackItems().size();
 			}
 			String text = getResources().getQuantityString(R.plurals.tracks, total, items, total);
 			actionBar.setTitle(text);

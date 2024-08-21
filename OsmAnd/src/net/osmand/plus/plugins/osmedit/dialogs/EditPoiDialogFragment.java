@@ -43,7 +43,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.ViewCompat;
-import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -545,7 +544,7 @@ public class EditPoiDialogFragment extends BaseOsmAndDialogFragment {
 	}
 
 	public void smoothScrollToBottom() {
-		NestedScrollView scrollView = view.findViewById(R.id.nested_scroll);
+		ScrollView scrollView = view.findViewById(R.id.scroll_view);
 		int height = scrollView.getHeight();
 		int bottom = scrollView.getChildAt(0).getBottom();
 		int maxScrollY = Math.max(0, bottom - height);

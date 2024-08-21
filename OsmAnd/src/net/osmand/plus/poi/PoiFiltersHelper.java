@@ -15,10 +15,10 @@ import net.osmand.plus.R;
 import net.osmand.plus.api.SQLiteAPI.SQLiteConnection;
 import net.osmand.plus.api.SQLiteAPI.SQLiteCursor;
 import net.osmand.plus.api.SQLiteAPI.SQLiteStatement;
-import net.osmand.plus.backup.BackupUtils;
+import net.osmand.plus.backup.BackupHelper;
 import net.osmand.plus.plugins.PluginsHelper;
 import net.osmand.plus.settings.backend.ApplicationMode;
-import net.osmand.search.core.TopIndexFilter;
+import net.osmand.util.Algorithms;
 import net.osmand.util.CollectionUtils;
 
 import org.apache.commons.logging.Log;
@@ -212,12 +212,6 @@ public class PoiFiltersHelper {
 			}
 		}
 		return null;
-	}
-
-	@Nullable
-	public PoiUIFilter getFilter(TopIndexFilter topIndexFilter, Map<PoiCategory, LinkedHashSet<String>> acceptedTypes) {
-		PoiUIFilter poiUIFilter = new PoiUIFilter(topIndexFilter, acceptedTypes, application);
-		return addTopPoiFilter(poiUIFilter);
 	}
 
 	public void reloadAllPoiFilters() {
@@ -761,21 +755,21 @@ public class PoiFiltersHelper {
 		}
 
 		public long getLastModifiedTime() {
-			long lastModifiedTime = BackupUtils.getLastModifiedTime(context, FILTERS_LAST_MODIFIED_NAME);
+			long lastModifiedTime = BackupHelper.getLastModifiedTime(context, FILTERS_LAST_MODIFIED_NAME);
 			if (lastModifiedTime == 0) {
 				File dbFile = context.getDatabasePath(DATABASE_NAME);
 				lastModifiedTime = dbFile.exists() ? dbFile.lastModified() : 0;
-				BackupUtils.setLastModifiedTime(context, FILTERS_LAST_MODIFIED_NAME, lastModifiedTime);
+				BackupHelper.setLastModifiedTime(context, FILTERS_LAST_MODIFIED_NAME, lastModifiedTime);
 			}
 			return lastModifiedTime;
 		}
 
 		public void setLastModifiedTime(long lastModifiedTime) {
-			BackupUtils.setLastModifiedTime(context, FILTERS_LAST_MODIFIED_NAME, lastModifiedTime);
+			BackupHelper.setLastModifiedTime(context, FILTERS_LAST_MODIFIED_NAME, lastModifiedTime);
 		}
 
 		private void updateLastModifiedTime() {
-			BackupUtils.setLastModifiedTime(context, FILTERS_LAST_MODIFIED_NAME);
+			BackupHelper.setLastModifiedTime(context, FILTERS_LAST_MODIFIED_NAME);
 		}
 
 		private void deleteOldFilters(SQLiteConnection conn) {

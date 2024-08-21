@@ -13,6 +13,8 @@ import net.osmand.plus.views.mapwidgets.widgets.TextInfoWidget;
 
 public class SideWidgetInfo extends MapWidgetInfo {
 
+	private String externalProviderPackage;
+
 	public SideWidgetInfo(@NonNull String key,
 	                      @NonNull TextInfoWidget widget,
 	                      @DrawableRes int daySettingsIconId,
@@ -29,6 +31,15 @@ public class SideWidgetInfo extends MapWidgetInfo {
 		} else if (getMessageId() != MapWidgetInfo.INVALID_ID) {
 			widget.setContentTitle(getMessageId());
 		}
+	}
+
+	public void setExternalProviderPackage(@NonNull String externalProviderPackage) {
+		this.externalProviderPackage = externalProviderPackage;
+	}
+
+	@Nullable
+	public String getExternalProviderPackage() {
+		return externalProviderPackage;
 	}
 
 	@NonNull

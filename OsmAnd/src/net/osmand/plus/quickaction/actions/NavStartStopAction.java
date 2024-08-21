@@ -22,10 +22,11 @@ public class NavStartStopAction extends QuickAction {
 
 	private static final String KEY_DIALOG = "dialog";
 	public static final QuickActionType TYPE = new QuickActionType(NAV_START_STOP_ACTION_ID,
-			"nav.startstop", NavStartStopAction .class)
-			.nameRes(R.string.shared_string_navigation).iconRes(R.drawable.ic_action_start_navigation).nonEditable()
-			.category(QuickActionType.NAVIGATION)
-			.nameActionRes(R.string.quick_action_verb_start_stop);
+			"nav.startstop", NavStartStopAction .class).
+			nameRes(R.string.quick_action_start_stop_navigation).iconRes(R.drawable.ic_action_start_navigation).nonEditable().
+			category(QuickActionType.NAVIGATION);
+
+
 
 	public NavStartStopAction() {
 		super(TYPE);
@@ -78,7 +79,7 @@ public class NavStartStopAction extends QuickAction {
 	}
 
 	@Override
-	public String getActionText(@NonNull OsmandApplication app) {
+	public String getActionText(OsmandApplication app) {
 		RoutingHelper helper = app.getRoutingHelper();
 		if (helper.isPauseNavigation() || helper.isFollowingMode()) {
 			return app.getString(R.string.cancel_navigation);
@@ -99,7 +100,7 @@ public class NavStartStopAction extends QuickAction {
 	}
 
 	@Override
-	public boolean isActionWithSlash(@NonNull OsmandApplication app) {
+	public boolean isActionWithSlash(OsmandApplication app) {
 		RoutingHelper helper = app.getRoutingHelper();
 		return helper.isPauseNavigation() || helper.isFollowingMode();
 	}

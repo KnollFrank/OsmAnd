@@ -14,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import net.osmand.PlatformUtil;
@@ -189,10 +188,8 @@ public class PluginInstalledBottomSheetDialog extends MenuBottomSheetDialogFragm
 			Activity activity = getActivity();
 			PluginsHelper.enablePlugin(activity, app, plugin, false);
 
-			for (Fragment fragment : getParentFragmentManager().getFragments()) {
-				if (fragment instanceof PluginStateListener) {
-					((PluginStateListener) fragment).onPluginStateChanged(plugin);
-				}
+			if (activity instanceof PluginStateListener) {
+				((PluginStateListener) activity).onPluginStateChanged(plugin);
 			}
 		}
 	}
@@ -333,10 +330,8 @@ public class PluginInstalledBottomSheetDialog extends MenuBottomSheetDialogFragm
 	}
 
 	public interface PluginStateListener {
-		default void onPluginStateChanged(@NonNull OsmandPlugin plugin) {
-		}
 
-		default void onPluginInstalled(@NonNull OsmandPlugin plugin) {
-		}
+		void onPluginStateChanged(@NonNull OsmandPlugin plugin);
+
 	}
 }

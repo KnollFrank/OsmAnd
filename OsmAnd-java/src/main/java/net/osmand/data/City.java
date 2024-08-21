@@ -3,36 +3,26 @@ package net.osmand.data;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class City extends MapObject {
 	public enum CityType {
 		// that's tricky way to play with that numbers (to avoid including suburbs in city & vice verse)
 		// district special type and it is not registered as a city
-		CITY(10000, 100000),
-		TOWN(4000, 20000),
-		VILLAGE(1300, 1000),
-		HAMLET(1000, 100),
-		SUBURB(400, 5000),
-		BOROUGH(400, 2500),
-		DISTRICT(400, 10000),
-		NEIGHBOURHOOD(300, 500);
-		
-		private final double radius;
-		private final int population;
-		
-		CityType(double radius, int population) {
+		CITY(10000), TOWN(4000), VILLAGE(1300), HAMLET(1000), SUBURB(400), BOROUGH(400), DISTRICT(400), NEIGHBOURHOOD(300);
+
+		private double radius;
+
+		CityType(double radius) {
 			this.radius = radius;
-			this.population = population;
 		}
-		
+
 		public double getRadius() {
 			return radius;
-		}
-		
-		public int getPopulation() {
-			return population;
 		}
 		
 		public boolean storedAsSeparateAdminEntity() {
@@ -57,23 +47,6 @@ public class City extends MapObject {
 			}
 			return null;
 		}
-		
-		public static String typeToString(CityType type) {
-			if (type == null) {
-				return null;
-			}
-			return type.name().toLowerCase();
-		}
-		
-		static public Set<String> getAllCityTypeStrings() {
-			Set<String> cityTypeStrings = new HashSet<>();
-			for (CityType type : CityType.values()) {
-				cityTypeStrings.add(typeToString(type));
-			}
-			return cityTypeStrings;
-		}
-		
-		
 	}
 
 	private CityType type = null;

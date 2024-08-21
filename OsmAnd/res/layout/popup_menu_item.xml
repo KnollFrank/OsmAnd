@@ -23,7 +23,8 @@
 			android:id="@+id/divider"
 			android:layout_width="match_parent"
 			android:layout_height="1dp"
-			android:background="?attr/divider_color" />
+			android:layout_marginStart="@dimen/content_padding"
+			android:background="?attr/list_divider" />
 
 		<LinearLayout
 			android:layout_width="match_parent"

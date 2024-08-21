@@ -1,5 +1,7 @@
 package net.osmand.plus.plugins.osmedit.fragments;
 
+import static net.osmand.plus.plugins.osmedit.fragments.OsmEditingFragment.OSM_LOGIN_DATA;
+
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -24,6 +26,7 @@ import net.osmand.plus.chooseplan.OsmAndFeature;
 import net.osmand.plus.helpers.AndroidUiHelper;
 import net.osmand.plus.plugins.osmedit.oauth.OsmOAuthHelper;
 import net.osmand.plus.plugins.osmedit.oauth.OsmOAuthHelper.OsmAuthorizationListener;
+import net.osmand.plus.settings.bottomsheets.OsmLoginDataBottomSheet;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.ColorUtilities;
 import net.osmand.plus.utils.UiUtilities;
@@ -73,6 +76,7 @@ public class MappersPromoFragment extends BasePurchaseDialogFragment {
 		setupToolbar();
 		createFeaturesList();
 		setupSignInWithOsmButton();
+		setupUseLoginAndPasswordButton();
 
 		return mainView;
 	}
@@ -131,6 +135,18 @@ public class MappersPromoFragment extends BasePurchaseDialogFragment {
 				authHelper.addListener((OsmAuthorizationListener) fragment);
 			}
 			authHelper.startOAuth((ViewGroup) v, nightMode);
+		});
+	}
+
+	private void setupUseLoginAndPasswordButton() {
+		View button = mainView.findViewById(R.id.login_password_button);
+		int color = getColor(nightMode ? R.color.inactive_buttons_and_links_bg_dark : R.color.profile_button_gray);
+		setupButtonBackground(button, color);
+		button.setOnClickListener(v -> {
+			FragmentManager fragmentManager = getFragmentManager();
+			if (fragmentManager != null) {
+				OsmLoginDataBottomSheet.showInstance(fragmentManager, OSM_LOGIN_DATA, getTargetFragment(), isUsedOnMap(), null);
+			}
 		});
 	}
 

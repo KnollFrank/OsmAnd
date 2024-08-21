@@ -7,26 +7,23 @@ import net.osmand.telegram.SHARE_TYPE_MAP_AND_TEXT
 import net.osmand.telegram.SHARE_TYPE_TEXT
 import net.osmand.telegram.TelegramSettings
 import net.osmand.telegram.TelegramSettings.ShareChatInfo
-import net.osmand.telegram.helpers.TelegramHelper.TelegramAuthParamType.CODE
-import net.osmand.telegram.helpers.TelegramHelper.TelegramAuthParamType.PASSWORD
-import net.osmand.telegram.helpers.TelegramHelper.TelegramAuthParamType.PHONE_NUMBER
+import net.osmand.telegram.helpers.TelegramHelper.TelegramAuthParamType.*
 import net.osmand.telegram.utils.GRAYSCALE_PHOTOS_DIR
 import net.osmand.telegram.utils.GRAYSCALE_PHOTOS_EXT
 import net.osmand.telegram.utils.OsmandLocationUtils
 import net.osmand.telegram.utils.OsmandLocationUtils.DEVICE_PREFIX
 import net.osmand.telegram.utils.OsmandLocationUtils.USER_TEXT_LOCATION_TITLE
-import net.osmand.util.Algorithms
-import org.drinkless.tdlib.Client
-import org.drinkless.tdlib.Client.ResultHandler
-import org.drinkless.tdlib.TdApi
-import org.drinkless.tdlib.TdApi.AuthorizationState
-import org.drinkless.tdlib.TdApi.User
+import org.drinkless.td.libcore.telegram.Client
+import org.drinkless.td.libcore.telegram.Client.ResultHandler
+import org.drinkless.td.libcore.telegram.TdApi
+import org.drinkless.td.libcore.telegram.TdApi.AuthorizationState
 import java.io.File
-import java.util.TreeSet
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
+import kotlin.collections.HashSet
 
 
 class TelegramHelper private constructor() {
@@ -285,7 +282,7 @@ class TelegramHelper private constructor() {
 				PHONE_NUMBER -> client!!.send(
 					TdApi.SetAuthenticationPhoneNumber(
 						value,
-						TdApi.PhoneNumberAuthenticationSettings()
+						TdApi.PhoneNumberAuthenticationSettings(false, false, false, false, null)
 					), AuthorizationRequestHandler()
 				)
 				CODE -> client!!.send(TdApi.CheckAuthenticationCode(value), AuthorizationRequestHandler())
@@ -320,7 +317,7 @@ class TelegramHelper private constructor() {
 		try {
 			log.debug("Loading native tdlib...")
 			System.loadLibrary("tdjni")
-			Client.setLogMessageHandler(1) { level, message -> log.debug("$level: $message") }
+			Client.setLogVerbosityLevel(1)
 			libraryLoaded = true
 		} catch (e: Throwable) {
 			log.error("Failed to load tdlib", e)
@@ -376,7 +373,7 @@ class TelegramHelper private constructor() {
 		else -> 0
 	}
 
-	fun isOsmAndBot(userId: Long) = users[userId]?.getName() == OSMAND_BOT_USERNAME
+	fun isOsmAndBot(userId: Long) = users[userId]?.username == OSMAND_BOT_USERNAME
 
 	fun isBot(userId: Long) = users[userId]?.type is TdApi.UserTypeBot
 
@@ -530,8 +527,8 @@ class TelegramHelper private constructor() {
 			}
 			resultArticles.forEach {
 				shareInfo.lastTextMessageHandled = false
-				val sendOptions = TdApi.MessageSendOptions(true, true, true, true, null, 0, 0, false)
-				client?.send(TdApi.SendInlineQueryResultMessage(shareInfo.chatId, 0, null, sendOptions,
+				val sendOptions = TdApi.MessageSendOptions(true, true, null)
+				client?.send(TdApi.SendInlineQueryResultMessage(shareInfo.chatId, 0, 0, sendOptions,
 					inlineQueryResults.inlineQueryId, it.id, false)) { obj ->
 					handleTextLocationMessageUpdate(obj, shareInfo, true)
 				}
@@ -843,7 +840,7 @@ class TelegramHelper private constructor() {
 			client?.send(
 				TdApi.EditMessageLiveLocation(
 					shareInfo.chatId, shareInfo.currentMapMessageId,
-					null, null, 0, 0, 0
+					null, null, 0, 0
 				)
 			)
 			{ obj ->
@@ -866,8 +863,8 @@ class TelegramHelper private constructor() {
 			shareInfo.pendingTdLibText++
 			shareInfo.lastSendTextMessageTime = (System.currentTimeMillis() / 1000).toInt()
 			log.error("sendNewTextLocation ${shareInfo.pendingTdLibText}")
-			val sendOptions = TdApi.MessageSendOptions(true, true, true, true, null, 0, 0, false)
-			client?.send(TdApi.SendMessage(shareInfo.chatId, 0, null, sendOptions, null, content)) { obj ->
+			val sendOptions = TdApi.MessageSendOptions(false, true, null)
+			client?.send(TdApi.SendMessage(shareInfo.chatId, 0, 0, sendOptions, null, content)) { obj ->
 				handleTextLocationMessageUpdate(obj, shareInfo, false)
 			}
 		}
@@ -899,8 +896,8 @@ class TelegramHelper private constructor() {
 			shareInfo.pendingTdLibMap++
 			shareInfo.lastSendMapMessageTime = (System.currentTimeMillis() / 1000).toInt()
 			log.error("sendNewMapLocation ${shareInfo.pendingTdLibMap}")
-			val sendOptions = TdApi.MessageSendOptions(false, true, true, true, null, 0, 0, false)
-			client?.send(TdApi.SendMessage(shareInfo.chatId, 0, null, sendOptions, null, content)) { obj ->
+			val sendOptions = TdApi.MessageSendOptions(false, true, null)
+			client?.send(TdApi.SendMessage(shareInfo.chatId, 0, 0, sendOptions, null, content)) { obj ->
 				handleMapLocationMessageUpdate(obj, shareInfo, false)
 			}
 		}
@@ -914,7 +911,7 @@ class TelegramHelper private constructor() {
 			shareInfo.lastSendMapMessageTime = (System.currentTimeMillis() / 1000).toInt()
 			log.info("editMapLocation ${shareInfo.currentMapMessageId} pendingTdLibMap: ${shareInfo.pendingTdLibMap}")
 			client?.send(TdApi.EditMessageLiveLocation(shareInfo.chatId, shareInfo.currentMapMessageId,
-				null, location, locationMessage.bearing.toInt(), 0, 0)) { obj ->
+				null, location, locationMessage.bearing.toInt(), 0)) { obj ->
 				handleMapLocationMessageUpdate(obj, shareInfo, false)
 			}
 		}
@@ -1113,7 +1110,7 @@ class TelegramHelper private constructor() {
 				if (!info) {
 					log.info("Init tdlib parameters")
 
-					val parameters = TdApi.SetTdlibParameters()
+					val parameters = TdApi.TdlibParameters()
 					parameters.databaseDirectory = File(appDir, "tdlib").absolutePath
 					parameters.useMessageDatabase = true
 					parameters.useSecretChats = true
@@ -1123,7 +1120,14 @@ class TelegramHelper private constructor() {
 					parameters.deviceModel = "Android"
 					parameters.systemVersion = "OsmAnd Telegram"
 					parameters.applicationVersion = "1.0"
-					client!!.send(parameters, AuthorizationRequestHandler())
+					parameters.enableStorageOptimizer = true
+
+					client!!.send(TdApi.SetTdlibParameters(parameters), AuthorizationRequestHandler())
+				}
+			}
+			TdApi.AuthorizationStateWaitEncryptionKey.CONSTRUCTOR -> {
+				if (!info) {
+					client!!.send(TdApi.CheckDatabaseEncryptionKey(), AuthorizationRequestHandler())
 				}
 			}
 			TdApi.AuthorizationStateWaitPhoneNumber.CONSTRUCTOR -> {
@@ -1556,20 +1560,4 @@ class TelegramHelper private constructor() {
 			}// result is already received through UpdateAuthorizationState, nothing to do
 		}
 	}
-}
-
-fun User.getName(): String {
-	var name = "${this.firstName} ${this.lastName}".trim()
-	if (name.isEmpty()) {
-		this.usernames?.let {
-			val userNames = it.activeUsernames
-			if(!Algorithms.isEmpty(userNames)) {
-				name = userNames[0]
-			}
-		}
-	}
-	if (name.isEmpty()) {
-		name = this.phoneNumber
-	}
-	return name
 }

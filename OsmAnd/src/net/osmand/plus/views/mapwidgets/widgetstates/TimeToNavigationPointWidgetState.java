@@ -58,12 +58,7 @@ public class TimeToNavigationPointWidgetState extends WidgetState {
 
 	@Override
 	public void copyPrefs(@NonNull ApplicationMode appMode, @Nullable String customId) {
-		copyPrefsFromMode(appMode, appMode, customId);
-	}
-
-	@Override
-	public void copyPrefsFromMode(@NonNull ApplicationMode sourceAppMode, @NonNull ApplicationMode appMode, @Nullable String customId){
-		registerTimeTypePref(customId).setModeValue(appMode, arrivalTimeOrTimeToGo.getModeValue(sourceAppMode));
+		registerTimeTypePref(customId).setModeValue(appMode, arrivalTimeOrTimeToGo.getModeValue(appMode));
 	}
 
 	@NonNull

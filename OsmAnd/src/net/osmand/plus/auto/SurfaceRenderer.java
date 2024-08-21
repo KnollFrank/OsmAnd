@@ -24,7 +24,6 @@ import net.osmand.core.android.MapRendererView;
 import net.osmand.core.android.MapRendererView.MapRendererViewListener;
 import net.osmand.core.jni.ZoomLevel;
 import net.osmand.data.RotatedTileBox;
-import net.osmand.plus.AppInitializeListener;
 import net.osmand.plus.AppInitializer;
 import net.osmand.plus.OsmAndConstants;
 import net.osmand.plus.OsmandApplication;
@@ -253,7 +252,7 @@ public final class SurfaceRenderer implements DefaultLifecycleObserver, MapRende
 	public void handleTilt() {
 		synchronized (this) {
 			if (mapView != null && mapView.getAnimatedDraggingThread() != null && offscreenMapRendererView != null)
-				mapView.getAnimatedDraggingThread().startTilting(offscreenMapRendererView.getElevationAngle() < 90.0f ? 90.0f : 30.0f, 0.0f);
+				mapView.getAnimatedDraggingThread().startTilting(offscreenMapRendererView.getElevationAngle() < 90.0f ? 90.0f : 30.0f);
 		}
 	}
 
@@ -298,7 +297,7 @@ public final class SurfaceRenderer implements DefaultLifecycleObserver, MapRende
 			mapView.setView(surfaceView);
 		}
 		if (getApp().isApplicationInitializing()) {
-			getApp().getAppInitializer().addListener(new AppInitializeListener() {
+			getApp().getAppInitializer().addListener(new AppInitializer.AppInitializeListener() {
 				@Override
 				public void onFinish(@NonNull AppInitializer init) {
 					setupOffscreenRenderer();

@@ -204,10 +204,4 @@ public final class RoutePreviewScreen extends BaseAndroidAutoScreen implements I
 	@Override
 	public void routeWasFinished() {
 	}
-
-	public void tryToStartNavigation() {
-		if (!calculating) {
-			onNavigate();
-		}
-	}
 }

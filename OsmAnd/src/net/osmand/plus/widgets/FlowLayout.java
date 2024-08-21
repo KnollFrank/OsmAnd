@@ -13,7 +13,6 @@ public class FlowLayout extends ViewGroup {
 
 	private int line_height;
 	private boolean horizontalAutoSpacing;
-	private boolean alignToCenter = false;
 	private final int defaultHorizontalSpacing;
 	private final int defaultVerticalSpacing;
 
@@ -40,10 +39,6 @@ public class FlowLayout extends ViewGroup {
 	// If true, available horizontal space is added to items horizontalSpacing to fit the screen width.
 	public void setHorizontalAutoSpacing(boolean horizontalAutoSpacing) {
 		this.horizontalAutoSpacing = horizontalAutoSpacing;
-	}
-
-	public void setAlignToCenter(boolean alignToCenter) {
-		this.alignToCenter = alignToCenter;
 	}
 
 	@Override
@@ -105,12 +100,7 @@ public class FlowLayout extends ViewGroup {
 		int count = getChildCount();
 		int width = r - l;
 		boolean isLayoutRtl = AndroidUtils.isLayoutRtl(getContext());
-		int horizontalPosition;
-		if (alignToCenter) {
-			horizontalPosition = getCenteredHorizontalStartPosition(width, 0, isLayoutRtl);
-		} else {
-			horizontalPosition = isLayoutRtl ? width - getPaddingRight() : getPaddingLeft();
-		}
+		int horizontalPosition = isLayoutRtl ? width - getPaddingRight() : getPaddingLeft();
 		int verticalPosition = getPaddingTop();
 		for (int i = 0; i < count; i++) {
 			View child = getChildAt(i);
@@ -120,18 +110,14 @@ public class FlowLayout extends ViewGroup {
 				int freeSizeSpacing = getFreeSizeSpacing(width, childWidth, getItemHorizontalSpacing(child));
 				if (isLayoutRtl) {
 					if (horizontalPosition - childWidth < getPaddingLeft()) {
-						horizontalPosition = alignToCenter
-								? getCenteredHorizontalStartPosition(width, i, isLayoutRtl)
-								: width - getPaddingRight();
+						horizontalPosition = width - getPaddingRight();
 						verticalPosition += line_height;
 					}
 					child.layout(horizontalPosition - childWidth, verticalPosition, horizontalPosition, verticalPosition + childHeight);
 					horizontalPosition -= freeSizeSpacing;
 				} else {
 					if (horizontalPosition + childWidth > width) {
-						horizontalPosition = alignToCenter
-								? getCenteredHorizontalStartPosition(width, i, isLayoutRtl)
-								: getPaddingLeft();
+						horizontalPosition = getPaddingLeft();
 						verticalPosition += line_height;
 					}
 					child.layout(horizontalPosition, verticalPosition, horizontalPosition + childWidth, verticalPosition + childHeight);
@@ -139,27 +125,6 @@ public class FlowLayout extends ViewGroup {
 				}
 			}
 		}
-	}
-
-	private int getCenteredHorizontalStartPosition(int width, int startChildIndex, boolean isLayoutRtl) {
-		int startPosition = isLayoutRtl ? width - getPaddingRight() : getPaddingLeft();
-		int filledSpace = 0;
-		int horizontalCenter = (width / 2);
-		for (int i = startChildIndex; i < getChildCount(); i++) {
-			View child = getChildAt(i);
-			if (child.getVisibility() != GONE) {
-				filledSpace += child.getMeasuredWidth();
-				if (i != startChildIndex) {
-					filledSpace += getItemHorizontalSpacing(child);
-				}
-				if (filledSpace > width - (getPaddingLeft() + getPaddingRight())) {
-					return startPosition;
-				}
-
-				startPosition = isLayoutRtl ? horizontalCenter + (filledSpace / 2) : horizontalCenter - (filledSpace / 2);
-			}
-		}
-		return startPosition;
 	}
 
 	private int getFreeSizeSpacing(int width, int childWidth, int horizontalSpacing) {

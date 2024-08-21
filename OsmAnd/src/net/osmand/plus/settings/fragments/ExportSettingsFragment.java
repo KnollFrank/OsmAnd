@@ -1,6 +1,5 @@
 package net.osmand.plus.settings.fragments;
 
-import static net.osmand.plus.settings.backend.backup.exporttype.ExportType.MAP_SOURCES;
 import static net.osmand.plus.settings.fragments.BaseSettingsFragment.APP_MODE_KEY;
 
 import android.app.ProgressDialog;
@@ -22,16 +21,12 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 import net.osmand.IndexConstants;
 import net.osmand.PlatformUtil;
-import net.osmand.map.ITileSource;
-import net.osmand.map.TileSourceManager;
 import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
-import net.osmand.plus.resources.SQLiteTileSource;
 import net.osmand.plus.settings.backend.ApplicationMode;
 import net.osmand.plus.settings.backend.ApplicationModeBean;
-import net.osmand.plus.settings.backend.backup.FileSettingsHelper.SettingsExportListener;
 import net.osmand.plus.settings.backend.backup.exporttype.ExportType;
-import net.osmand.plus.settings.backend.backup.exporttype.MapSourcesExportType;
+import net.osmand.plus.settings.backend.backup.FileSettingsHelper.SettingsExportListener;
 import net.osmand.plus.settings.backend.backup.items.FileSettingsItem;
 import net.osmand.plus.settings.backend.backup.items.SettingsItem;
 import net.osmand.plus.utils.AndroidUtils;
@@ -104,10 +99,6 @@ public class ExportSettingsFragment extends BaseSettingsListFragment {
 			for (Map.Entry<ExportType, List<?>> entry : selectedTypes.entrySet()) {
 				ExportType exportType = entry.getKey();
 				List<?> items = entry.getValue();
-
-				if (exportType == MAP_SOURCES && !Algorithms.isEmpty(items)) {
-					items = convertTileSources(items);
-				}
 				if (items == null) {
 					items = getItemsForType(exportType);
 				}
@@ -116,26 +107,6 @@ public class ExportSettingsFragment extends BaseSettingsListFragment {
 				}
 			}
 		}
-	}
-
-	@NonNull
-	private List<ITileSource> convertTileSources(@NonNull List<?> items) {
-		List<ITileSource> sources = new ArrayList<>();
-		for (Object item : items) {
-			if (item instanceof File) {
-				File file = (File) item;
-				ITileSource template;
-				if (file.getName().endsWith(SQLiteTileSource.EXT)) {
-					template = new SQLiteTileSource(app, file, TileSourceManager.getKnownSourceTemplates());
-				} else {
-					template = TileSourceManager.createTileSourceTemplate(file);
-				}
-				if (!MapSourcesExportType.shouldSkipMapSource(template)) {
-					sources.add(template);
-				}
-			}
-		}
-		return sources;
 	}
 
 	@Nullable

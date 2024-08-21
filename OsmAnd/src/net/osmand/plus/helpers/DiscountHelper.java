@@ -106,14 +106,13 @@ public class DiscountHelper {
 		mLastCheckTime = System.currentTimeMillis();
 		Map<String, String> pms = new LinkedHashMap<>();
 		pms.put("version", Version.getFullVersion(app));
-		pms.put("nd", String.valueOf(app.getAppInitializer().getFirstInstalledDays()));
-		pms.put("ns", String.valueOf(app.getAppInitializer().getNumberOfStarts()));
+		pms.put("nd", app.getAppInitializer().getFirstInstalledDays() + "");
+		pms.put("ns", app.getAppInitializer().getNumberOfStarts() + "");
 		pms.put("lang", app.getLanguage() + "");
 		try {
-			if (app.isUserAndroidIdAllowed()) {
-				pms.put("aid", app.getUserAndroidId());
-			}
-		} catch (Exception ignore) {
+			pms.put("aid", app.getUserAndroidId());
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		new AsyncTask<Void, Void, String>() {
 

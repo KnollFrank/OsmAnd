@@ -17,6 +17,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
@@ -27,12 +28,12 @@ import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.base.BaseOsmAndFragment;
 import net.osmand.plus.helpers.AndroidUiHelper;
 import net.osmand.plus.keyevent.InputDevicesHelper;
+import net.osmand.plus.keyevent.KeyEventCommandsCache;
 import net.osmand.plus.keyevent.KeyEventHelper;
 import net.osmand.plus.keyevent.KeySymbolMapper;
 import net.osmand.plus.keyevent.assignment.KeyAssignment;
+import net.osmand.plus.keyevent.commands.KeyEventCommand;
 import net.osmand.plus.keyevent.devices.InputDeviceProfile;
-import net.osmand.plus.keyevent.fragments.editassignment.EditKeyAssignmentController;
-import net.osmand.plus.quickaction.QuickAction;
 import net.osmand.plus.settings.backend.ApplicationMode;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.ColorUtilities;
@@ -119,10 +120,9 @@ public class SelectKeyCodeFragment extends BaseOsmAndFragment implements KeyEven
 	}
 
 	private void setupDescription(@NonNull View view) {
-		EditKeyAssignmentController controller = EditKeyAssignmentController.getExistedInstance(app);
-		QuickAction quickAction = controller != null ? controller.getSelectedAction() : null;
-		if (quickAction != null) {
-			String action = quickAction.getName(app);
+		KeyEventCommand command = KeyEventCommandsCache.getCommand(app, getCommandId());
+		if (command != null) {
+			String action = command.toHumanString(app);
 			String message = getString(R.string.press_button_to_link_with_action, action);
 			TextView description = view.findViewById(R.id.description);
 			description.setText(createSpannableString(message, BOLD, action));
@@ -140,9 +140,9 @@ public class SelectKeyCodeFragment extends BaseOsmAndFragment implements KeyEven
 	private void setupApplyButton(@NonNull View view) {
 		applyButton = view.findViewById(R.id.dismiss_button);
 		applyButton.setOnClickListener(v -> {
-			EditKeyAssignmentController controller = EditKeyAssignmentController.getExistedInstance(app);
-			if (controller != null) {
-				controller.onKeyCodeSelected(initialKeyCode, keyCode);
+			Fragment target = getTargetFragment();
+			if (target instanceof OnKeyCodeSelectedCallback) {
+				((OnKeyCodeSelectedCallback) target).onKeyCodeSelected(initialKeyCode, keyCode);
 			}
 			dismiss();
 		});
@@ -186,12 +186,12 @@ public class SelectKeyCodeFragment extends BaseOsmAndFragment implements KeyEven
 		View warning = view.findViewById(R.id.warning);
 		View warningIcon = view.findViewById(R.id.warning_icon);
 		TextView warningMessage = view.findViewById(R.id.warning_message);
-		KeyAssignment assignmentDuplication = getAssignmentDuplication(keyCode);
-		if (assignmentDuplication != null) {
+		KeyEventCommand commandDuplicate = getCommandDuplication(keyCode);
+		if (commandDuplicate != null) {
 			AndroidUiHelper.updateVisibility(warning, true);
 			AndroidUiHelper.updateVisibility(warningIcon, true);
 			String keyLabel = KeySymbolMapper.getKeySymbol(app, keyCode);
-			String actionName = assignmentDuplication.getName(app);
+			String actionName = commandDuplicate.toHumanString(app);
 			String message = getString(R.string.key_is_already_assigned_error, keyLabel, actionName);
 			warningMessage.setText(createSpannableString(message, BOLD, keyLabel, actionName));
 		} else if (isKeyCodeAlreadyAssignedToThisAction() && hasInputFromUser) {
@@ -204,11 +204,9 @@ public class SelectKeyCodeFragment extends BaseOsmAndFragment implements KeyEven
 	}
 
 	private void updateApplyButtonState() {
-		boolean assignedToThisAction = isKeyCodeAlreadyAssignedToThisAction();
-		applyButton.setEnabled(isKeyCodeChanged() && !assignedToThisAction);
-		boolean keyCodeFree = isKeyCodeFree();
-		applyButton.setButtonType(keyCodeFree ? DialogButtonType.PRIMARY : DialogButtonType.PRIMARY_HARMFUL);
-		applyButton.setTitleId(keyCodeFree || assignedToThisAction ? R.string.shared_string_save : R.string.shared_string_reassign);
+		applyButton.setEnabled(isKeyCodeChanged() && !isKeyCodeAlreadyAssignedToThisAction());
+		applyButton.setButtonType(isKeyCodeFree() ? DialogButtonType.PRIMARY : DialogButtonType.PRIMARY_HARMFUL);
+		applyButton.setTitleId(isKeyCodeFree() ? R.string.shared_string_save : R.string.shared_string_reassign);
 	}
 
 	@Override
@@ -246,23 +244,28 @@ public class SelectKeyCodeFragment extends BaseOsmAndFragment implements KeyEven
 	}
 
 	private boolean isKeyCodeFree() {
-		return getAssignmentDuplication(keyCode) == null;
+		return getCommandDuplication(keyCode) == null;
 	}
 
 	private boolean isKeyCodeAlreadyAssignedToThisAction() {
-		EditKeyAssignmentController controller = EditKeyAssignmentController.getExistedInstance(app);
-		return controller != null && controller.isKeyCodeAlreadyAssignedToThisAction(keyCode);
+		KeyAssignment keyAssignment = getKeyAssignment();
+		return keyAssignment != null && keyAssignment.hasKeyCode(keyCode);
 	}
 
-	@Nullable
-	private KeyAssignment getAssignmentDuplication(int keyCode) {
+	private KeyEventCommand getCommandDuplication(int keyCode) {
 		if (inputDevice != null) {
-			KeyAssignment assignment = inputDevice.findAssignment(keyCode);
-			if (assignment != null && !Objects.equals(getKeyAssignment(), assignment)) {
-				return assignment;
+			KeyEventCommand command = inputDevice.findCommand(keyCode);
+			if (command != null && !Objects.equals(getCommandId(), command.getId())) {
+				return command;
 			}
 		}
 		return null;
+	}
+
+	@NonNull
+	private String getCommandId() {
+		KeyAssignment assignment = getKeyAssignment();
+		return assignment != null ? assignment.getCommandId() : "";
 	}
 
 	@Nullable
@@ -320,6 +323,7 @@ public class SelectKeyCodeFragment extends BaseOsmAndFragment implements KeyEven
 	}
 
 	public static void showInstance(@NonNull FragmentManager manager,
+									@NonNull Fragment targetFragment,
 	                                @NonNull ApplicationMode appMode,
 	                                @NonNull String deviceId,
 									@NonNull String assignmentId,
@@ -332,6 +336,7 @@ public class SelectKeyCodeFragment extends BaseOsmAndFragment implements KeyEven
 			arguments.putString(ATTR_ASSIGNMENT_ID, assignmentId);
 			arguments.putInt(ATTR_KEY_CODE, keyCode);
 			fragment.setArguments(arguments);
+			fragment.setTargetFragment(targetFragment, 0);
 			manager.beginTransaction()
 					.replace(R.id.fragmentContainer, fragment, TAG)
 					.addToBackStack(TAG)

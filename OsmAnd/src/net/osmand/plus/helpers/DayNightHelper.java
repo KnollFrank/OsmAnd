@@ -55,7 +55,7 @@ public class DayNightHelper implements SensorEventListener {
 	private final OsmandSettings settings;
 	private final OsmAndLocationProvider locationProvider;
 
-	private MapThemeProvider externalMapThemeProvider;
+	private MapThemeProvider mapThemeProvider;
 	private OsmAndLocationListener locationListener;
 	private SensorEventListener sensorEventListener;
 	private StateChangedListener<Boolean> sensorStateListener;
@@ -79,8 +79,8 @@ public class DayNightHelper implements SensorEventListener {
 		lastTime = 0;
 	}
 
-	public void setExternalMapThemeProvider(@Nullable MapThemeProvider externalMapThemeProvider) {
-		this.externalMapThemeProvider = externalMapThemeProvider;
+	public void setMapThemeProvider(@Nullable MapThemeProvider mapThemeProvider) {
+		this.mapThemeProvider = mapThemeProvider;
 	}
 
 	@NonNull
@@ -111,43 +111,33 @@ public class DayNightHelper implements SensorEventListener {
 	}
 
 	public boolean isNightMode(boolean usedOnMap) {
-		return isNightMode(usedOnMap, new RequestMapThemeParams());
-	}
-
-	public boolean isNightMode(boolean usedOnMap, @NonNull RequestMapThemeParams params) {
 		if (usedOnMap) {
-			return isNightModeForMapControls(params);
+			return isNightModeForMapControls();
 		} else {
-			return !settings.isLightContent();
+			return !app.getSettings().isLightContent();
 		}
 	}
 
 	public boolean isNightModeForMapControls() {
-		return isNightModeForMapControls(new RequestMapThemeParams());
+		return isNightModeForMapControlsForProfile(settings.APPLICATION_MODE.get());
 	}
 
 	public boolean isNightModeForMapControlsForProfile(ApplicationMode mode) {
-		return isNightModeForMapControls(new RequestMapThemeParams().setAppMode(mode));
-	}
-
-	public boolean isNightModeForMapControls(@NonNull RequestMapThemeParams params) {
-		ApplicationMode mode = params.requireAppMode(settings.APPLICATION_MODE.get());
 		if (settings.isLightContentForMode(mode)) {
-			return isNightModeForProfile(params);
+			return isNightModeForProfile(mode);
 		} else {
 			return true;
 		}
 	}
 
 	public boolean isNightMode() {
-		return isNightModeForProfile(new RequestMapThemeParams());
+		return isNightModeForProfile(settings.APPLICATION_MODE.get());
 	}
 
-	private boolean isNightModeForProfile(@NonNull RequestMapThemeParams params) {
-		ApplicationMode mode = params.requireAppMode(settings.APPLICATION_MODE.get());
+	public boolean isNightModeForProfile(ApplicationMode mode) {
 		DayNightMode dayNightMode = settings.DAYNIGHT_MODE.getModeValue(mode);
-		if (externalMapThemeProvider != null && !params.shouldIgnoreExternalProvider()) {
-			DayNightMode providedTheme = externalMapThemeProvider.getMapTheme();
+		if (mapThemeProvider != null) {
+			DayNightMode providedTheme = mapThemeProvider.getMapTheme();
 			dayNightMode = providedTheme != null ? providedTheme : dayNightMode;
 		}
 		NavigationSession carNavigationSession = app.getCarNavigationSession();
@@ -180,8 +170,6 @@ public class DayNightHelper implements SensorEventListener {
 			return lastNightMode;
 		} else if (dayNightMode.isSensor()) {
 			return lastNightMode;
-		} else if (dayNightMode.isAppTheme()) {
-			return !settings.isLightContentForMode(mode);
 		}
 		return false;
 	}

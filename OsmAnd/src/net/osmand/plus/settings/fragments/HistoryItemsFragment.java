@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -59,7 +58,7 @@ public abstract class HistoryItemsFragment extends BaseOsmAndDialogFragment impl
 	protected View appbar;
 	protected DialogButton deleteButton;
 	protected DialogButton selectAllButton;
-	protected ImageButton shareButton;
+	protected ImageView shareButton;
 	protected HistoryAdapter adapter;
 	protected RecyclerView recyclerView;
 	protected View warningCard;
@@ -126,9 +125,7 @@ public abstract class HistoryItemsFragment extends BaseOsmAndDialogFragment impl
 			dismiss();
 		});
 
-		ViewGroup container = appbar.findViewById(R.id.actions_container);
-		LayoutInflater inflater = UiUtilities.getInflater(appbar.getContext(), nightMode);
-		shareButton = (ImageButton) inflater.inflate(R.layout.action_button, container, false);
+		shareButton = appbar.findViewById(R.id.action_button_icon);
 		shareButton.setOnClickListener(v -> {
 			if (selectedItems.isEmpty()) {
 				app.showShortToastMessage(getString(R.string.no_items_selected_warning));
@@ -136,7 +133,6 @@ public abstract class HistoryItemsFragment extends BaseOsmAndDialogFragment impl
 				shareItems();
 			}
 		});
-		container.addView(shareButton);
 		updateToolbarSwitch(appbar);
 	}
 

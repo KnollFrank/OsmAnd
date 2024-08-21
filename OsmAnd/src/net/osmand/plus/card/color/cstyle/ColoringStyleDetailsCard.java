@@ -6,17 +6,11 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import net.osmand.plus.R;
-import net.osmand.plus.helpers.AndroidUiHelper;
 import net.osmand.plus.routepreparationmenu.cards.BaseCard;
 
 public class ColoringStyleDetailsCard extends BaseCard {
 
 	private final IColoringStyleDetailsController controller;
-
-	public ColoringStyleDetailsCard(@NonNull FragmentActivity activity,
-	                                @NonNull IColoringStyleDetailsController controller){
-		this(activity, controller, true);
-	}
 
 	public ColoringStyleDetailsCard(@NonNull FragmentActivity activity,
 	                                @NonNull IColoringStyleDetailsController controller,
@@ -39,10 +33,11 @@ public class ColoringStyleDetailsCard extends BaseCard {
 		}
 		updateVisibility(true);
 
-		AndroidUiHelper.updateVisibility(view.findViewById(R.id.upper_space), controller.shouldShowUpperSpace());
-		AndroidUiHelper.updateVisibility(view.findViewById(R.id.bottom_space), controller.shouldShowBottomSpace());
-		AndroidUiHelper.updateVisibility(view.findViewById(R.id.slope_legend), controller.shouldShowSlopeLegend());
-		AndroidUiHelper.updateVisibility(view.findViewById(R.id.speed_altitude_legend), controller.shouldShowSpeedAltitudeLegend());
+		updateVisibility(R.id.upper_space, controller.shouldShowUpperSpace());
+		updateVisibility(R.id.bottom_space, controller.shouldShowBottomSpace());
+
+		updateVisibility(R.id.slope_legend, controller.shouldShowSlopeLegend());
+		updateVisibility(R.id.speed_altitude_legend, controller.shouldShowSpeedAltitudeLegend());
 
 		updateDescription();
 		updateLegend();
@@ -54,7 +49,7 @@ public class ColoringStyleDetailsCard extends BaseCard {
 		if (description != null) {
 			tvDescription.setText(description);
 		}
-		AndroidUiHelper.updateVisibility(tvDescription, description != null);
+		updateVisibility(tvDescription, description != null);
 	}
 
 	private void updateLegend() {

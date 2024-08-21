@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.osmand.plus.wikivoyage.explore.travelcards.TravelGpxCard.TravelGpxVH;
+import static net.osmand.util.Algorithms.capitalizeFirstLetterAndLowercase;
 
 public class SavedArticlesRvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -144,9 +145,9 @@ public class SavedArticlesRvAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 			String activityTypeKey = article.activityType;
 			if (!Algorithms.isEmpty(activityTypeKey)) {
 				OsmRouteType activityType = OsmRouteType.getOrCreateTypeFromName(activityTypeKey);
-				int activityTypeIcon = AndroidUtils.getActivityTypeIcon(app, activityType);
+				int activityTypeIcon = getActivityTypeIcon(activityType);
 				holder.activityTypeIcon.setImageDrawable(getActiveIcon(activityTypeIcon));
-				holder.activityType.setText(AndroidUtils.getActivityTypeTitle(app, activityType));
+				holder.activityType.setText(getActivityTypeTitle(activityType));
 				holder.activityTypeLabel.setVisibility(View.VISIBLE);
 			}
 			holder.distance.setText(OsmAndFormatter.getFormattedDistance(article.totalDistance, app));
@@ -166,6 +167,17 @@ public class SavedArticlesRvAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 			holder.leftButton.setCompoundDrawablesWithIntrinsicBounds(readIcon, null, null, null);
 			updateSaveButton(holder, article);
 		}
+	}
+
+	@DrawableRes
+	private int getActivityTypeIcon(OsmRouteType activityType) {
+		int iconId = app.getResources().getIdentifier("mx_" + activityType.getIcon(), "drawable", app.getPackageName());
+		return iconId != 0 ? iconId : R.drawable.mx_special_marker;
+	}
+
+	private String getActivityTypeTitle(OsmRouteType activityType) {
+		return AndroidUtils.getActivityTypeStringPropertyName(app, activityType.getName(),
+				capitalizeFirstLetterAndLowercase(activityType.getName()));
 	}
 
 	private void updateSaveButton(TravelGpxVH holder, TravelGpx article) {

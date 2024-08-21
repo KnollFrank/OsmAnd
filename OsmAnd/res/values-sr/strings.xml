@@ -19,14 +19,15 @@
     <string name="local_index_tile_data_expire">Истиче за (минута): %1$s</string>
     <string name="local_index_tile_data_maxzoom">Највеће увеличање: %1$s</string>
     <string name="edit_tilesource_elliptic_tile">Елиптична Меркатор пројекција</string>
-    <string name="edit_tilesource_maxzoom">Максималан зум</string>
-    <string name="edit_tilesource_minzoom">Минималан зум</string>
+    <string name="edit_tilesource_maxzoom">Највеће увеличање</string>
+    <string name="edit_tilesource_minzoom">Најмање увеличање</string>
     <string name="edit_tilesource_url_to_load">Адреса</string>
     <string name="edit_tilesource_choose_existing">Изаберите постојећи…</string>
     <string name="driving_region_japan">Јапан</string>
     <string name="driving_region_us">Сједињене Америчке Државе</string>
     <string name="driving_region_canada">Канада</string>
     <string name="driving_region_europe_asia">Европа, Aзија, Јужна Америка и сличне</string>
+    <string name="driving_region_uk">Велика Британија, Индија и сличне</string>
     <string name="local_index_tile_data_minzoom">Најмање увеличање: %1$s</string>
     <string name="speak_title">Најави…</string>
     <string name="speak_descr">Подесите најаве назива улица, саобраћајних упозорења (лежећи, знаци заустављања), радара и ограничења брзине.</string>
@@ -625,7 +626,7 @@
     <string name="rendering_attr_moreDetailed_name">Више појединости</string>
     <string name="rendering_attr_lessDetailed_name">Мање појединости</string>
     <string name="rendering_attr_hideAccess_name">Забране приступа</string>
-    <string name="rendering_attr_showAccess_name">Приказуј ограничења приступа и путарина</string>
+    <string name="rendering_attr_showAccess_name">Приказуј забране приступа</string>
     <string name="rendering_attr_showSurfaceGrade_name">Приказуј стање путева</string>
     <string name="rendering_attr_showSurfaces_name">Приказуј материјале путева</string>
     <string name="rendering_attr_showCycleRoutes_name">Бициклистичке стазе</string>
@@ -750,9 +751,9 @@
     <string name="routing_attr_avoid_motorway_description">Избегавање аутопутева</string>
     <string name="routing_attr_avoid_borders_name">Без граничних прелаза</string>
     <string name="routing_attr_avoid_borders_description">Избегавање прелажења државних граница</string>
-    <string name="routing_attr_weight_name">Тежина руте</string>
+    <string name="routing_attr_weight_name">Ограничење тежине</string>
     <string name="routing_attr_weight_description">Одреди дозвољену тежину возила на путањи.</string>
-    <string name="routing_attr_height_name">Висина руте</string>
+    <string name="routing_attr_height_name">Ограничење висине</string>
     <string name="routing_attr_height_description">Одреди висину возила која је дозвољена на путевима.</string>
     <string name="copying_osmand_one_file_descr">Умножавам датотеку (%s) на ново одредиште…</string>
     <string name="copying_osmand_files_descr">Умножавам податке ОСМ-а на ново одредиште (%s)…</string>
@@ -1018,7 +1019,7 @@
     <string name="routing_attr_short_way_name">Пут који штеди гориво</string>
     <string name="replace_favorite_confirmation">Замените омиљеног %1$s\?</string>
     <string name="rendering_attr_hideOverground_name">Надземне грађевине</string>
-    <string name="shared_string_change">Промени</string>
+    <string name="shared_string_change">Измени</string>
     <string name="get_started">Почнимо</string>
     <string name="route_stops_before">%1$s стајања пре</string>
     <string name="coords_search">Претрага координата</string>
@@ -1255,7 +1256,10 @@
     <string name="quick_action_auto_zoom_desc">Дугме за укључивање/искључивање брзинско контролисаног аутозумирања мапе.</string>
     <string name="quick_action_auto_zoom_on">Укључи аутозумирање</string>
     <string name="quick_action_auto_zoom_off">Искључи аутозумирање</string>
+    <string name="quick_action_add_destination">Постави одредиште</string>
+    <string name="quick_action_replace_destination">Замени одредиште</string>
     <string name="quick_action_add_destination_desc">Дугме за центрирање одредишта на средину заслона, а свако претходно означено одредиште ће постати последња међутачка.</string>
+    <string name="quick_action_add_first_intermediate">Додај прву пролазну међутачку</string>
     <string name="quick_action_replace_destination_desc">Дугме које центрира ново одредиште на средину заслона, и замењује претходно означено одредиште (ако постоји).</string>
     <string name="no_overlay">Без слоја над картом</string>
     <string name="quick_action_add_first_intermediate_desc">Дугме за центрирање положаја заслона на прву међутачку ка одредишту.</string>
@@ -1277,7 +1281,7 @@
     <string name="routing_attr_relief_smoothness_factor_hills_name">Брдовито</string>
     <string name="routing_attr_relief_smoothness_factor_plains_name">Мање брдовито</string>
     <string name="routing_attr_relief_smoothness_factor_more_plains_name">Равно</string>
-    <string name="routing_attr_driving_style_speed_name">Краће руте</string>
+    <string name="routing_attr_driving_style_speed_name">Краће путање</string>
     <string name="routing_attr_driving_style_balance_name">Уравнотежено</string>
     <string name="routing_attr_driving_style_safety_name">Радије иди споредним</string>
     <string name="relief_smoothness_factor_descr">Омиљено тло: равно или брдовито.</string>
@@ -1328,6 +1332,7 @@
     <string name="download_hillshade_maps">Сенчење</string>
     <string name="offline_edition">Уређивање ван мреже</string>
     <string name="quick_action_new_action">Додај радњу</string>
+    <string name="quick_action_add_favorite">Додај омиљено</string>
     <string name="what_is_here">Овде су:</string>
     <string name="parked_at">остављена у</string>
     <string name="pick_up_till">Покупити до</string>
@@ -1705,7 +1710,7 @@
     <string name="north_west">северозапад</string>
     <string name="north_north_west">север-северозапад</string>
     <string name="accuracy">Тачност</string>
-    <string name="altitude">Алтитуда</string>
+    <string name="altitude">Висина</string>
     <string name="no_info">Нема података</string>
     <string name="i_am_here">Ја сам овде</string>
     <string name="poi_filter_sightseeing">Разгледање знаменитости</string>
@@ -2175,10 +2180,17 @@
     <string name="configure_screen_quick_action">Брзе радње</string>
     <string name="quick_action_item_action">Радња %d</string>
     <string name="quick_action_item_screen">Заслон %d</string>
+    <string name="quick_action_add_poi">Додај тачку занимања</string>
+    <string name="quick_action_map_style">Измени начин приказа карте</string>
     <string name="quick_action_map_style_switch">Начин приказа карте је измењен на „%s“.</string>
+    <string name="quick_action_take_audio_note">Нова звучна белешка</string>
+    <string name="quick_action_take_video_note">Нова белешка видеа</string>
+    <string name="quick_action_take_photo_note">Нова сликовна белешка</string>
+    <string name="quick_action_add_osm_bug">Додај белешку ОСМ-а</string>
     <string name="quick_action_navigation_voice">Укљ/искљ глас</string>
     <string name="quick_action_navigation_voice_off">Укључи глас</string>
     <string name="quick_action_navigation_voice_on">Искључи глас</string>
+    <string name="quick_action_add_parking">Додај место паркирања</string>
     <string name="dialog_add_action_title">Додај радњу</string>
     <string name="quick_actions_delete">Обриши радњу</string>
     <string name="quick_actions_delete_text">Обрисати радњу „%s“\?</string>
@@ -2198,6 +2210,7 @@
     <string name="quick_action_map_style_action">Додај начин приказа карте</string>
     <string name="quick_action_empty_param_error">Попуните све одреднице</string>
     <string name="quick_action_map_styles">Начини приказа карте</string>
+    <string name="quick_action_map_source">Измени извор карте</string>
     <string name="quick_action_map_source_title">Додај извор карте</string>
     <string name="quick_action_map_source_action">Додај извор карте</string>
     <string name="quick_action_map_source_switch">Извор карте промењен на „%s“.</string>
@@ -2259,11 +2272,14 @@
     <string name="update_all">Освежи све (%1$s MB)</string>
     <string name="poi_context_menu_modify_osm_change">Промени измену ОСМ-а</string>
     <string name="last_map_change">Последња измена карте: %s</string>
+    <string name="quick_action_add_marker">Додај ознаку на карти</string>
     <string name="quick_action_fav_name_descr">Оставите празно да се користи адреса или име места.</string>
+    <string name="quick_action_map_overlay">Измени слој над картом</string>
     <string name="quick_action_map_overlay_title">Слојеви изнад карте</string>
     <string name="quick_action_map_overlay_action">Додај слој над картом</string>
     <string name="quick_action_map_overlay_switch">Слој изнад картом промењен на „%s“.</string>
     <string name="quick_action_map_underlay_switch">Слој испод карте промењен на „%s“.</string>
+    <string name="quick_action_map_underlay">Измени слој испод карте</string>
     <string name="quick_action_map_underlay_title">Слојеви испод карте</string>
     <string name="quick_action_map_underlay_action">Додај слој испод карте</string>
     <string name="day_off_label">искљ.</string>
@@ -2627,6 +2643,7 @@
 \n - Окретањем карте према компасу или правцу кретања
 \n - Навођењем у одговарајућу траку, приказ ограничења брзине, снимљени и текстуални гласови за навођење
 \n
+\n
 \n Ограничења бесплатног издања ОсмАнд-а:
 \n - Ограничен број преузимања карата
 \n - Без приступа ТОИ са Википедије када нема интернета
@@ -2849,7 +2866,7 @@
     <string name="rendering_attr_undefined_name">Неодређено</string>
     <string name="time_of_day">Доба дана</string>
     <string name="by_transport_type">До %1$s</string>
-    <string name="step_by_step">Скретање-по-скретање</string>
+    <string name="step_by_step">Корак-по-корак</string>
     <string name="routeInfo_road_types_name">Врсте путева</string>
     <string name="exit_at">Излаз на</string>
     <string name="shared_string_swap">Замени</string>
@@ -2872,8 +2889,8 @@
     <string name="rendering_attr_highway_class_steps_name">Степенице</string>
     <string name="rendering_attr_highway_class_path_name">Стаза</string>
     <string name="rendering_attr_highway_class_cycleway_name">Бициклистичка стаза</string>
-    <string name="routing_attr_avoid_sett_name">Без калдрме</string>
-    <string name="routing_attr_avoid_sett_description">Избегавај калдрму</string>
+    <string name="routing_attr_avoid_sett_name">Без калдрма</string>
+    <string name="routing_attr_avoid_sett_description">Избегавај калдрме</string>
     <string name="send_log">Пошаљи дневник</string>
     <string name="files_moved">Премештено је %1$d датотека (%2$s).</string>
     <string name="files_copied">Умножено је %1$d датотека (%2$s).</string>
@@ -3160,7 +3177,7 @@
     <string name="rendering_attr_piste_difficulty_extreme_name">Крајње сложена</string>
     <string name="rendering_attr_piste_difficulty_undefined_name">Неодређено</string>
     <string name="routeInfo_piste_difficulty_name">Тежина стазе</string>
-    <string name="routing_attr_width_name">Ширина</string>
+    <string name="routing_attr_width_name">Ограничење ширине</string>
     <string name="routing_attr_width_description">Назначите дозвољену ширину возила на путу.</string>
     <string name="avoid_in_routing_descr_">Избегавај одређене путеве и врсте путева</string>
     <string name="app_mode_utv">Упоредно</string>
@@ -3380,14 +3397,14 @@
     <string name="shared_string_routing">Навођење</string>
     <string name="shared_string_app_default_w_val">Подразумевано у програму (%s)</string>
     <string name="no_recalculation_setting">Без прерачунавања</string>
-    <string name="route_recalculation_dist_title">Минимална удаљеност за поновно израчунавање руте</string>
+    <string name="route_recalculation_dist_title">Најмања удаљеност за прерачунавање пута</string>
     <string name="route_recalculation_dist_descr">Пут ће бити прерачунат ако је удаљеност до пута већа од одабране одреднице</string>
     <string name="profile_type_custom_string">Произвољни налог</string>
     <string name="shared_string_angle_param">Угао: %s°</string>
     <string name="shared_string_angle">Угао</string>
     <string name="recalc_angle_dialog_descr">Потпуно прави одсечак између мојег положаја и израчунатог пута биће приказан док се пут не израчуна</string>
     <string name="recalc_angle_dialog_title">Најмањи угао између мојег положаја и пута</string>
-    <string name="shared_string_preparing">Припремам</string>
+    <string name="shared_string_preparing">Препремам</string>
     <string name="shared_string_poi_types">Врсте тачака занимања</string>
     <string name="shared_string_nothing_selected">Ништа није означено</string>
     <string name="shared_string_quick_actions">Брзе радње</string>
@@ -3455,7 +3472,7 @@
     <string name="height_limit_description">Унесите висину возила, нека ограничења пута могу бити примењена за висока возила.</string>
     <string name="weight_limit_description">Унесите тежину возила, нека ограничења пута могу бити примењена за тешка возила.</string>
     <string name="system_screen_timeout_descr">Искључи заслон према системском времену закључавања.</string>
-    <string name="shared_string_always">Увек</string>
+    <string name="shared_string_always">Увек&gt;</string>
     <string name="screen_control">Управљање заслоном</string>
     <string name="system_screen_timeout">Користи системско време закључавања заслона</string>
     <string name="turn_screen_on_descr">Одаберите могућности укључивања заслона (ОсмАнд треба да буде у прочељу када се уређај закључа):</string>
@@ -3504,7 +3521,7 @@
     <string name="app_mode_inline_skates">Котураљке</string>
     <string name="speed_cameras_restart_descr">Поново покрените програм ради брисања свих података брзинских камера.</string>
     <string name="item_deleted">%1$s обрисано</string>
-    <string name="routing_attr_length_name">Дужина</string>
+    <string name="routing_attr_length_name">Ограничење дужине</string>
     <string name="shared_string_bearing">Правац</string>
     <string name="quick_action_showhide_mapillary_descr">Прикажи или сакриј слој Мапиларија на карти.</string>
     <string name="routing_attr_length_description">Одаберите дужину возила која је дозвољена на путевима.</string>
@@ -3641,6 +3658,7 @@
 \n
 \n%2$s: су ступњеви при којима ће изворне плочице бити видљиве, а умањење или увећање биће изван ових вредности.</string>
     <string name="lenght_limit_description">Унесите дужину возила, нека ограничења пута могу бити примењена за дужа возила.</string>
+    <string name="quick_action_remove_next_destination">Обриши следећу одредишну тачку</string>
     <string name="please_provide_point_name_error">Молимо одредите име тачке</string>
     <string name="quick_action_remove_next_destination_descr">Уклања тренутну одредишну тачку. Ако је она и завршна тачка, навођење ће се зауставити.</string>
     <string name="search_download_wikipedia_maps">Преузмите карте Википедије</string>
@@ -3694,6 +3712,7 @@
     <string name="empty_state_my_tracks">Додај датотеке трагова</string>
     <string name="empty_state_my_tracks_desc">Увези или сними датотеке трагова</string>
     <string name="context_menu_item_add_waypoint">Додај тачку трага</string>
+    <string name="quick_action_add_gpx">Додај тачку трага</string>
     <string name="map_widget_monitoring">Снимање путовања</string>
     <string name="marker_save_as_track">Сачувај као датотеку трага</string>
     <string name="follow_track">Следи траг</string>
@@ -4443,8 +4462,8 @@
     <string name="always_ask_waypoint_appearance_description">Додиром на ову радњу отвориће се заслон „Додај пролазну тачку“, где можете променити име и појаву.</string>
     <string name="shared_string_open_street_map">ОпенСтритМап</string>
     <string name="rendering_attr_OSMMapperAssistantFixme_name">Ознаке поправке</string>
-    <string name="rendering_attr_showWaterwayTunnels_name">Повећана видљивост за тунеле пловних путева</string>
-    <string name="rendering_attr_showWaterwayTunnels_description">Повећање видљивости за тунеле водених путева</string>
+    <string name="rendering_attr_showWaterwayTunnels_name">Тунели пловних путева</string>
+    <string name="rendering_attr_showWaterwayTunnels_description">Не скривај тунеле за водене путеве</string>
     <string name="rendering_attr_OSMMapperAssistantFixme_description">Прикажи ознаке поправке</string>
     <string name="rendering_attr_OSMMapperAssistantNote_name">Ознаке за белешке</string>
     <string name="rendering_attr_OSMMapperAssistantNote_description">Прикажи ознаке белешки</string>
@@ -4607,7 +4626,7 @@
     <string name="route_maneuvers_desc">Навигациони видгети су омогућени током навигације за приказ информација као што су растојање, време доласка или преостало време, следећа скретања, смер, тренутни назив улице, информације о тракама, максимална брзина, упозорења о приближавању, ТОИ, тачке пута.</string>
     <string name="audio_video_notes_desc">Омогућава брзи приступ за почетак/заустављање снимања звука, видеа или сликовне белешке.</string>
     <string name="routing_attr_difficulty_preference_intermediate_name">Средњи</string>
-    <string name="calculate_online">Израчунај мрежно</string>
+    <string name="calculate_online">Рачунање на мрежи</string>
     <string name="track_attach_to_the_roads_descr">Стаза ће бити прикачена за пут помоћу ванмрежних карата, облик стазе ће бити промењен.</string>
     <string name="get_altitude_data">Добави податке о надморској висини</string>
     <string name="calculate_altitude">Рачунај надморску висину</string>
@@ -4646,7 +4665,7 @@
     <string name="use_latin_name_if_missing">Користи латинично име ако недостаје</string>
     <string name="import_as_one_track">Увези као једну путању</string>
     <string name="routing_attr_motor_type_electric_name">Електрична</string>
-    <string name="routing_attr_motor_type_name">Гориво коришћено мотором</string>
+    <string name="routing_attr_motor_type_name">Мотор возила</string>
     <string name="routing_attr_motor_type_lpg_name">Плин</string>
     <string name="routing_attr_motor_type_gas_name">Метан (CNG)</string>
     <string name="transport_hazmat_no_desc">На неким путевима и тунелима може бити забрањен превоз опасних твари.</string>
@@ -4657,7 +4676,7 @@
     <string name="routing_attr_motor_type_diesel_name">Дизел</string>
     <string name="routing_attr_motor_type_petrol_name">Бензин</string>
     <string name="transport_hazmat_yes_desc">Одаберите применљиву врсту.</string>
-    <string name="transport_hazmat_title">Превожење опасних материја</string>
+    <string name="transport_hazmat_title">Превожење опасних твари</string>
     <string name="download_heightmap_maps">Висинска карта</string>
     <string name="av_notes_photo_widget_desc">Тап по справици ће усликати слику.</string>
     <string name="compass_always_visible">Увек видљиво</string>
@@ -5021,6 +5040,7 @@
     <string name="app_mode_moped">Мопед</string>
     <string name="inch">инч</string>
     <string name="shared_string_yards">јарди</string>
+    <string name="change_default_tracks_appearance_confirmation_description">Да ли изменити изглед трага %1$s\?</string>
     <string name="shared_string_apply_changes">Примени измене</string>
     <string name="no_visible_tracks_description">Изаберите трагове за приказ на карти.</string>
     <string name="no_visible_tracks">Нема трагова на карти</string>
@@ -5183,7 +5203,7 @@
     <string name="ant_plus_bluetooth_off">Блутут је искључен</string>
     <string name="ant_plus_bluetooth_off_description">Укључите претрагу Блутута и упарите пријемнике.</string>
     <string name="delete_folder">Избриши фолдер</string>
-    <string name="delete_track_folder_dialog_message">Ово ће избрисати фолдер „%1$s“ и све %2$s садржане стазе.</string>
+    <string name="delete_track_folder_dialog_message">Ово ће избрисати фасциклу „%1$s“ и све садржане стазе (%2$s).</string>
     <string name="track_not_recorded">Није снимљено</string>
     <string name="shared_string_new_track">Нови траг</string>
     <string name="map_2d_mode_action">Површински начин приказа (2д)</string>
@@ -5225,7 +5245,7 @@
     <string name="osmand_cloud_deletion_all_data_warning">Сви подаци из Облака ОсмАнда ће бити %1$s. Подаци на уређају ће остати нетакнути.</string>
     <string name="send_crash_log_descr">Садржи само податке о рушењима програма</string>
     <string name="help_article_plan_route_coordinate_input_name">Унос координата</string>
-    <string name="dangerous_goods_description">На неким путевима и тунелима није дозвољен превоз опасних материја.</string>
+    <string name="dangerous_goods_description">На неким путевима и тунелима превоз опасних твари је забрањен.</string>
     <string name="delete_account">Обриши налог</string>
     <string name="write_bearing">Пиши усмерење страна света</string>
     <string name="routing_attr_allow_via_ferrata_description">Планинарска путања опремљена постављеним ужадима, гредама, лествицама и брвнима.</string>
@@ -5357,7 +5377,7 @@
     <string name="osmand_cloud_deleting_account_descr">Кроз неколико тренутака ће сви Ваши подаци и налози бити избрисани из Облака ОсмАнда.
 \n
 \nСви подаци на уређају остаће целовити.</string>
-    <string name="shared_string_class">Класа</string>
+    <string name="shared_string_class">Врста</string>
     <string name="help_article_navigation_routing_bicycle_based_routing_name">Путања бициклом (МТБ)</string>
     <string name="routing_attr_hazmat_category_usa_2_name">Плинови</string>
     <string name="dangerous_goods">Опасна роба</string>
@@ -5541,7 +5561,7 @@
     <string name="widget_available_ram">Доступан РАМ</string>
     <string name="filter_by_name">Филтер по имену</string>
     <string name="special_routing_cpp">Специјални тип рутирања</string>
-    <string name="delete_smart_folder_dialog_message">Ово ће уклонити паметан фолдер \"%1$s\". (Ниједна путања неће бити избрисана.)</string>
+    <string name="delete_smart_folder_dialog_message">Ово ће избрисати \"%1$s\" паметан фолдер.</string>
     <string name="discard_filter_changes_prompt">Ресетовати све филтере?</string>
     <string name="empty_name">Празно име</string>
     <string name="calculate_offline_altitude_descr">Израчунавање елевације офлајн, на основу података Теренске мапе (3Д). Разлике у односу на сачувану висину на уређају могу се користити за корекцију елевације.</string>
@@ -5629,8 +5649,6 @@
 \n
 \n • Додати филтери према подацима сензора за стазе
 \n
-\n • Побољшано прилагођавање изгледа за групу путања
-\n
 \n • Додата подршка за додатне ГПКС ознаке
 \n
 \n • Прилагодите „Удаљеност током навигације“: бирајте између прецизних или заокружите бројеве
@@ -5640,208 +5658,4 @@
 \n • ОпенСтритМап пријављивање је пребачено на ОАут 2.0
 \n
 \n</string>
-    <string name="distance_during_navigation">Растојање током навигације</string>
-    <string name="precise">Прецизно</string>
-    <string name="distance_during_navigation_description">Одаберите како се информације о удаљености приказују у навигационим виџетима (удаљеност до тачке, следеће скретање, траке).
-\n
-\nИзаберите „%1$s“ за тачне бројеве или „%2$s“ за лакшу читљивост.</string>
-    <string name="round_up">Заокружено</string>
-    <string name="upload_local_versions">Отпреми локалне верзије</string>
-    <string name="download_cloud_versions">Преузми верзије облака</string>
-    <string name="map_widget_map_scale">Размера мапе</string>
-    <string name="unchanged_parameter_summary">Свака путања задржаће своје сопствене параметре.</string>
-    <string name="shared_string_unchanged">Непромењено</string>
-    <string name="gpx_approximation_cpp">Рутирање-базирано (C++)</string>
-    <string name="gpx_approximation_geo_java">Рутирање-базирано (Јава, брзо)</string>
-    <string name="gpx_approximation_java">Рутирање-базирано (Јава)</string>
-    <string name="fix_north_up_descr">Не ротирајте мапу покретима у оријентацији карте Север Горе</string>
-    <string name="fix_north_up">Омогући Фиксни Север Горе</string>
-    <string name="change_default_appearance_confirmation">Променити подразумеван изглед за %1$s?</string>
-    <string name="release_4_8">• Нова опција бојења терена „Висина“
-\n
-\n • Прилагођене палете боја за терен, стазе и руте
-\n
-\n • 3Д варијанта за иконе положаја локације
-\n
-\n • Брзе радње се сада могу доделити спољним тастатурама
-\n
-\n • Време: Освежавање корисничког интерфејса, додата анимација ветра
-\n
-\n • Побољшања 3Д стаза: нове опције визуелизације и колоризације
-\n
-\n • Проширен избор туристичких рута на мапи
-\n
-\n • Додата опција теме апликације за праћење режима мапе
-\n
-\n • Поправљена статистика стаза, сортирање и претрага
-\n
-\n • ОСМ уређивање: избрисани начин ауторизације пријаве/лозинке
-\n
-\n • Прелазак на систем дељења листа почевши од Андроид 14
-\n
-\n</string>
-    <string name="use_3d_track_visualization">3Д визуелизација</string>
-    <string name="apply_only_to_new">Примени само на ново</string>
-    <string name="change_default_tracks_appearance_confirmation">Применити промене на постојеће путање у фолдеру или само на нове?</string>
-    <string name="shared_string_changes">Промене</string>
-    <string name="shared_string_scale">Skala</string>
-    <string name="relief_3d_download_description">Potrebne su dodatne mape za prikaz terena na mapi.</string>
-    <string name="vertical_exaggeration_description">Promenom vrednosti skale možete naglasiti 3D reljef.</string>
-    <string name="vertical_exaggeration">Vertikalno uvećanje</string>
-    <string name="use_terrain_maps">Користи Теренске мапе</string>
-    <string name="use_nearby_roads">Користи оближње путеве</string>
-    <string name="use_terrain_maps_summary">Користе се мапе терена за податке о надморској висини. Геометрија путање остаје непромењена.</string>
-    <string name="use_nearby_roads_summary">Користи се ванмрежна мапа ради проналажења оближњих путева и података о надморској висини. Може прилагодити геометрију путање.</string>
-    <string name="retrieve_elevation_data_summary">ОсмАнд може да преузме податке о надморској висини са оближњих путева или мапа терена.</string>
-    <string name="delete_actions_button">Дугме за брисање</string>
-    <string name="shared_string_osm_id">ОСМ ИД</string>
-    <string name="delete_actions_button_confirmation">Да ли сте сигурни да желите да избришете „%1$s“ са свим додатим радњама?</string>
-    <string name="route_line_use_coloring_altitude">Линија руте је обојена по надморској висини.</string>
-    <string name="getting_list_of_required_maps">Преузима се листа потребних мапа…</string>
-    <string name="required_maps">Потребне Мапе</string>
-    <string name="missing_maps_description">Неке ванмрежне мапе потребне за ову руту недостају или нису ажуриране. Преузмите или ажурирајте ове мапе.</string>
-    <string name="missing_maps_header">Недостајуће или застареле мапе</string>
-    <string name="route_line_use_coloring_speed">Линија руте је обојена по брзини кретања.</string>
-    <string name="maps_that_also_be_used">Мапе које ће се такође користити: %1$s</string>
-    <string name="required_maps_calculate_online_summary">Листа мапа које недостају заснива се на праволинијској рути. Да бисте добили тачну листу мапа, ОсмАнд може унапред да израчуна вашу руту на мрежи.</string>
-    <string name="downward_gradient">Надоле градијент</string>
-    <string name="upward_gradient">Градијент навише</string>
-    <string name="bottom">Дно</string>
-    <string name="explore_3d_track_description">Истражите путању у интерактивном 3Д! Визуелизујте висину, брзину и још много тога директно на мапи.</string>
-    <string name="gpx_approximation_geo_cpp">Засновано на геометрији (C++, брзо)</string>
-    <string name="track_vertical_exaggeration_description">Променом вредности размере, можете променити висину 3Д стазе.</string>
-    <string name="top_and_bottom">Врх и дно</string>
-    <string name="title_3d_track">3Д Путања</string>
-    <string name="visualized_by">Визуализовано од</string>
-    <string name="wall_color">Боја зида</string>
-    <string name="track_line">Линија стазе</string>
-    <string name="fixed_height">Фиксна висина</string>
-    <string name="top">Врх</string>
-    <string name="allow_display_on_top">Дозволи приказ на врху</string>
-    <string name="allow_display_on_top_description">Дозволи приказивање текстова мапе један на другом</string>
-    <string name="show_debug_info">Прикажи информације за отклањање грешака</string>
-    <string name="show_debug_info_description">Приказ графичке информације о положају сваког текста на мапи</string>
-    <string name="map_text">Текстови мапе</string>
-    <string name="routing_attr_avoid_cobblestone_name">Избегавај калдрму</string>
-    <string name="routing_attr_avoid_cobblestone_description">Избегавање калдрме</string>
-    <string name="steps_per_minute_unit">КПМ</string>
-    <string name="disable_map_layers_descr">Онемогућите све слојеве мапе изнад векторске мапе (потребно је поновно покретање).</string>
-    <string name="disable_map_layers">Онемогући слојеве мапе</string>
-    <string name="height_legend_description">За визуелизацију рељефа користе се висинске мапе у боји.</string>
-    <string name="travel_topics">Теме путовања</string>
-    <string name="play_weather_forecast">Пусти временску прогнозу</string>
-    <string name="change_terrain_color_scheme">Промена шеме боје терена</string>
-    <string name="clear_all_key_shortcuts_summary">Сва додељења тастера за изабрани тип ће бити уклоњена.</string>
-    <string name="no_assigned_keys_desc">Изаберите акцију и доделите тастер додиром на дугме „Додај“.</string>
-    <string name="new_key_assignment">Ново додељење тастера</string>
-    <string name="key_name_pattern">Тастер \"%1$s\"</string>
-    <string name="key_assignment_add_key">Додај тастер</string>
-    <string name="no_assigned_keys">Нема додељених тастера</string>
-    <string name="shared_string_key">Тастер</string>
-    <string name="wall_height">Висина зида</string>
-    <string name="clear_all_key_shortcuts">Уклони све пречице тастера</string>
-    <string name="rendering_value_dark_orange_name">Тамно наранџаста</string>
-    <string name="clear_key_assignment_summary">Додељивање тастера за изабрану радњу ће бити обрисано.</string>
-    <string name="key_assignment_add_action">Додај акцију</string>
-    <string name="assigned_keys">Додељења тастера</string>
-    <string name="action_icon">Додај икону</string>
-    <string name="user_palette">Корисничка палета</string>
-    <string name="shared_string_colors">Боје</string>
-    <string name="missing_maps_ignore">Користи преузете мапе</string>
-    <string name="backup_error_failed_to_transfer_file">Пренос датотеке(а) у облаку није успео.</string>
-    <string name="contact_support_retry">Покушајте поново или контактирајте подршку</string>
-    <string name="tomorrow">Сутрадан</string>
-    <string name="map_settings_weather_wind_animation">Анимација ветра</string>
-    <string name="daynight_mode_sensor_summary">Користи светлосни сензор уређаја за пребацивање између светлих и тамних тема у складу са нивоима амбијенталног светла.</string>
-    <string name="daynight_mode_sunrise_sunset_summary">Аутоматски пребацује између дневне и ноћне теме на основу локалног времена изласка и заласка сунца.</string>
-    <string name="daynight_mode_night_summary">Увек приказује мапу у тамној теми, погодној за ноћне услове или услове слабог осветљења.</string>
-    <string name="daynight_mode_day_summary">Увек приказује мапу у светлој теми, идеално за видљивост током дана.</string>
-    <string name="daynight_mode_app_theme">Тема апликације</string>
-    <string name="key_event_action_continuous_zoom_out">Континуирано умањивање</string>
-    <string name="remove_key_assignment_summary">Додељивање тастера за изабрану радњу ће бити уклоњено.</string>
-    <string name="remove_key_assignment">Уклони додељивање тастера</string>
-    <string name="daynight_mode_app_theme_summary">Приказ мапе је у складу са општом темом апликације — дневни режим за светлу тему и ноћни режим за тамну тему</string>
-    <string name="key_event_action_continuous_zoom_in">Континуирано увећавање</string>
-    <string name="weather_data_sources_prompt">ОсмАнд пружа временске податке из два извора:</string>
-    <string name="weather_source_ecmwf_description">Европски Центар за средњерочне временске прогнозе</string>
-    <string name="weather_source_GFS_description">Глобални систем прогнозе Националног центра за предвиђање животне средине</string>
-    <string name="weather_source_ecmwf_title">ЕЦМВП</string>
-    <string name="weather_source_GFS_title">ГФС</string>
-    <string name="data_source">Извор података</string>
-    <string name="shared_string_modify">Измени</string>
-    <string name="missing_maps_ignore_details">Преузете мапе покривају вашу руту? Крећите се са њима ако сте упознати са подручјем.</string>
-    <string name="quick_action_map_underlay">Подслој</string>
-    <string name="quick_action_map_overlay">Надслој</string>
-    <string name="quick_action_to_my_location">Ка Мојој локацији</string>
-    <string name="shared_string_set">Постави</string>
-    <string name="shared_string_simulate">Симулирај</string>
-    <string name="quick_action_remove_next_destination">Следећа одредишна тачка</string>
-    <string name="quick_action_map_style">Стил мапе</string>
-    <string name="quick_action_location_by_gpx">Локација по ГПИксу</string>
-    <string name="quick_action_terrain_color_scheme">Теренска шема боја</string>
-    <string name="quick_action_directions_from">Почетна тачка</string>
-    <string name="quick_action_destination">Одредиште</string>
-    <string name="quick_action_move_map_left">Мапу према лево</string>
-    <string name="quick_action_move_map_right">Мапу према десно</string>
-    <string name="quick_action_move_map_down">Мапу на доле</string>
-    <string name="quick_action_move_map_up">Мапу на горе</string>
-    <string name="quick_action_new_route">Нова рута</string>
-    <string name="quick_action_previous_app_profile">Додај профил претходном</string>
-    <string name="quick_action_next_app_profile">Додај профил следећем</string>
-    <string name="app_profile">Додај профил</string>
-    <string name="shared_string_create">Креирај</string>
-    <string name="shared_string_replace">Замени</string>
-    <string name="quick_action_display_position_in_center">Прикажи позицију увек у центру</string>
-    <string name="quick_action_terrain">Теренски тип бојења</string>
-    <string name="quick_action_first_intermediate">Прво између</string>
-    <string name="quick_action_audio_note">Звучна белешка</string>
-    <string name="quick_action_video_note">Видео белешка</string>
-    <string name="quick_action_photo_note">Сликовна белешка</string>
-    <string name="quick_action_track_waypoint">Пролазна тачка стазе</string>
-    <string name="quick_action_parking_place">Паркинг место</string>
-    <string name="quick_action_verb_show_hide">Прикажи / Сакриј</string>
-    <string name="quick_action_verb_pause_resume">Паузирај / Настави</string>
-    <string name="quick_action_verb_turn_on_off">Укључи / Искључи</string>
-    <string name="quick_action_verb_start_stop">Почни / Стопирај</string>
-    <string name="weather_screen">Екран временске прогнозе</string>
-    <string name="energy_avg_info_description">Ниво батерије у минути: %1$s
-\nПотрошња енергије (mAh): %2$s</string>
-    <string name="rendering_avg_info">Статистика приказивања (просечно 1 / 5/ 15 минута)</string>
-    <string name="rendering_avg_info_description">FPS према последњих 1k кадрова: %1$s
-\nCPU базично: %2$s
-\nGPU 1k: %3$s
-\nIDLE 1k: %4$s</string>
-    <string name="energy_avg_info">Енергетска статистика (просек 1 / 5 / 15 минута)</string>
-    <string name="choose_map_orientation">Одаберите орјентацију мапе</string>
-    <string name="navigation_position_icon">Икона навигационе позиције</string>
-    <string name="resting_position_icon">Икона положаја за одмор</string>
-    <string name="shared_string_all_icons">Све иконе</string>
-    <string name="rendering_value_pale_name">Бледо</string>
-    <string name="profile_icon">Икона профила</string>
-    <string name="navigation_position_icon_summary">Икона се приказује док сте усмеравани или се крећете.</string>
-    <string name="resting_position_icon_summary">Икона се приказује када се не крећете.</string>
-    <string name="navigation_position">Положај навигације</string>
-    <string name="resting_navigation_position">Положај мировања и навигације</string>
-    <string name="view_angle">Угао гледања</string>
-    <string name="location_radius">Опсег локације</string>
-    <string name="view_angle_description">Приказује област у облику конуса према којој сте тренутно постављени</string>
-    <string name="resting_position">Положај мировања</string>
-    <string name="location_radius_description">Приказује кружну област која представља вашу тренутну тачност локације</string>
-    <string name="rendering_avg_info_details">FPS према последњим 1k кадрова: %1$s
-\nCPU (плочице): %2$s
-\nCPU (време мировања): %3$s
-\nCPU (чекање GPU): %4$s</string>
-    <string name="auto_25_chars_route_kr">Настави десно</string>
-    <string name="auto_25_chars_route_tr">Скрени десно</string>
-    <string name="auto_25_chars_route_tshr">Скрени оштро десно</string>
-    <string name="auto_25_chars_route_tslr">Скрени мало десно</string>
-    <string name="auto_25_chars_route_tl">Скрени лево</string>
-    <string name="auto_25_chars_route_tu">Направи полукруг</string>
-    <string name="auto_25_chars_route_kl">Настави лево</string>
-    <string name="auto_25_chars_route_tshl">Скрени оштро лево</string>
-    <string name="auto_25_chars_route_tsll">Скрени мало лево</string>
-    <string name="hugerock_promo_description">Бесплатан приступ функцијама укључујући неограничено преузимање мапа, 3Д рељеф итд. за %1$s месец</string>
-    <string name="driving_region_india">Индија</string>
-    <string name="hugerock_promo">Хјуџрок Промоција за %1$s месеца</string>
-    <string name="driving_region_uk">ВБ и слично</string>
 </resources>

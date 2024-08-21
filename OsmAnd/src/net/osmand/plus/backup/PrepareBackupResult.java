@@ -134,7 +134,7 @@ public class PrepareBackupResult {
 		this.localFiles = localFileMap;
 	}
 
-	public void setError(@Nullable String error) {
+	void setError(@Nullable String error) {
 		this.error = error;
 	}
 }

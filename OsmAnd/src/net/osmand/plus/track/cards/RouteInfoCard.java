@@ -1,6 +1,7 @@
 package net.osmand.plus.track.cards;
 
 import android.text.util.Linkify;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -20,13 +21,12 @@ import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.helpers.AndroidUiHelper;
-import net.osmand.plus.helpers.LocaleHelper;
-import net.osmand.plus.plugins.PluginsHelper;
-import net.osmand.plus.plugins.osmedit.OsmEditingPlugin;
+import net.osmand.plus.mapcontextmenu.builders.AmenityMenuBuilder;
 import net.osmand.plus.routepreparationmenu.cards.MapBaseCard;
 import net.osmand.plus.settings.backend.OsmAndAppCustomization;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.ColorUtilities;
+import net.osmand.plus.utils.UiUtilities;
 import net.osmand.plus.widgets.tools.ClickableSpanTouchListener;
 import net.osmand.plus.wikipedia.WikiAlgorithms;
 import net.osmand.plus.wikipedia.WikiArticleHelper;
@@ -45,17 +45,18 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
 import static net.osmand.aidlapi.OsmAndCustomizationConstants.CONTEXT_MENU_LINKS_ID;
+import static net.osmand.plus.utils.AndroidUtils.getActivityTypeStringPropertyName;
+import static net.osmand.plus.utils.AndroidUtils.getStringByProperty;
+import static net.osmand.util.Algorithms.capitalizeFirstLetterAndLowercase;
 
 public class RouteInfoCard extends MapBaseCard {
 
-	private static final String OSM_RELATION_URL = "https://www.openstreetmap.org/relation/";
 	private static final Map<String, Integer> TRANSLATABLE_KEYS = new HashMap<>();
 
 	static {
 		TRANSLATABLE_KEYS.put("name", R.string.shared_string_name);
 		TRANSLATABLE_KEYS.put("alt_name", R.string.shared_string_alt_name);
 		TRANSLATABLE_KEYS.put("symbol", R.string.shared_string_symbol);
-		TRANSLATABLE_KEYS.put("relation_id", R.string.shared_string_osm_id);
 	}
 
 
@@ -82,7 +83,11 @@ public class RouteInfoCard extends MapBaseCard {
 		LinearLayout container = view.findViewById(R.id.items_container);
 		container.removeAllViews();
 
-		String routeTypeToDisplay = AndroidUtils.getActivityTypeTitle(app, routeKey.type);
+		RouteKey routeKey = this.routeKey;
+		String routeTypeName = routeKey.type.getName();
+
+		String routeTypeToDisplay = capitalizeFirstLetterAndLowercase(routeTypeName);
+		routeTypeToDisplay = getActivityTypeStringPropertyName(app, routeTypeName, routeTypeToDisplay);
 		addInfoRow(container, app.getString(R.string.layer_route), routeTypeToDisplay, false, false);
 
 		for (TagsRow row : getRows()) {
@@ -92,7 +97,6 @@ public class RouteInfoCard extends MapBaseCard {
 
 			for (int tagIndex = 0; tagIndex < tagsCount; tagIndex++) {
 				RouteTag tag = row.tags.get(tagIndex);
-				if (!shouldAddRow(tag.key)) break;
 
 				ViewGroup tagContainer = tagIndex == 0 ? container : expandableView;
 				View view = addInfoRow(tagContainer, tag);
@@ -165,20 +169,15 @@ public class RouteInfoCard extends MapBaseCard {
 		OsmAndAppCustomization customization = app.getAppCustomization();
 		if ("wikipedia".equals(tag.key)) {
 			if (Algorithms.isUrl(formattedValue) && customization.isFeatureEnabled(CONTEXT_MENU_LINKS_ID)) {
-				setupClickableContent(view,
-						v -> WikiArticleHelper.askShowArticle(activity, nightMode, collectTrackPoints(), formattedValue));
+				TextView tvContent = view.findViewById(R.id.title);
+				tvContent.setTextColor(ColorUtilities.getActiveColor(app, nightMode));
+				view.setOnClickListener(v -> {
+					WikiArticleHelper.askShowArticle(activity, nightMode, collectTrackPoints(), formattedValue);
+				});
 			}
-		} else if ("relation_id".equals(tag.key)) {
-			String url = OSM_RELATION_URL + formattedValue;
-			setupClickableContent(view, v -> AndroidUtils.openUrl(activity, url, nightMode));
 		}
-		return view;
-	}
 
-	private void setupClickableContent(@NonNull View view, @NonNull OnClickListener onClickListener) {
-		TextView tvContent = view.findViewById(R.id.title);
-		tvContent.setTextColor(ColorUtilities.getActiveColor(app, nightMode));
-		tvContent.setOnClickListener(onClickListener);
+		return view;
 	}
 
 	@NonNull
@@ -244,13 +243,6 @@ public class RouteInfoCard extends MapBaseCard {
 		return points;
 	}
 
-	private boolean shouldAddRow(@NonNull String key) {
-		if ("relation_id".equals(key)) {
-			return PluginsHelper.isEnabled(OsmEditingPlugin.class);
-		}
-		return true;
-	}
-
 	private static class RouteTag {
 
 		@NonNull
@@ -280,18 +272,17 @@ public class RouteInfoCard extends MapBaseCard {
 					String langId = key.substring(keyStart.length());
 					String displayLanguage = new Locale(langId).getDisplayLanguage();
 					return app.getString(R.string.ltr_or_rtl_combine_via_colon, nameStr, displayLanguage);
-				} else if (key.equals(translatableKey.getKey())) {
-					return app.getString(translatableKey.getValue());
 				}
 			}
-			return poiType != null ? poiType.getTranslation() : Algorithms.capitalizeFirstLetterAndLowercase(key);
+
+			return poiType != null ? poiType.getTranslation() : capitalizeFirstLetterAndLowercase(key);
 		}
 
 		@NonNull
 		public String getFormattedValue(@NonNull OsmandApplication app, @NonNull OsmRouteType routeType) {
 			switch (key) {
 				case "network":
-					String network = AndroidUtils.getStringByProperty(app, "poi_route_" + routeType.getName() + "_" + value + "_poi");
+					String network = getStringByProperty(app, "poi_route_" + routeType.getName() + "_" + value + "_poi");
 					return Algorithms.isEmpty(network) ? value : network;
 				case "wikipedia":
 					return WikiAlgorithms.getWikiUrl(value);
@@ -334,7 +325,7 @@ public class RouteInfoCard extends MapBaseCard {
 				}
 			}
 
-			Locale preferredLocale = LocaleHelper.getPreferredNameLocale(app, localeIds);
+			Locale preferredLocale = AmenityMenuBuilder.getPreferredNameLocale(app, localeIds);
 			String preferredLocaleId = preferredLocale != null ? preferredLocale.getLanguage() : null;
 			boolean finalHasNativeName = hasNativeName;
 

@@ -92,7 +92,6 @@ public class RendererRegistry {
 		internalRenderers.put(PUBLICTRANSPORTROUTES_RENDER, "publictransportroutes" + ADDON_RENDERER_INDEX_EXT);
 	}
 
-	@Nullable
 	public RenderingRulesStorage defaultRender() {
 		if (defaultRender == null) {
 			defaultRender = getRenderer(DEFAULT_RENDER);
@@ -414,7 +413,6 @@ public class RendererRegistry {
 		return "";
 	}
 
-	@Nullable
 	public RenderingRulesStorage getCurrentSelectedRenderer() {
 		if (currentSelectedRender == null) {
 			return defaultRender();

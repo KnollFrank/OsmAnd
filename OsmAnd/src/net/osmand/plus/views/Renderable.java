@@ -10,14 +10,12 @@ import android.graphics.Shader;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import net.osmand.data.QuadRect;
-import net.osmand.data.RotatedTileBox;
 import net.osmand.gpx.GPXUtilities;
 import net.osmand.gpx.GPXUtilities.WptPt;
-import net.osmand.plus.card.color.palette.gradient.PaletteGradientColor;
+import net.osmand.data.QuadRect;
+import net.osmand.data.RotatedTileBox;
 import net.osmand.plus.routing.ColoringType;
 import net.osmand.plus.track.GradientScaleType;
-import net.osmand.plus.track.Track3DStyle;
 import net.osmand.plus.views.layers.MapTileLayer;
 import net.osmand.plus.views.layers.geometry.GpxGeometryWay;
 import net.osmand.router.RouteSegmentResult;
@@ -85,12 +83,10 @@ public class Renderable {
 
         @NonNull
         protected ColoringType coloringType = ColoringType.TRACK_SOLID;
-        protected String gradientColorPalette = PaletteGradientColor.DEFAULT_NAME;
         protected String routeInfoAttribute;
 
         protected GpxGeometryWay geometryWay;
         protected boolean drawArrows;
-        protected Track3DStyle track3DStyle;
 
         public RenderableSegment(List<WptPt> points, double segmentSize) {
             this.points = points;
@@ -105,12 +101,6 @@ public class Renderable {
         public boolean setDrawArrows(boolean drawArrows) {
             boolean changed = this.drawArrows != drawArrows;
             this.drawArrows = drawArrows;
-            return changed;
-        }
-
-        public boolean setTrack3DStyle(@Nullable Track3DStyle track3DStyle) {
-            boolean changed = !Algorithms.objectEquals(this.track3DStyle, track3DStyle);
-            this.track3DStyle = track3DStyle;
             return changed;
         }
 
@@ -130,18 +120,15 @@ public class Renderable {
 
         public boolean setTrackParams(int color, String width,
                                       @NonNull ColoringType coloringType,
-                                      @Nullable String routeInfoAttribute,
-                                      @Nullable String gradientColorPalette) {
+                                      @Nullable String routeInfoAttribute) {
             boolean changed = this.color != color
                     || !Algorithms.stringsEqual(this.width, width)
                     || this.coloringType != coloringType
-                    || !Algorithms.stringsEqual(this.routeInfoAttribute, routeInfoAttribute)
-                    || !Algorithms.stringsEqual(this.gradientColorPalette, gradientColorPalette);
+                    || !Algorithms.stringsEqual(this.routeInfoAttribute, routeInfoAttribute);
             this.color = color;
             this.width = width;
             this.coloringType = coloringType;
             this.routeInfoAttribute = routeInfoAttribute;
-            this.gradientColorPalette = gradientColorPalette;
             return changed;
         }
 
@@ -199,18 +186,17 @@ public class Renderable {
         public void drawGeometry(@NonNull Canvas canvas, @NonNull RotatedTileBox tileBox,
                                  @NonNull QuadRect quadRect, int trackColor, float trackWidth,
                                  @Nullable float[] dashPattern) {
-            drawGeometry(canvas, tileBox, quadRect, trackColor, trackWidth, dashPattern, drawArrows, track3DStyle);
+            drawGeometry(canvas, tileBox, quadRect, trackColor, trackWidth, dashPattern, drawArrows);
         }
 
         public void drawGeometry(@NonNull Canvas canvas, @NonNull RotatedTileBox tileBox,
                                  @NonNull QuadRect quadRect, int trackColor, float trackWidth,
-                                 @Nullable float[] dashPattern, boolean drawArrows,
-                                 @Nullable Track3DStyle track3DStyle) {
+                                 @Nullable float[] dashPattern, boolean drawArrows) {
             if (geometryWay != null) {
                 List<WptPt> points = coloringType.isRouteInfoAttribute() ? this.points : getPointsForDrawing();
                 if (!Algorithms.isEmpty(points)) {
                     geometryWay.setTrackStyleParams(trackColor, trackWidth, dashPattern, drawArrows,
-                            track3DStyle, coloringType, routeInfoAttribute, gradientColorPalette);
+                            coloringType, routeInfoAttribute);
                     geometryWay.updateSegment(tileBox, points, routeSegments);
                     geometryWay.drawSegments(tileBox, canvas, quadRect.top, quadRect.left,
                             quadRect.bottom, quadRect.right, null, 0);

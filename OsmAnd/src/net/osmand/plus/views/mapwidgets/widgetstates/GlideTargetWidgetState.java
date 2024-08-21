@@ -44,12 +44,7 @@ public class GlideTargetWidgetState extends WidgetState {
 
 	@Override
 	public void copyPrefs(@NonNull ApplicationMode appMode, @Nullable String customId) {
-		copyPrefsFromMode(appMode, appMode, customId);
-	}
-
-	@Override
-	public void copyPrefsFromMode(@NonNull ApplicationMode sourceAppMode, @NonNull ApplicationMode appMode, @Nullable String customId) {
-		registerPreference(customId).setModeValue(appMode, preference.getModeValue(sourceAppMode));
+		registerPreference(customId).setModeValue(appMode, preference.getModeValue(appMode));
 	}
 
 	@NonNull

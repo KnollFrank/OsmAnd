@@ -1,8 +1,8 @@
 package net.osmand.plus.download.local.dialogs;
 
-import static net.osmand.plus.settings.enums.LocalSortMode.COUNTRY_NAME_DESCENDING;
-import static net.osmand.plus.settings.enums.LocalSortMode.DATE_DESCENDING;
-import static net.osmand.plus.settings.enums.LocalSortMode.NAME_DESCENDING;
+import static net.osmand.plus.settings.enums.MapsSortMode.COUNTRY_NAME_DESCENDING;
+import static net.osmand.plus.settings.enums.MapsSortMode.DATE_DESCENDING;
+import static net.osmand.plus.settings.enums.MapsSortMode.NAME_DESCENDING;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -23,10 +23,8 @@ import net.osmand.plus.R;
 import net.osmand.plus.base.MenuBottomSheetDialogFragment;
 import net.osmand.plus.base.bottomsheetmenu.BaseBottomSheetItem;
 import net.osmand.plus.configmap.tracks.SortByBottomSheet.SortModeViewHolder;
-import net.osmand.plus.download.local.LocalItemType;
-import net.osmand.plus.download.local.LocalItemUtils;
 import net.osmand.plus.helpers.AndroidUiHelper;
-import net.osmand.plus.settings.enums.LocalSortMode;
+import net.osmand.plus.settings.enums.MapsSortMode;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.ColorUtilities;
 import net.osmand.plus.utils.UiUtilities;
@@ -36,22 +34,18 @@ public class SortMapsBottomSheet extends MenuBottomSheetDialogFragment {
 	private static final String TAG = SortMapsBottomSheet.class.getSimpleName();
 
 	private static final String SORT_MODE_KEY = "sort_mode_key";
-	private static final String ITEM_TYPE_KEY = "item_type_key";
 
-	private LocalItemType type;
-	private LocalSortMode sortMode;
+	private MapsSortMode mapsSortMode;
 
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		OsmandApplication app = requiredMyApplication();
-
-		type = AndroidUtils.getSerializable(requireArguments(), ITEM_TYPE_KEY, LocalItemType.class);
 		if (savedInstanceState != null) {
-			sortMode = AndroidUtils.getSerializable(savedInstanceState, SORT_MODE_KEY, LocalSortMode.class);
-		} else if (type != null) {
-			sortMode = LocalItemUtils.getSortModePref(app, type).get();
+			mapsSortMode = AndroidUtils.getSerializable(savedInstanceState, SORT_MODE_KEY, MapsSortMode.class);
+		} else {
+			mapsSortMode = app.getSettings().LOCAL_MAPS_SORT_MODE.get();
 		}
 	}
 
@@ -72,7 +66,7 @@ public class SortMapsBottomSheet extends MenuBottomSheetDialogFragment {
 		items.add(new BaseBottomSheetItem.Builder().setCustomView(view).create());
 	}
 
-	private void setMapsSortMode(@NonNull LocalSortMode sortMode) {
+	private void setMapsSortMode(@NonNull MapsSortMode sortMode) {
 		Fragment target = getTargetFragment();
 		if (target instanceof MapsSortModeListener) {
 			((MapsSortModeListener) target).setMapsSortMode(sortMode);
@@ -81,7 +75,7 @@ public class SortMapsBottomSheet extends MenuBottomSheetDialogFragment {
 
 	public class SortModesAdapter extends RecyclerView.Adapter<SortModeViewHolder> {
 
-		private final LocalSortMode[] sortModes = LocalSortMode.getSupportedModes(type);
+		private final MapsSortMode[] sortModes = MapsSortMode.values();
 		private final int activeColorId = ColorUtilities.getActiveIconColorId(nightMode);
 		private final int defaultColorId = ColorUtilities.getDefaultIconColorId(nightMode);
 
@@ -95,11 +89,11 @@ public class SortMapsBottomSheet extends MenuBottomSheetDialogFragment {
 
 		@Override
 		public void onBindViewHolder(@NonNull SortModeViewHolder holder, int position) {
-			LocalSortMode sortMode = sortModes[position];
+			MapsSortMode sortMode = sortModes[position];
 
 			holder.title.setText(sortMode.getNameId());
 
-			boolean selected = sortMode == SortMapsBottomSheet.this.sortMode;
+			boolean selected = sortMode == mapsSortMode;
 			int colorId = selected ? activeColorId : defaultColorId;
 			holder.groupTypeIcon.setImageDrawable(getIcon(sortMode.getIconId(), colorId));
 
@@ -114,7 +108,7 @@ public class SortMapsBottomSheet extends MenuBottomSheetDialogFragment {
 			AndroidUiHelper.updateVisibility(holder.divider, shouldShowDivider(sortMode));
 		}
 
-		private boolean shouldShowDivider(@NonNull LocalSortMode mode) {
+		private boolean shouldShowDivider(@NonNull MapsSortMode mode) {
 			return mode == NAME_DESCENDING || mode == COUNTRY_NAME_DESCENDING || mode == DATE_DESCENDING;
 		}
 
@@ -127,23 +121,19 @@ public class SortMapsBottomSheet extends MenuBottomSheetDialogFragment {
 	@Override
 	public void onSaveInstanceState(@NonNull Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putSerializable(SORT_MODE_KEY, sortMode);
+		outState.putSerializable(SORT_MODE_KEY, mapsSortMode);
 	}
 
-	public static void showInstance(@NonNull FragmentManager manager, @NonNull Fragment target, @NonNull LocalItemType type) {
+	public static void showInstance(@NonNull FragmentManager manager, @NonNull Fragment target) {
 		if (AndroidUtils.isFragmentCanBeAdded(manager, TAG)) {
-			Bundle bundle = new Bundle();
-			bundle.putSerializable(ITEM_TYPE_KEY, type);
-
 			SortMapsBottomSheet fragment = new SortMapsBottomSheet();
-			fragment.setArguments(bundle);
 			fragment.setTargetFragment(target, 0);
 			fragment.show(manager, TAG);
 		}
 	}
 
 	public interface MapsSortModeListener {
-		void setMapsSortMode(@NonNull LocalSortMode sortMode);
+		void setMapsSortMode(@NonNull MapsSortMode sortMode);
 	}
 }
 

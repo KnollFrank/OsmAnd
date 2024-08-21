@@ -20,7 +20,6 @@ import net.osmand.plus.settings.backend.backup.SettingsItemWriter;
 import net.osmand.plus.settings.backend.backup.StreamSettingsItemWriter;
 import net.osmand.plus.utils.FileUtils;
 import net.osmand.util.Algorithms;
-import net.osmand.util.CollectionUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,8 +51,7 @@ public class FileSettingsItem extends StreamSettingsItem {
 		TRAVEL("travel", IndexConstants.WIKIVOYAGE_INDEX_DIR, R.drawable.ic_plugin_wikipedia),
 		MULTIMEDIA_NOTES("multimedia_notes", IndexConstants.AV_INDEX_DIR, R.drawable.ic_action_photo_dark),
 		NAUTICAL_DEPTH("nautical_depth", IndexConstants.NAUTICAL_INDEX_DIR, R.drawable.ic_action_nautical_depth),
-		FAVORITES_BACKUP("favorites_backup", IndexConstants.BACKUP_INDEX_DIR, R.drawable.ic_action_folder_favorites),
-		COLOR_PALETTE("colors_palette", IndexConstants.COLOR_PALETTE_DIR, R.drawable.ic_action_file_color_palette);
+		FAVORITES_BACKUP("favorites_backup", IndexConstants.BACKUP_INDEX_DIR, R.drawable.ic_action_folder_favorites);
 
 		private final String subtypeName;
 		private final String subtypeFolder;
@@ -145,11 +143,6 @@ public class FileSettingsItem extends StreamSettingsItem {
 						break;
 					case NAUTICAL_DEPTH:
 						if (name.endsWith(IndexConstants.BINARY_DEPTH_MAP_INDEX_EXT)) {
-							return subtype;
-						}
-						break;
-					case COLOR_PALETTE:
-						if (name.endsWith(IndexConstants.TXT_EXT)) {
 							return subtype;
 						}
 						break;
@@ -266,7 +259,7 @@ public class FileSettingsItem extends StreamSettingsItem {
 
 	@Override
 	public boolean needMd5Digest() {
-		return CollectionUtils.equalsToAny(subtype, FileSubtype.TTS_VOICE, FileSubtype.VOICE, FileSubtype.GPX);
+		return subtype == FileSubtype.TTS_VOICE || subtype == FileSubtype.VOICE;
 	}
 
 	public File getPluginPath() {
@@ -318,7 +311,7 @@ public class FileSettingsItem extends StreamSettingsItem {
 		} else if (file != null) {
 			if (file.isDirectory()) {
 				List<File> filesToUpload = new ArrayList<>();
-				FileUtils.collectFiles(file, filesToUpload, false);
+				FileUtils.collectDirFiles(file, filesToUpload);
 
 				for (File file : filesToUpload) {
 					size += file.length();

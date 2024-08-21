@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import net.osmand.PlatformUtil;
 import net.osmand.osm.AbstractPoiType;
 import net.osmand.osm.MapPoiTypes.PoiTranslator;
-import net.osmand.plus.plugins.PluginsHelper;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.util.Algorithms;
 
@@ -39,7 +38,7 @@ public class MapPoiTypesTranslator implements PoiTranslator {
 				return app.poiTypes.getBasePoiName(baseLangType) + langTranslation;
 			}
 		}
-		return getTranslation(type.getFormattedKeyName());
+		return getTranslation(type.getIconKeyName());
 	}
 
 	@Override
@@ -58,9 +57,7 @@ public class MapPoiTypesTranslator implements PoiTranslator {
 				return val;
 			}
 		} catch (Throwable e) {
-			if (PluginsHelper.isDevelopment()) {
-				LOG.info("No translation: " + keyName);
-			}
+			LOG.info("No translation: " + keyName);
 		}
 		return null;
 	}
@@ -71,7 +68,7 @@ public class MapPoiTypesTranslator implements PoiTranslator {
 		if (baseLangType != null) {
 			return getSynonyms(baseLangType);
 		}
-		return getSynonyms(type.getFormattedKeyName());
+		return getSynonyms(type.getIconKeyName());
 	}
 
 	@Override
@@ -91,9 +88,7 @@ public class MapPoiTypesTranslator implements PoiTranslator {
 				return val;
 			}
 		} catch (Exception e) {
-			if (PluginsHelper.isDevelopment()) {
-				LOG.info("No synonyms: " + keyName);
-			}
+			LOG.info("No synonyms: " + keyName);
 		}
 		return "";
 	}
@@ -109,7 +104,7 @@ public class MapPoiTypesTranslator implements PoiTranslator {
 		if (baseLangType != null) {
 			return getEnTranslation(baseLangType) + " (" + AndroidUtils.getLangTranslation(app, type.getLang()).toLowerCase() + ")";
 		}
-		return getEnTranslation(type.getFormattedKeyName());
+		return getEnTranslation(type.getIconKeyName());
 	}
 
 	@Override
@@ -131,9 +126,7 @@ public class MapPoiTypesTranslator implements PoiTranslator {
 				return val;
 			}
 		} catch (Exception e) {
-			if (PluginsHelper.isDevelopment()) {
-				LOG.info("No EnTranslation: " + keyName);
-			}
+			LOG.info("No EnTranslation: " + keyName);
 		}
 		return null;
 	}

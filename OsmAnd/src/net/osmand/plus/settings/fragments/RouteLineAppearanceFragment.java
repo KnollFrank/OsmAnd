@@ -24,35 +24,27 @@ import androidx.fragment.app.FragmentManager;
 import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.base.ContextMenuScrollFragment;
-import net.osmand.plus.card.base.multistate.IMultiStateCardController;
-import net.osmand.plus.card.base.multistate.MultiStateCard;
 import net.osmand.plus.card.color.ColoringStyle;
-import net.osmand.plus.card.color.palette.gradient.GradientColorsPaletteController;
-import net.osmand.plus.card.color.palette.gradient.PaletteGradientColor;
 import net.osmand.plus.card.color.palette.main.data.PaletteColor;
 import net.osmand.plus.helpers.AndroidUiHelper;
-import net.osmand.plus.inapp.InAppPurchaseHelper;
-import net.osmand.plus.profiles.LocationIcon;
 import net.osmand.plus.routepreparationmenu.MapRouteInfoMenu;
 import net.osmand.plus.routing.ColoringType;
 import net.osmand.plus.routing.PreviewRouteLineInfo;
 import net.osmand.plus.routing.RoutingHelper;
+import net.osmand.plus.routing.cards.RouteLineColorCard;
+import net.osmand.plus.routing.cards.RouteLineWidthCard;
 import net.osmand.plus.routing.cards.RouteTurnArrowsCard;
 import net.osmand.plus.settings.backend.ApplicationMode;
 import net.osmand.plus.settings.controllers.RouteLineColorController;
 import net.osmand.plus.settings.controllers.RouteLineColorController.IRouteLineColorControllerListener;
-import net.osmand.plus.settings.controllers.RouteLineWidthController;
-import net.osmand.plus.settings.controllers.RouteLineWidthController.IRouteLineWidthControllerListener;
 import net.osmand.plus.track.fragments.TrackAppearanceFragment.OnNeedScrollListener;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.ColorUtilities;
 import net.osmand.plus.widgets.dialogbutton.DialogButtonType;
 import net.osmand.plus.widgets.dialogbutton.DialogButton;
 
-import java.util.Objects;
-
 public class RouteLineAppearanceFragment extends ContextMenuScrollFragment
-		implements IRouteLineColorControllerListener, IRouteLineWidthControllerListener, InAppPurchaseHelper.InAppPurchaseListener {
+		implements IRouteLineColorControllerListener, HeaderUiAdapter {
 
 	public static final String TAG = RouteLineAppearanceFragment.class.getName();
 
@@ -61,7 +53,7 @@ public class RouteLineAppearanceFragment extends ContextMenuScrollFragment
 	private ApplicationMode appMode;
 
 	private int toolbarHeightPx;
-	private String currentHeaderSourceId;
+	private HeaderInfo selectedHeader;
 
 	private View buttonsShadow;
 	private View controlButtons;
@@ -70,8 +62,8 @@ public class RouteLineAppearanceFragment extends ContextMenuScrollFragment
 	private DialogButton saveButton;
 	private TextView headerTitle;
 
-	private MultiStateCard colorsCard;
-	private MultiStateCard widthCard;
+	private RouteLineColorCard colorsCard;
+	private RouteLineWidthCard widthCard;
 
 	@Override
 	public int getMainLayoutId() {
@@ -147,17 +139,12 @@ public class RouteLineAppearanceFragment extends ContextMenuScrollFragment
 		ColoringType coloringType = settings.ROUTE_COLORING_TYPE.getModeValue(appMode);
 		String routeInfoAttribute = settings.ROUTE_INFO_ATTRIBUTE.getModeValue(appMode);
 		String widthKey = settings.ROUTE_LINE_WIDTH.getModeValue(appMode);
-		String gradientPaletteName = settings.ROUTE_GRADIENT_PALETTE.getModeValue(appMode);
 		boolean showTurnArrows = settings.ROUTE_SHOW_TURN_ARROWS.getModeValue(appMode);
 
 		PreviewRouteLineInfo previewRouteLineInfo = new PreviewRouteLineInfo(colorDay, colorNight,
-				coloringType, routeInfoAttribute, widthKey, gradientPaletteName, showTurnArrows);
+				coloringType, routeInfoAttribute, widthKey, showTurnArrows);
 
-		String navigationIconName = appMode.getNavigationIcon();
-		LocationIcon navigationIcon = LocationIcon.isModel(navigationIconName)
-				? LocationIcon.MOVEMENT_DEFAULT
-				: LocationIcon.fromName(navigationIconName, false);
-		previewRouteLineInfo.setIconId(navigationIcon.getIconId());
+		previewRouteLineInfo.setIconId(appMode.getNavigationIcon().getIconId());
 		previewRouteLineInfo.setIconColor(appMode.getProfileColor(isNightMode()));
 
 		return previewRouteLineInfo;
@@ -194,9 +181,6 @@ public class RouteLineAppearanceFragment extends ContextMenuScrollFragment
 		enterAppearanceMode();
 		openMenuHalfScreen();
 		calculateLayout();
-		updateColorItems();
-		updateHeaderState();
-		hideBottomHeaderShadow();
 	}
 
 	private void calculateLayout() {
@@ -211,38 +195,45 @@ public class RouteLineAppearanceFragment extends ContextMenuScrollFragment
 		ViewGroup cardsContainer = getCardsContainer();
 		cardsContainer.removeAllViews();
 
-		RouteLineColorController colorController = getColorCardController();
-		colorsCard = new MultiStateCard(mapActivity, colorController);
+		colorsCard = new RouteLineColorCard(mapActivity, getColorCardController(), this);
 		cardsContainer.addView(colorsCard.build(mapActivity));
 
-		RouteLineWidthController widthController = getWidthCardController();
-		inflate(R.layout.list_item_divider_basic, cardsContainer, true);
-		widthCard = new MultiStateCard(mapActivity, widthController);
+		widthCard = new RouteLineWidthCard(mapActivity, previewRouteLineInfo, createScrollListener(), this);
 		cardsContainer.addView(widthCard.build(mapActivity));
 
 		RouteTurnArrowsCard turnArrowCard = new RouteTurnArrowsCard(mapActivity, previewRouteLineInfo);
 		cardsContainer.addView(turnArrowCard.build(mapActivity));
 	}
 
-	private void updateHeaderContent(@NonNull String headerSourceId) {
-		if (currentHeaderSourceId == null) {
-			currentHeaderSourceId = headerSourceId;
+	@Override
+	public void onUpdateHeader(@NonNull HeaderInfo headerInfo,
+	                           @NonNull String title,
+	                           @NonNull String description) {
+		if (selectedHeader == null) {
+			selectedHeader = headerInfo;
 		}
-		if (objectEquals(currentHeaderSourceId, headerSourceId)) {
-			IMultiStateCardController controller = getHeaderSourceController();
-			headerTitle.setText(controller.getCardTitle());
+		if (objectEquals(selectedHeader, headerInfo)) {
+			headerTitle.setText(title);
 
 			TextView headerDescr = headerContainer.findViewById(R.id.descr);
-			headerDescr.setText(controller.getCardStateSelectorTitle());
+			headerDescr.setText(description);
 
 			View selector = headerContainer.findViewById(R.id.selector);
-			selector.setOnClickListener(controller::onSelectorButtonClicked);
+			View selectorIcon = headerContainer.findViewById(R.id.selector_button);
+			if (headerInfo instanceof RouteLineColorCard) {
+				selector.setOnClickListener(v -> {
+					FragmentActivity activity = getActivity();
+					if (activity != null) {
+						RouteLineColorController colorController = getColorCardController();
+						colorController.showPopUpMenu(activity, v, nightMode);
+					}
+				});
+				AndroidUiHelper.updateVisibility(selectorIcon, true);
+			} else {
+				selector.setOnClickListener(null);
+				AndroidUiHelper.updateVisibility(selectorIcon, false);
+			}
 		}
-	}
-
-	private IMultiStateCardController getHeaderSourceController() {
-		boolean color = Objects.equals(currentHeaderSourceId, RouteLineColorController.PROCESS_ID);
-		return color ? getColorCardController() : getWidthCardController();
 	}
 
 	@Override
@@ -255,17 +246,21 @@ public class RouteLineAppearanceFragment extends ContextMenuScrollFragment
 
 			@Override
 			public void onVerticalScrollNeeded(int y) {
-				int bottomVisibleY = getBottomVisibleY();
-				if (y > bottomVisibleY) {
+				View view = widthCard.getView();
+				if (view != null) {
+					int resultYPosition = view.getTop() + y;
+					int dialogHeight = getInnerScrollableHeight();
 					ScrollView scrollView = (ScrollView) getBottomScrollView();
-					int diff = y - bottomVisibleY;
-					int scrollY = scrollView.getScrollY();
-					scrollView.smoothScrollTo(0, scrollY + diff);
+					if (resultYPosition > (scrollView.getScrollY() + dialogHeight)) {
+						scrollView.smoothScrollTo(0, resultYPosition - dialogHeight);
+					}
 				}
 			}
 
-			private int getBottomVisibleY() {
-				return controlButtons.getTop();
+			private int getInnerScrollableHeight() {
+				int totalScreenHeight = getViewHeight() - getMenuStatePosY(getCurrentMenuState());
+				int frameTotalHeight = controlButtons.getHeight() + buttonsShadow.getHeight();
+				return totalScreenHeight - frameTotalHeight;
 			}
 		};
 	}
@@ -319,10 +314,6 @@ public class RouteLineAppearanceFragment extends ContextMenuScrollFragment
 
 	private void onSaveButtonClicked() {
 		getColorCardController().getColorsPaletteController().refreshLastUsedTime();
-		GradientColorsPaletteController gradientColorsPaletteController = getColorCardController().getGradientPaletteController();
-		if (gradientColorsPaletteController != null) {
-			gradientColorsPaletteController.refreshLastUsedTime();
-		}
 		saveRouteLineAppearance();
 		dismiss();
 	}
@@ -334,7 +325,6 @@ public class RouteLineAppearanceFragment extends ContextMenuScrollFragment
 		settings.ROUTE_INFO_ATTRIBUTE.setModeValue(appMode, previewRouteLineInfo.getRouteInfoAttribute());
 		settings.ROUTE_LINE_WIDTH.setModeValue(appMode, previewRouteLineInfo.getWidth());
 		settings.ROUTE_SHOW_TURN_ARROWS.setModeValue(appMode, previewRouteLineInfo.shouldShowTurnArrows());
-		settings.ROUTE_GRADIENT_PALETTE.setModeValue(appMode, previewRouteLineInfo.getGradientPalette());
 	}
 
 	private void setupScrollListener() {
@@ -352,7 +342,7 @@ public class RouteLineAppearanceFragment extends ContextMenuScrollFragment
 			} else {
 				hideShadowButton();
 			}
-			updateHeaderState();
+			updateHeaderState(false);
 		});
 	}
 
@@ -382,16 +372,16 @@ public class RouteLineAppearanceFragment extends ContextMenuScrollFragment
 				.setDuration(200);
 	}
 
-	private void updateHeaderState() {
-		String headerSourceId;
+	private void updateHeaderState(boolean forceUpdate) {
+		HeaderInfo header;
 		if (getBottomScrollView().getScrollY() > colorsCard.getViewHeight() + headerTitle.getBottom()) {
-			headerSourceId = RouteLineWidthController.PROCESS_ID;
+			header = widthCard;
 		} else {
-			headerSourceId = RouteLineColorController.PROCESS_ID;
+			header = colorsCard;
 		}
-		if (!Objects.equals(currentHeaderSourceId, headerSourceId)) {
-			currentHeaderSourceId = headerSourceId;
-			updateHeaderContent(headerSourceId);
+		if (header != selectedHeader || forceUpdate) {
+			selectedHeader = header;
+			selectedHeader.onNeedUpdateHeader();
 		}
 	}
 
@@ -469,7 +459,6 @@ public class RouteLineAppearanceFragment extends ContextMenuScrollFragment
 	public void onDestroy() {
 		super.onDestroy();
 		getColorCardController().onDestroy(getActivity());
-		getWidthCardController().onDestroy(getActivity());
 	}
 
 	private void enterAppearanceMode() {
@@ -530,27 +519,17 @@ public class RouteLineAppearanceFragment extends ContextMenuScrollFragment
 	}
 
 	@Override
-	public void onColoringStyleSelected(@Nullable ColoringStyle coloringStyle) {
-		if (coloringStyle != null) {
-			previewRouteLineInfo.setRouteColoringStyle(coloringStyle);
-			updateColorItems();
-			updateHeaderContent(RouteLineColorController.PROCESS_ID);
-		}
+	public void onColoringStyleSelected(@NonNull ColoringStyle coloringStyle) {
+		previewRouteLineInfo.setRouteColoringStyle(coloringStyle);
+		updateColorItems();
+		updateHeaderState(true);
 	}
 
 	@Override
 	public void onColorSelectedFromPalette(@NonNull PaletteColor paletteColor) {
-		if (paletteColor instanceof PaletteGradientColor){
-			PaletteGradientColor paletteGradientColor = (PaletteGradientColor) paletteColor;
-			previewRouteLineInfo.setGradientPalette(paletteGradientColor.getPaletteName());
-			if (getMapActivity() != null) {
-				getMapActivity().refreshMap();
-			}
-		} else{
-			RouteLineColorController colorController = getColorCardController();
-			previewRouteLineInfo.setCustomColor(paletteColor.getColor(), colorController.isNightMap());
-			updateColorItems();
-		}
+		RouteLineColorController colorController = getColorCardController();
+		previewRouteLineInfo.setCustomColor(paletteColor.getColor(), colorController.isNightMap());
+		updateColorItems();
 	}
 
 	@Override
@@ -558,12 +537,10 @@ public class RouteLineAppearanceFragment extends ContextMenuScrollFragment
 		updateColorItems();
 	}
 
-	@Override
-	public void onRouteLineWidthSelected(@Nullable String width) {
-		updateHeaderContent(RouteLineWidthController.PROCESS_ID);
-	}
-
 	private void updateColorItems() {
+		if (widthCard != null) {
+			widthCard.updateItems();
+		}
 		if (getMapActivity() != null) {
 			getMapActivity().refreshMap();
 		}
@@ -576,16 +553,6 @@ public class RouteLineAppearanceFragment extends ContextMenuScrollFragment
 	@NonNull
 	private RouteLineColorController getColorCardController() {
 		return RouteLineColorController.getInstance(app, previewRouteLineInfo, this);
-	}
-
-	@NonNull
-	private RouteLineWidthController getWidthCardController() {
-		return RouteLineWidthController.getInstance(app, previewRouteLineInfo, createScrollListener(), this);
-	}
-
-	@Override
-	public void onItemPurchased(String sku, boolean active) {
-		setupCards();
 	}
 
 	public static boolean showInstance(@NonNull MapActivity mapActivity,

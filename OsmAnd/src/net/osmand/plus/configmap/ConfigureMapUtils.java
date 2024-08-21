@@ -136,7 +136,7 @@ public class ConfigureMapUtils {
 
 	@DrawableRes
 	protected static int getDayNightIcon(MapActivity activity) {
-		return activity.getMyApplication().getSettings().DAYNIGHT_MODE.get().getDefaultIcon();
+		return activity.getMyApplication().getSettings().DAYNIGHT_MODE.get().getIconRes();
 	}
 
 	protected static String getScale(MapActivity activity) {

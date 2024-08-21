@@ -4,6 +4,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static net.osmand.test.common.EspressoUtils.waitForView;
@@ -20,6 +21,7 @@ import android.util.Range;
 
 import androidx.annotation.NonNull;
 import androidx.test.espresso.Espresso;
+import androidx.test.espresso.IdlingPolicies;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -43,27 +45,30 @@ import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class RouteRecalculationFromBeginningTest extends AndroidTest {
 
-	private static final int SPEED_KM_PER_HOUR = 500;
 	private static final String SELECTED_GPX_NAME = "gpx_recalc_test.gpx";
+
 	private static final LatLon START = new LatLon(50.17356, 18.51406);
 
 	@Rule
-	public ActivityScenarioRule<MapActivity> scenarioRule = new ActivityScenarioRule<>(MapActivity.class);
+	public ActivityScenarioRule<MapActivity> mActivityScenarioRule =
+			new ActivityScenarioRule<>(MapActivity.class);
 
-	private ObserveDistToFinishIdlingResource idlingResource;
+	private ObserveDistToFinishIdlingResource observeDistToFinishIdlingResource;
 
 	@Before
 	@Override
 	public void setup() {
 		super.setup();
-		enableSimulation(SPEED_KM_PER_HOUR);
+		IdlingPolicies.setIdlingResourceTimeout(40, TimeUnit.SECONDS);
+		enableSimulation(500);
 		try {
-			ResourcesImporter.importGpxAssets(app, Collections.singletonList(SELECTED_GPX_NAME), null);
+			ResourcesImporter.importGpxAssets(app, Collections.singletonList(SELECTED_GPX_NAME));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -72,8 +77,8 @@ public class RouteRecalculationFromBeginningTest extends AndroidTest {
 	@After
 	public void cleanUp() {
 		super.cleanUp();
-		if (idlingResource != null) {
-			unregisterIdlingResources(idlingResource);
+		if (observeDistToFinishIdlingResource != null) {
+			unregisterIdlingResources(observeDistToFinishIdlingResource);
 		}
 	}
 
@@ -83,7 +88,8 @@ public class RouteRecalculationFromBeginningTest extends AndroidTest {
 
 		openNavigationMenu();
 
-		ViewInteraction linearLayout = waitForView(allOf(withId(R.id.map_options_route_button), isDisplayed()));
+		ViewInteraction linearLayout = waitForView(allOf(withId(R.id.map_options_route_button),
+				isDisplayed()));
 		linearLayout.perform(click());
 
 		ViewInteraction linearLayout2 = onView(
@@ -103,14 +109,21 @@ public class RouteRecalculationFromBeginningTest extends AndroidTest {
 				withText(GpxUiHelper.getGpxTitle(SELECTED_GPX_NAME)), isDisplayed()));
 		trackItemView.perform(click());
 
-		ViewInteraction closeButton = onView(allOf(withId(R.id.close_button), isDisplayed()));
-		closeButton.perform(click());
+		ViewInteraction appCompatImageButton2 = onView(
+				allOf(withId(R.id.close_button), withContentDescription("Navigate up"),
+						childAtPosition(
+								childAtPosition(
+										withId(R.id.route_menu_top_shadow_all),
+										1),
+								0),
+						isDisplayed()));
+		appCompatImageButton2.perform(click());
 
 		setRouteStart(START);
 		startNavigation();
 
-		idlingResource = new ObserveDistToFinishIdlingResource(app);
-		registerIdlingResources(idlingResource);
+		observeDistToFinishIdlingResource = new ObserveDistToFinishIdlingResource(app);
+		registerIdlingResources(observeDistToFinishIdlingResource);
 
 		Espresso.onIdle();
 	}

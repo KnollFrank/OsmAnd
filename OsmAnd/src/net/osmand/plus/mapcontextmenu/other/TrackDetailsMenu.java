@@ -294,7 +294,6 @@ public class TrackDetailsMenu {
 			mapActivity.getMapLayers().getContextMenuLayer().exitGpxDetailsMode();
 			mapActivity.getMapLayers().getGpxLayer().setTrackChartPoints(null);
 			mapActivity.getMapLayers().getMapInfoLayer().setTrackChartPoints(null);
-			mapActivity.getMapLayers().getMeasurementToolLayer().setTrackChartPoints(null);
 			mapActivity.refreshMap();
 		}
 		if (hidding) {
@@ -667,10 +666,10 @@ public class TrackDetailsMenu {
 		Context themedContext = UiUtilities.getThemedContext(mapActivity, nightMode);
 		boolean useHours = analysis.getTimeSpan() != 0 && analysis.getTimeSpan() / HOUR_IN_MILLIS > 0;
 		GpxMarkerView markerView = new GpxMarkerView(themedContext, analysis.getStartTime(), useHours);
-		ChartUtils.setupElevationChart(chart, markerView, 24, 16, true);
+		ChartUtils.setupElevationChart(chart, markerView, 24, 16,true);
 
 		List<ILineDataSet> dataSets = new ArrayList<>();
-		if (gpxItem.chartTypes != null) {
+		if (gpxItem.chartTypes != null && gpxItem.chartTypes.length > 0) {
 			for (GPXDataSetType dataSetType : gpxItem.chartTypes) {
 				OrderedLineDataSet dataSet = null;
 				boolean withoutGaps = selectedGpxFile != null && (!selectedGpxFile.isJoinSegments() && gpxItem.isGeneralTrack());

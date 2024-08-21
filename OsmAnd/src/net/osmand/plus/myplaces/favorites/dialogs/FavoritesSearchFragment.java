@@ -1,7 +1,5 @@
 package net.osmand.plus.myplaces.favorites.dialogs;
 
-import static net.osmand.CollatorStringMatcher.StringMatcherMode.CHECK_CONTAINS;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -27,7 +25,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
-import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -52,7 +49,6 @@ import net.osmand.plus.utils.ColorUtilities;
 import net.osmand.plus.utils.OsmAndFormatter;
 import net.osmand.plus.views.PointImageUtils;
 import net.osmand.plus.widgets.tools.SimpleTextWatcher;
-import net.osmand.search.core.SearchPhrase.NameStringMatcher;
 import net.osmand.util.Algorithms;
 import net.osmand.util.MapUtils;
 
@@ -165,8 +161,8 @@ public class FavoritesSearchFragment extends DialogFragment {
 					dismiss();
 				}
 			});
-			listAdapter = new FavoritesSearchListAdapter(getMyApplication());
-			listAdapter.setAssistant(accessibilityAssistant);
+			listAdapter = new FavoritesSearchListAdapter(getMyApplication(), getActivity());
+			listAdapter.setAccessibilityAssistant(accessibilityAssistant);
 			listAdapter.synchronizePoints();
 			listView.setAdapter(listAdapter);
 		}
@@ -274,25 +270,24 @@ public class FavoritesSearchFragment extends DialogFragment {
 		private static final int FOOTER_SHADOW_TYPE = 3;
 
 		private final OsmandApplication app;
+		private final Activity activity;
+		private AccessibilityAssistant accessibilityAssistant;
 		private final FavouritesHelper helper;
-		private AccessibilityAssistant assistant;
 
 		private LatLon location;
 
-		private final List<FavouritePoint> points = new ArrayList<>();
-		private Filter myFilter;
+		List<FavouritePoint> points = new ArrayList<>();
+		Filter myFilter;
 		private Set<?> filter;
 
-		@ColorRes
 		private final int enabledColor;
-		@ColorRes
 		private final int disabledColor;
-		@ColorRes
 		private final int disabledIconColor;
 
-		public FavoritesSearchListAdapter(@NonNull OsmandApplication app) {
+		public FavoritesSearchListAdapter(OsmandApplication app, Activity activity) {
 			super(app, R.layout.search_list_item);
 			this.app = app;
+			this.activity = activity;
 			this.helper = app.getFavoritesHelper();
 			location = app.getSettings().getLastKnownMapLocation();
 			boolean light = app.getSettings().isLightContent();
@@ -301,8 +296,8 @@ public class FavoritesSearchFragment extends DialogFragment {
 			disabledIconColor = ColorUtilities.getDefaultIconColorId(!light);
 		}
 
-		public void setAssistant(AccessibilityAssistant assistant) {
-			this.assistant = assistant;
+		public void setAccessibilityAssistant(AccessibilityAssistant accessibilityAssistant) {
+			this.accessibilityAssistant = accessibilityAssistant;
 		}
 
 		public void synchronizePoints() {
@@ -439,7 +434,7 @@ public class FavoritesSearchFragment extends DialogFragment {
 					int color = visible
 							? app.getFavoritesHelper().getColorWithCategory(point, getColor(R.color.color_favorite))
 							: getColor(disabledIconColor);
-					imageView.setImageDrawable(PointImageUtils.getFromPoint(app, color, false, point));
+					imageView.setImageDrawable(PointImageUtils.getFromPoint(activity, color, false, point));
 					title.setText(point.getDisplayName(app));
 					title.setTypeface(Typeface.DEFAULT, visible ? Typeface.NORMAL : Typeface.ITALIC);
 					title.setTextColor(getColor(visible ? enabledColor : disabledColor));
@@ -463,7 +458,7 @@ public class FavoritesSearchFragment extends DialogFragment {
 					divider.setVisibility(View.VISIBLE);
 				}
 			}
-			ViewCompat.setAccessibilityDelegate(view, assistant);
+			ViewCompat.setAccessibilityDelegate(view, accessibilityAssistant);
 			return view;
 		}
 
@@ -481,37 +476,41 @@ public class FavoritesSearchFragment extends DialogFragment {
 		}
 
 		@ColorInt
-		protected int getColor(@ColorRes int resId) {
+		protected int getColor(@ColorInt int resId) {
 			return ColorUtilities.getColor(getContext(), resId);
 		}
 	}
 
-	private class FavoritesFilter extends Filter {
+	class FavoritesFilter extends Filter {
 
-		private final FavouritesHelper helper;
+		FavouritesHelper helper;
 
-		private FavoritesFilter() {
+		FavoritesFilter() {
 			helper = app.getFavoritesHelper();
 		}
 
 		@Override
 		protected FilterResults performFiltering(CharSequence constraint) {
 			FilterResults results = new FilterResults();
+			String favorites = app.getString(R.string.shared_string_favorites).toLowerCase();
 			if (constraint == null || constraint.length() == 0) {
 				results.values = null;
 				results.count = 1;
 			} else {
 				Set<Object> filter = new HashSet<>();
-				String query = constraint.toString().toLowerCase().trim();
-				NameStringMatcher matcher = new NameStringMatcher(query, CHECK_CONTAINS);
-
+				String cs = constraint.toString().toLowerCase().trim();
 				for (FavoriteGroup group : helper.getFavoriteGroups()) {
-					String groupName = group.getDisplayName(app);
-					if (matcher.matches(groupName)) {
+					String groupName;
+					if (Algorithms.isEmpty(group.getName())) {
+						groupName = favorites;
+					} else {
+						groupName = group.getName().toLowerCase();
+					}
+					if (groupName.contains(cs)) {
 						filter.add(group);
 					} else {
 						for (FavouritePoint point : group.getPoints()) {
-							if (matcher.matches(point.getName()) || matcher.matches(point.getDisplayName(app))) {
+							if (point.getName().toLowerCase().contains(cs)) {
 								filter.add(point);
 							}
 						}

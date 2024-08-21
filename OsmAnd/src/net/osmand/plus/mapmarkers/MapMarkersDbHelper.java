@@ -1,22 +1,22 @@
 package net.osmand.plus.mapmarkers;
 
-import androidx.annotation.Nullable;
-
+import net.osmand.plus.settings.enums.HistorySource;
+import net.osmand.plus.utils.AndroidDbUtils;
 import net.osmand.data.LatLon;
 import net.osmand.data.PointDescription;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.api.SQLiteAPI.SQLiteConnection;
 import net.osmand.plus.api.SQLiteAPI.SQLiteCursor;
-import net.osmand.plus.backup.BackupUtils;
+import net.osmand.plus.backup.BackupHelper;
 import net.osmand.plus.helpers.SearchHistoryHelper;
-import net.osmand.plus.settings.enums.HistorySource;
-import net.osmand.plus.utils.AndroidDbUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import androidx.annotation.Nullable;
 
 public class MapMarkersDbHelper {
 
@@ -83,37 +83,37 @@ public class MapMarkersDbHelper {
 	}
 
 	public long getMarkersLastModifiedTime() {
-		long lastModifiedTime = BackupUtils.getLastModifiedTime(context, MARKERS_LAST_MODIFIED_NAME);
+		long lastModifiedTime = BackupHelper.getLastModifiedTime(context, MARKERS_LAST_MODIFIED_NAME);
 		if (lastModifiedTime == 0) {
 			lastModifiedTime = getDBLastModifiedTime();
-			BackupUtils.setLastModifiedTime(context, MARKERS_LAST_MODIFIED_NAME, lastModifiedTime);
+			BackupHelper.setLastModifiedTime(context, MARKERS_LAST_MODIFIED_NAME, lastModifiedTime);
 		}
 		return lastModifiedTime;
 	}
 
 	public long getMarkersHistoryLastModifiedTime() {
-		long lastModifiedTime = BackupUtils.getLastModifiedTime(context, MARKERS_HISTORY_LAST_MODIFIED_NAME);
+		long lastModifiedTime = BackupHelper.getLastModifiedTime(context, MARKERS_HISTORY_LAST_MODIFIED_NAME);
 		if (lastModifiedTime == 0) {
 			lastModifiedTime = getDBLastModifiedTime();
-			BackupUtils.setLastModifiedTime(context, MARKERS_HISTORY_LAST_MODIFIED_NAME, lastModifiedTime);
+			BackupHelper.setLastModifiedTime(context, MARKERS_HISTORY_LAST_MODIFIED_NAME, lastModifiedTime);
 		}
 		return lastModifiedTime;
 	}
 
 	public void setMarkersLastModifiedTime(long lastModifiedTime) {
-		BackupUtils.setLastModifiedTime(context, MARKERS_LAST_MODIFIED_NAME, lastModifiedTime);
+		BackupHelper.setLastModifiedTime(context, MARKERS_LAST_MODIFIED_NAME, lastModifiedTime);
 	}
 
 	public void setMarkersHistoryLastModifiedTime(long lastModifiedTime) {
-		BackupUtils.setLastModifiedTime(context, MARKERS_HISTORY_LAST_MODIFIED_NAME, lastModifiedTime);
+		BackupHelper.setLastModifiedTime(context, MARKERS_HISTORY_LAST_MODIFIED_NAME, lastModifiedTime);
 	}
 
 	private void updateMarkersLastModifiedTime() {
-		BackupUtils.setLastModifiedTime(context, MARKERS_LAST_MODIFIED_NAME);
+		BackupHelper.setLastModifiedTime(context, MARKERS_LAST_MODIFIED_NAME);
 	}
 
 	private void updateMarkersHistoryLastModifiedTime() {
-		BackupUtils.setLastModifiedTime(context, MARKERS_HISTORY_LAST_MODIFIED_NAME);
+		BackupHelper.setLastModifiedTime(context, MARKERS_HISTORY_LAST_MODIFIED_NAME);
 	}
 
 	private long getDBLastModifiedTime() {

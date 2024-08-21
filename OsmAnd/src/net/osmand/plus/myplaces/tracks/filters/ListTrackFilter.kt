@@ -165,7 +165,7 @@ open class ListTrackFilter(
 		return false
 	}
 
-	protected fun getTrackPropertyValue(trackItem: TrackItem): String {
+	private fun getTrackPropertyValue(trackItem: TrackItem): String {
 		var value = trackItem.dataItem?.getParameter<Any>(trackFilterType.property!!)
 		value?.let {
 			value = collectionFilterParams.trackParamToString(it)

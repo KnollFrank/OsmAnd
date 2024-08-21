@@ -4,9 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.keyevent.assignment.KeyAssignment;
-import net.osmand.plus.quickaction.QuickAction;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,7 +12,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class CustomInputDeviceProfile extends InputDeviceProfile {
 
@@ -28,7 +25,7 @@ public class CustomInputDeviceProfile extends InputDeviceProfile {
 		setAssignments(parentDevice.getAssignmentsCopy());
 	}
 
-	public CustomInputDeviceProfile(@NonNull OsmandApplication app, @NonNull JSONObject object) throws JSONException {
+	public CustomInputDeviceProfile(@NonNull JSONObject object) throws JSONException {
 		customId = object.getString("id");
 		customName = object.getString("name");
 
@@ -40,7 +37,7 @@ public class CustomInputDeviceProfile extends InputDeviceProfile {
 		List<KeyAssignment> assignments = new ArrayList<>();
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
-			assignments.add(new KeyAssignment(app, jsonObject));
+			assignments.add(new KeyAssignment(jsonObject));
 		}
 		setAssignments(assignments);
 	}
@@ -56,52 +53,43 @@ public class CustomInputDeviceProfile extends InputDeviceProfile {
 		}
 	}
 
-	public void addAssignment(@NonNull KeyAssignment assignment) {
-		for (int keyCode : assignment.getKeyCodes()) {
-			removeKeyCodeFromPreviousAssignment(assignment, keyCode);
-		}
-		assignmentsCollection.addAssignment(assignment);
-		assignmentsCollection.syncCache();
-	}
-
-	public void updateAssignment(@NonNull String assignmentId,
-	                             @NonNull QuickAction action, @NonNull List<Integer> keyCodes) {
+	public void addAssignmentKeyCode(@NonNull String assignmentId, int keyCode) {
 		KeyAssignment assignment = assignmentsCollection.findById(assignmentId);
 		if (assignment != null) {
-			for (int keyCode: keyCodes) {
-				removeKeyCodeFromPreviousAssignment(assignment, keyCode);
-			}
-			assignment.setAction(action);
-			assignment.setKeyCodes(keyCodes);
+			removeKeyCodeFromPreviousAssignment(keyCode);
+			assignment.addKeyCode(keyCode);
 			assignmentsCollection.syncCache();
 		}
 	}
 
-	private void removeKeyCodeFromPreviousAssignment(@NonNull KeyAssignment assignment, int keyCode) {
+	public void updateAssignmentKeyCode(@NonNull String assignmentId, int oldKeyCode, int newKeyCode) {
+		KeyAssignment assignment = assignmentsCollection.findById(assignmentId);
+		if (assignment != null) {
+			removeKeyCodeFromPreviousAssignment(newKeyCode);
+			assignment.updateKeyCode(oldKeyCode, newKeyCode);
+			assignmentsCollection.syncCache();
+		}
+	}
+
+	private void removeKeyCodeFromPreviousAssignment(int keyCode) {
 		KeyAssignment previousAssignment = assignmentsCollection.findByKeyCode(keyCode);
 		if (previousAssignment != null) {
 			previousAssignment.removeKeyCode(keyCode);
-			if (!Objects.equals(assignment.getId(), previousAssignment.getId()) && !previousAssignment.hasKeyCodes()) {
-				removeKeyAssignmentCompletely(previousAssignment.getId());
-			}
 		}
 	}
 
-	public void removeKeyAssignmentCompletely(@NonNull String assignmentId) {
+	public void clearAssignmentKeyCodes(@NonNull String assignmentId) {
 		KeyAssignment assignment = assignmentsCollection.findById(assignmentId);
 		if (assignment != null) {
-			assignmentsCollection.getAssignments().remove(assignment);
+			assignment.clearKeyCodes();
 			assignmentsCollection.syncCache();
 		}
 	}
 
-	public void saveUpdatedAssignmentsList(@NonNull List<KeyAssignment> assignments) {
-		assignmentsCollection.setAssignments(assignments);
-		assignmentsCollection.syncCache();
-	}
-
-	public void clearAllAssignments() {
-		assignmentsCollection.getAssignments().clear();
+	public void resetAllAssignments() {
+		for (KeyAssignment assignment : assignmentsCollection.getAllAssignments()) {
+			assignment.clearKeyCodes();
+		}
 		assignmentsCollection.syncCache();
 	}
 
@@ -117,13 +105,13 @@ public class CustomInputDeviceProfile extends InputDeviceProfile {
 	}
 
 	@NonNull
-	public JSONObject toJson(@NonNull OsmandApplication app) throws JSONException {
+	public JSONObject toJson() throws JSONException {
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("id", customId);
 		jsonObject.put("name", customName);
 		JSONArray jsonArray = new JSONArray();
 		for (KeyAssignment assignment : getAssignments()) {
-			jsonArray.put(assignment.toJson(app));
+			jsonArray.put(assignment.toJson());
 		}
 		jsonObject.put("assignments", jsonArray);
 		return jsonObject;

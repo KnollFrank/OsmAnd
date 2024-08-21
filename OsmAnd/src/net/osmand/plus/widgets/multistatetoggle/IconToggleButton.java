@@ -1,13 +1,11 @@
 package net.osmand.plus.widgets.multistatetoggle;
 
 import android.graphics.drawable.Drawable;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.annotation.ColorInt;
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 
 import net.osmand.plus.OsmandApplication;
@@ -32,52 +30,37 @@ public class IconToggleButton extends MultiStateToggleButton<IconRadioItem> {
 	                            @NonNull IconRadioItem item) {
 		if (item.isUseDefaultColor()) {
 			ImageView ivIcon = view.findViewById(R.id.icon);
-			ivIcon.setImageDrawable(uiUtilities.getIcon(item.getIconId(false)));
+			ivIcon.setImageDrawable(uiUtilities.getIcon(item.getIconId()));
 		}
 	}
 
 	@Override
-	protected void updateItemView(@NonNull ViewGroup view, @NonNull IconRadioItem item,
-								  boolean selected, @ColorInt int color) {
+	protected void updateItemView(@NonNull ViewGroup view,
+	                              @NonNull IconRadioItem item,
+	                              @ColorInt int color) {
 		if (!item.isUseDefaultColor()) {
 			ImageView ivIcon = view.findViewById(R.id.icon);
-			Drawable icon = uiUtilities.getPaintedIcon(item.getIconId(selected), color);
+			Drawable icon = uiUtilities.getPaintedIcon(item.getIconId(), color);
 			ivIcon.setImageDrawable(icon);
 		}
 	}
 
-	@Override
-	protected View getBorderBackgroundView(@NonNull ViewGroup button) {
-		return button.findViewById(R.id.background_border);
-	}
-
 	public static class IconRadioItem extends RadioItem {
 
-		static final int INVALID_ID = -1;
-
 		private final int iconId;
-		private int selectedIconId = INVALID_ID;
-		private boolean useDefaultColor;
+		private final boolean useDefaultColor;
 
 		public IconRadioItem(int iconId) {
+			this(iconId, false);
+		}
+
+		public IconRadioItem(int iconId, boolean useDefaultColor) {
 			this.iconId = iconId;
+			this.useDefaultColor = useDefaultColor;
 		}
 
-		@NonNull
-		public IconRadioItem setSelectedIconId(@DrawableRes int selectedIconId) {
-			this.selectedIconId = selectedIconId;
-			return this;
-		}
-
-		@NonNull
-		public IconRadioItem setUseDefaultColor() {
-			this.useDefaultColor = true;
-			return this;
-		}
-
-		@DrawableRes
-		public int getIconId(boolean selected) {
-			return selected && selectedIconId != INVALID_ID ? selectedIconId : iconId;
+		public int getIconId() {
+			return iconId;
 		}
 
 		public boolean isUseDefaultColor() {

@@ -24,8 +24,7 @@ public class NavRemoveNextDestination extends QuickAction {
 			.nameRes(R.string.quick_action_remove_next_destination)
 			.iconRes(R.drawable.ic_action_navigation_skip_destination)
 			.nonEditable()
-			.category(QuickActionType.NAVIGATION)
-			.nameActionRes(R.string.shared_string_remove);
+			.category(QuickActionType.NAVIGATION);
 
 	public NavRemoveNextDestination() {
 		super(TYPE);
