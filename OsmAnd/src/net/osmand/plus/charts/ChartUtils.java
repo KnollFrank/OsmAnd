@@ -85,7 +85,7 @@ public class ChartUtils {
 		int labelsColor = ContextCompat.getColor(context, R.color.text_color_secondary_light);
 		int yAxisGridColor = AndroidUtils.getColorFromAttr(context, R.attr.chart_grid_line_color);
 		Typeface typeface = FontCache.getFont(context, context.getString(R.string.font_roboto_medium));
-		chart.setupGPXChart(markerView, topOffset, bottomOffset, labelsColor, yAxisGridColor, typeface, useGesturesAndScale);
+		// FK-FIXME: enable again: chart.setupGPXChart(markerView, topOffset, bottomOffset, labelsColor, yAxisGridColor, typeface, useGesturesAndScale);
 	}
 
 	private static float setupAxisDistance(OsmandApplication ctx, AxisBase axisBase, double meters) {
