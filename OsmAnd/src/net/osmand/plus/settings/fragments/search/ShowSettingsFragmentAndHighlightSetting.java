@@ -5,7 +5,6 @@ import static net.osmand.plus.settings.fragments.search.YOffsetOfChildWithinCont
 import android.view.View;
 import android.widget.ListView;
 
-import androidx.annotation.IdRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -32,8 +31,8 @@ class ShowSettingsFragmentAndHighlightSetting implements de.KnollFrank.lib.setti
 
 	private final de.KnollFrank.lib.settingssearch.results.ShowSettingsFragmentAndHighlightSetting delegate;
 
-	public ShowSettingsFragmentAndHighlightSetting(final @IdRes int fragmentContainerViewId) {
-		delegate = new DefaultShowSettingsFragmentAndHighlightSetting(fragmentContainerViewId);
+	public ShowSettingsFragmentAndHighlightSetting() {
+		delegate = new DefaultShowSettingsFragmentAndHighlightSetting();
 	}
 
 	@Override
