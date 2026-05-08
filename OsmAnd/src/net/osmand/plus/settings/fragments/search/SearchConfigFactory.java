@@ -2,10 +2,14 @@ package net.osmand.plus.settings.fragments.search;
 
 import androidx.annotation.IdRes;
 import androidx.fragment.app.FragmentActivity;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.uiautomator.UiDevice;
 
 import net.osmand.plus.settings.backend.preferences.OsmandPreference;
 
 import de.KnollFrank.lib.settingssearch.client.SearchConfig;
+import de.KnollFrank.lib.settingssearch.common.Keyboard;
+import de.KnollFrank.lib.settingssearch.fragment.Activities;
 
 class SearchConfigFactory {
 
@@ -17,7 +21,10 @@ class SearchConfigFactory {
 						PreferencePathDisplayerFactory.getApplicationModeKeys(),
 						availableAppModes);
 		return SearchConfig
-				.builder(fragmentContainerViewId, fragmentActivity)
+				.builder(
+						fragmentContainerViewId,
+						fragmentActivity,
+						SearchConfigFactory::navigateToInitialPreferenceScreen)
 				.withQueryHint("Search Settings")
 				.withSearchResultsFilter(searchResultsFilter)
 				.withPreferencePathDisplayer(PreferencePathDisplayerFactory.createPreferencePathDisplayer(fragmentActivity))
@@ -25,5 +32,15 @@ class SearchConfigFactory {
 				.withSearchResultsFragmentUI(new SearchResultsFragmentUI())
 				.withShowSettingsFragmentAndHighlightSetting(new ShowSettingsFragmentAndHighlightSetting())
 				.build();
+	}
+
+	private static void navigateToInitialPreferenceScreen(final UiDevice device) {
+		Activities
+				.getCurrentActivity()
+				.ifPresent(activity ->
+						InstrumentationRegistry
+								.getInstrumentation()
+								.runOnMainSync(() -> Keyboard.hideKeyboard(activity)));
+		device.pressBack();
 	}
 }
