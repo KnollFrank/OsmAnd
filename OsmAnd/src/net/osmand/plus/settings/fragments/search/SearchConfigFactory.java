@@ -2,14 +2,11 @@ package net.osmand.plus.settings.fragments.search;
 
 import androidx.annotation.IdRes;
 import androidx.fragment.app.FragmentActivity;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.uiautomator.UiDevice;
 
 import net.osmand.plus.settings.backend.preferences.OsmandPreference;
 
 import de.KnollFrank.lib.settingssearch.client.SearchConfig;
 import de.KnollFrank.lib.settingssearch.common.Keyboard;
-import de.KnollFrank.lib.settingssearch.fragment.Activities;
 
 class SearchConfigFactory {
 
@@ -24,7 +21,7 @@ class SearchConfigFactory {
 				.builder(
 						fragmentContainerViewId,
 						fragmentActivity,
-						SearchConfigFactory::navigateToInitialPreferenceScreen)
+						() -> navigateToInitialPreferenceScreen(fragmentActivity))
 				.withQueryHint("Search Settings")
 				.withSearchResultsFilter(searchResultsFilter)
 				.withPreferencePathDisplayer(PreferencePathDisplayerFactory.createPreferencePathDisplayer(fragmentActivity))
@@ -34,13 +31,10 @@ class SearchConfigFactory {
 				.build();
 	}
 
-	private static void navigateToInitialPreferenceScreen(final UiDevice device) {
-		Activities
-				.getCurrentActivity()
-				.ifPresent(activity ->
-						InstrumentationRegistry
-								.getInstrumentation()
-								.runOnMainSync(() -> Keyboard.hideKeyboard(activity)));
-		device.pressBack();
+	private static void navigateToInitialPreferenceScreen(final FragmentActivity fragmentActivity) {
+		fragmentActivity.runOnUiThread(() -> {
+			Keyboard.hideKeyboard(fragmentActivity);
+			fragmentActivity.getOnBackPressedDispatcher().onBackPressed();
+		});
 	}
 }
