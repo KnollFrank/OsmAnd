@@ -147,8 +147,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import btools.routingapp.BRouterServiceConnection;
 import btools.routingapp.IBRouterService;
+import de.KnollFrank.lib.settingssearch.common.uicontroller.CurrentActivityProvider;
 import de.KnollFrank.lib.settingssearch.db.preference.db.PreferencesDatabaseManager;
-import de.KnollFrank.lib.settingssearch.fragment.CurrentActivityProvider;
 
 public class OsmandApplication extends MultiDexApplication {
 
